@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import Deutsch from './de.jsx';
+import Chinese from './ch.jsx';
 import English from './en.jsx';
 import French from './fr.jsx';
 import Japanese from './jp.jsx';
@@ -15,6 +16,9 @@ function dict(item) {
     switch (lang) {
     case "en":
         return English[item];
+
+     case "ch":
+            return Chinese[item];
 
     case "es":
         return Spanish[item];
