@@ -585,12 +585,12 @@ const Portuguese = {
     <>Mostrar linha { from } a { to } de { size }</>,
 
     "Select a language":"Selecionar idioma",
+    "Chinese" :"chinês",
     "English":"Inglês",
     "Deutsch":"Alemão",
     "Spanish": "Espanhol",
     "Portuguese": "Português",
     "French": "Francês",
-    "Japanese": "Japonês",
 
     "Type":"Tipo",
     "Export notebooks":"Exportar notebooks",
