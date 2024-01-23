@@ -4,7 +4,6 @@ import Deutsch from './de.jsx';
 import Chinese from './ch.jsx';
 import English from './en.jsx';
 import French from './fr.jsx';
-import Japanese from './jp.jsx';
 import Portuguese from './por.jsx';
 import Spanish from './es.jsx';
 import Vietnamese from './vi.jsx';
@@ -31,9 +30,6 @@ function dict(item) {
 
     case "fr":
         return French[item];
-
-    case "jp":
-        return Japanese[item];
 
     case "vi":
         return Vietnamese[item];
