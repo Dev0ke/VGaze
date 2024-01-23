@@ -583,12 +583,13 @@ const Spanish = {
     <>Mostrar línea { from } a { to } de { size }</>,
 
     "Select a language":"Seleccione un idioma",
+    "Chinese" :"Chino",
     "English":"Inglés",
     "Deutsch":"Alemán",
     "Spanish": "Español",
     "Portuguese": "Portugués",
     "French": "Francés",
-    "Japanese": "Japonés",
+
 
     "Type":"Tipo",
     "Export notebooks":"Exportar bloc de notas",
