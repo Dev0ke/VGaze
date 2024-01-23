@@ -582,12 +582,12 @@ const Deutsch = {
     <>Zeigt Zeile { from } bis { to } von { size }</>,
 
     "Select a language":"Sprache auswählen",
+    "Chinese" :"Chinesisch",
     "English":"Englisch",
     "Deutsch":"Deutsch",
     "Spanish": "Spanisch",
     "Portuguese": "Portugiesisch",
     "French": "Französisch",
-    "Japanese": "Japanisch",
 
     "Type":"Typ",
     "Export notebooks":"Notizbücher exportieren",
