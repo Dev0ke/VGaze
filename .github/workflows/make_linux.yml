@@ -19,6 +19,6 @@ jobs:
     - name: make gui
       run: cd gui/velociraptor/ && make build
     - name: make bin
-      run: make linux
+      run: export PATH=/go/bin:$PATH && make linux
 
 
