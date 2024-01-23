@@ -565,7 +565,6 @@ const Chinese = {
 
     "Select a language":"选择语言",
     "Chinese" :"汉语",
-    "Japanese": "日语",
     "English":"英語",
     "Deutsch":"德语",
     "Spanish": "西班牙语",
