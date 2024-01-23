@@ -588,12 +588,13 @@ const French = {
     <>Afficher la ligne { from } à { to } de { size }</>,
 
     "Select a language":"Sélectionner la langue",
+    "Chinese" :"Chinois",
     "English":"Anglais",
     "Deutsch":"Allemand",
     "Spanish":"Espagnol",
     "Portuguese":"Portugais",
     "French":"Français",
-    "Japanese": "Japonais",
+ 
 
     "Type":"Type",
     "Export notebooks":"Exporter les carnets de notes",
