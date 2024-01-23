@@ -7,7 +7,7 @@ import humanizeDuration from "humanize-duration";
 
 import automated from "./jp.json";
 
-const Japanese = {
+const Chinese = {
     "SEARCH_CLIENTS": "客户端搜索",
     "Quarantine description": (<>
           <p>试图隔离这台主机</p>
