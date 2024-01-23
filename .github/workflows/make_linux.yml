@@ -1,0 +1,24 @@
+name: make linux
+
+on:
+  push:
+    branches: [ "master","Dev0ke" ]
+  pull_request:
+    branches: [ "master","Dev0ke" ]
+  release:
+    types: [created] # 表示在创建新的 Release 时触发
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: gui
+      run: cd gui/velociraptor/ && npm install
+    - name: make gui
+      run: make build
+    - name: make bin
+      run: make linux
+
+
