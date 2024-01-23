@@ -5,7 +5,7 @@ import React from 'react';
 import Alert from 'react-bootstrap/Alert';
 import humanizeDuration from "humanize-duration";
 
-import automated from "./jp.json";
+import automated from "./ch.json";
 
 const Chinese = {
     "SEARCH_CLIENTS": "客户端搜索",
