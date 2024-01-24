@@ -28,6 +28,9 @@ import Snackbar from './components/core/snackbar.jsx';
 import Welcome from './components/welcome/welcome.jsx';
 import LoginPage from './components/welcome/login.jsx';
 import LogoffPage from './components/welcome/logoff.jsx';
+import Overview from './components/core/overview.jsx'
+import ExceptionDetails from './components/core/exception-details.jsx';
+import AppRecords from './components/core/app-records.jsx';
 import KeyboardHelp from './components/core/keyboard-help.jsx';
 import { UserSettings } from './components/core/user.jsx';
 import { ContextMenuPopup } from './components/utils/context.jsx';
@@ -66,191 +69,201 @@ import './themes/midnight.css';
 */
 
 class App extends Component {
-    static propTypes = {
-        history: PropTypes.any,
+  static propTypes = {
+    history: PropTypes.any,
+  }
+
+  state = {
+    client: {},
+
+    // The file listing in the current directory.
+    current_node: {},
+
+    // The current row within the current node that is selected.
+    selected_row: {},
+
+    query: "",
+    query_version: "",
+  }
+
+  // Called to update the current client.
+  setClient = (client) => {
+    this.setState({ client: client });
+  };
+
+  setClientSearch = (query) => {
+    let now = new Date();
+    this.setState({ query: query, query_version: now.getTime() });
+    this.props.history.push('/search/' + (query || "all"));
+  };
+
+  updateCurrentNode = (node) => {
+    this.setState({ current_node: node });
+  }
+
+  // Renders the entire app as normal.
+  renderApp() {
+    // We need to prepare a vfs_path for the navigator to link
+    // to. Depending on the current node, we make a link with or
+    // without a final "/".
+    let vfs_path = "/";
+    if (this.state.current_node && this.state.current_node.path) {
+      let path = [...this.state.current_node.path];
+      let name = this.state.current_node.selected && this.state.current_node.selected.Name;
+      if (name) {
+        path.push(name);
+        vfs_path = Join(path);
+      } else {
+        vfs_path = Join(path) + "/";
+      }
     }
 
-    state = {
-        client: {},
+    return <div>
+      <Navbar fixed="top" className="main-navbar justify-content-between">
+        <div className="navigator-left-side form-inline">
+          <VeloNavigator
+            vfs_path={vfs_path}
+            client={this.state.client} />
 
-        // The file listing in the current directory.
-        current_node: {},
-
-        // The current row within the current node that is selected.
-        selected_row: {},
-
-        query: "",
-        query_version: "",
-    }
-
-    // Called to update the current client.
-    setClient = (client) => {
-        this.setState({client: client});
-    };
-
-    setClientSearch = (query) => {
-        let now = new Date();
-        this.setState({query: query, query_version: now.getTime()});
-        this.props.history.push('/search/' + (query || "all"));
-    };
-
-    updateCurrentNode = (node) => {
-        this.setState({current_node: node});
-    }
-
-    // Renders the entire app as normal.
-    renderApp() {
-        // We need to prepare a vfs_path for the navigator to link
-        // to. Depending on the current node, we make a link with or
-        // without a final "/".
-        let vfs_path = "/";
-        if (this.state.current_node && this.state.current_node.path) {
-            let path = [...this.state.current_node.path];
-            let name = this.state.current_node.selected && this.state.current_node.selected.Name;
-            if (name) {
-                path.push(name);
-                vfs_path = Join(path);
-            } else {
-                vfs_path = Join(path) + "/";
-            }
-        }
-
-        return <div>
-                 <Navbar fixed="top" className="main-navbar justify-content-between">
-                   <div className="navigator-left-side form-inline">
-                     <VeloNavigator
-                       vfs_path={vfs_path}
-                       client={this.state.client} />
-
-                     <VeloClientSearch
-                       setSearch={this.setClientSearch}
-                     />
-                   </div>
-                   <VeloClientSummary
-                     setClient={this.setClient}
-                     client={this.state.client}/>
-                   <UserLabel className="navbar-text"/>
-                 </Navbar>
-                 <div id="content">
-                   <Switch>
-                     <Route path="/dashboard">
-                       <UserDashboard />
-                     </Route>
-                     <Route exact path="/" component={Welcome}/>
-                     <Route exact path="/welcome" component={Welcome}/>
-                     <Route path="/search/:query?">
-                       <VeloClientList
-                         setSearch={this.setClientSearch}
-                         version={this.state.query_version}
-                         query={this.state.query}
-                         setClient={this.setClient}
-                       />
-                     </Route>
-                     <Route path="/artifacts/:artifact?">
-                       <ArtifactInspector client={this.state.client}/>
-                     </Route>
-                     <Route path="/users/:user?" component={UserInspector}/>
-                     <Route path="/hunts/:hunt_id?/:tab?">
-                       <VeloHunts/>
-                     </Route>
-                     <Route path="/host/:client_id([^/]{7,})/:action?">
-                       <ClientSetterFromRoute
-                         client={this.state.client}
-                         setClient={this.setClient} />
-                       <VeloHostInfo
-                         client={this.state.client}
-                         setClient={this.setClient}
-                       />
-                     </Route>
-                     <Route path="/host/:client_id(server)/:action?">
-                       <ServerInfo  />
-                     </Route>
-                     <Route path="/vfs/:client_id/:vfs_path(.*)">
-                       <ClientSetterFromRoute client={this.state.client} setClient={this.setClient} />
-                       <VFSViewer client={this.state.client}
-                                  selectedRow={this.state.selected_row}
-                                  updateCurrentNode={this.updateCurrentNode}
-                                  node={this.state.current_node}
-                                  vfs_path={this.state.vfs_path} />
-                     </Route>
-                     {/* ClientFlowsView will only be invoked when the
+          <VeloClientSearch
+            setSearch={this.setClientSearch}
+          />
+        </div>
+        <VeloClientSummary
+          setClient={this.setClient}
+          client={this.state.client} />
+        <UserLabel className="navbar-text" />
+      </Navbar>
+      <div id="content">
+        <Switch>
+          <Route path="/dashboard">
+            <UserDashboard />
+          </Route>
+          <Route exact path="/" component={Welcome} />
+          <Route exact path="/welcome" component={Welcome} />
+          <Route path="/search/:query?">
+            <VeloClientList
+              setSearch={this.setClientSearch}
+              version={this.state.query_version}
+              query={this.state.query}
+              setClient={this.setClient}
+            />
+          </Route>
+          <Route path="/artifacts/:artifact?">
+            <ArtifactInspector client={this.state.client} />
+          </Route>
+          <Route path="/users/:user?" component={UserInspector} />
+          <Route path="/hunts/:hunt_id?/:tab?">
+            <VeloHunts />
+          </Route>
+          <Route path="/host/:client_id([^/]{7,})/:action?">
+            <ClientSetterFromRoute
+              client={this.state.client}
+              setClient={this.setClient} />
+            <VeloHostInfo
+              client={this.state.client}
+              setClient={this.setClient}
+            />
+          </Route>
+          <Route path="/host/:client_id(server)/:action?">
+            <ServerInfo />
+          </Route>
+          <Route path="/vfs/:client_id/:vfs_path(.*)">
+            <ClientSetterFromRoute client={this.state.client} setClient={this.setClient} />
+            <VFSViewer client={this.state.client}
+              selectedRow={this.state.selected_row}
+              updateCurrentNode={this.updateCurrentNode}
+              node={this.state.current_node}
+              vfs_path={this.state.vfs_path} />
+          </Route>
+          {/* ClientFlowsView will only be invoked when the
                        * client looks like a client id - the
                        * ServerFlowsView is invoked when client_id ==
                        * "server". For now we assume the client_id is
                        * longer than 7 chars
                        */}
-                     <Route path="/collected/:client_id([^/]{7,})/:flow_id?/:tab?">
-                       <ClientSetterFromRoute client={this.state.client} setClient={this.setClient} />
-                       <ClientFlowsView client={this.state.client} />
-                     </Route>
-                     <Route path="/collected/server/:flow_id?/:tab?">
-                       <ServerFlowsView />
-                     </Route>
-                     <Route path="/notebooks/:notebook_id?">
-                       <Notebook />
-                     </Route>
-                     <Route path="/events/:client_id([^/]{7,})/:artifact?/:time?">
-                       <ClientSetterFromRoute client={this.state.client} setClient={this.setClient} />
-                       <EventMonitoring client={this.state.client}/>
-                     </Route>
-                     <Route path="/events/server/:artifact?/:time?">
-                       <EventMonitoring client={{client_id: ""}}/>
-                     </Route>
-                   </Switch>
-                 </div>
-                 <Navbar fixed="bottom" className="app-footer justify-content-between ">
-                   <Nav></Nav>
-                   <Nav>
-                     <VeloLiveClock className="float-right" />
-                     <Snackbar />
-                   </Nav>
-                 </Navbar>
-               </div>;
+          <Route path="/collected/:client_id([^/]{7,})/:flow_id?/:tab?">
+            <ClientSetterFromRoute client={this.state.client} setClient={this.setClient} />
+            <ClientFlowsView client={this.state.client} />
+          </Route>
+          <Route path="/collected/server/:flow_id?/:tab?">
+            <ServerFlowsView />
+          </Route>
+          <Route path="/notebooks/:notebook_id?">
+            <Notebook />
+          </Route>
+          <Route path="/events/:client_id([^/]{7,})/:artifact?/:time?">
+            <ClientSetterFromRoute client={this.state.client} setClient={this.setClient} />
+            <EventMonitoring client={this.state.client} />
+          </Route>
+          <Route path="/events/server/:artifact?/:time?">
+            <EventMonitoring client={{ client_id: "" }} />
+          </Route>
+
+          {/* <Route exact path="/overview" component={Overview}/> */}
+          <Route path="/overview">
+            <Overview />
+          </Route>
+          <Route exact path="/exception-details" >
+            <ExceptionDetails />
+          </Route>
+          <Route exact path="/app-records" component={AppRecords} />
+
+        </Switch>
+      </div>
+      <Navbar fixed="bottom" className="app-footer justify-content-between ">
+        <Nav></Nav>
+        <Nav>
+          <VeloLiveClock className="float-right" />
+          <Snackbar />
+        </Nav>
+      </Navbar>
+    </div>;
+  }
+
+  renderMainPage() {
+    return (
+      <div>
+        <UserSettings>
+          <SnackbarProvider>
+            <SidebarKeyNavigator client={this.state.client} />
+            <Switch>
+              <Route path="/fullscreen/notebooks/:notebook_id">
+                <FullScreenNotebook />
+              </Route>
+              <Route path="/fullscreen/hunts/:hunt_id/notebook">
+                <FullScreenHuntNotebook />
+              </Route>
+              <Route path="/fullscreen/collected/:client_id/:flow_id/notebook">
+                <FullScreenFlowNotebook />
+              </Route>
+              <Route>
+                {this.renderApp()}
+              </Route>
+            </Switch>
+            <KeyboardHelp />
+          </SnackbarProvider>
+          <ContextMenuPopup />
+        </UserSettings>
+      </div>
+    );
+  };
+
+  render() {
+    // This is an error injected into the main page by the server
+    // template renderer. We pick it up from here and override
+    // rendering the main page with this special login page.
+    if (window.ErrorState) {
+      if (window.ErrorState.Type === "Login") {
+        return <LoginPage />;
+      }
+      if (window.ErrorState.Type === "Logoff") {
+        return <LogoffPage />;
+      }
     }
 
-    renderMainPage() {
-        return (
-            <div>
-              <UserSettings>
-                <SnackbarProvider>
-                  <SidebarKeyNavigator client={this.state.client}/>
-                  <Switch>
-                    <Route path="/fullscreen/notebooks/:notebook_id">
-                      <FullScreenNotebook />
-                    </Route>
-                    <Route path="/fullscreen/hunts/:hunt_id/notebook">
-                      <FullScreenHuntNotebook />
-                    </Route>
-                    <Route path="/fullscreen/collected/:client_id/:flow_id/notebook">
-                      <FullScreenFlowNotebook />
-                    </Route>
-                    <Route>
-                      { this.renderApp() }
-                    </Route>
-                  </Switch>
-                  <KeyboardHelp />
-                </SnackbarProvider>
-                <ContextMenuPopup/>
-              </UserSettings>
-            </div>
-        );
-    };
-
-    render() {
-        // This is an error injected into the main page by the server
-        // template renderer. We pick it up from here and override
-        // rendering the main page with this special login page.
-        if (window.ErrorState) {
-            if (window.ErrorState.Type === "Login") {
-                return <LoginPage/>;
-            }
-            if (window.ErrorState.Type === "Logoff") {
-                return <LogoffPage/>;
-            }
-        }
-
-        return this.renderMainPage();
-    };
+    return this.renderMainPage();
+  };
 }
 
 export default withRouter(App);
