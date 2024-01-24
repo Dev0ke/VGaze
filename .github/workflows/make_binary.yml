@@ -9,7 +9,7 @@ on:
     types: [created,published] # 表示在创建新的 Release 时触发
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
     - uses: actions/checkout@v4
@@ -26,13 +26,14 @@ jobs:
     - name: go mod
       run : go mod tidy
       
-    - name: make bin
+    - name: make linux
       run: export PATH=/go/bin:$PATH && make linux
+      
+    - name: make windows
+      run: export PATH=/go/bin:$PATH && make windows    
       
     - name: Archive binary
       uses: actions/upload-artifact@v4
       with:
         name: linux-bin
         path: output/velociraptor-v0.7.1-linux-amd64
-
-
