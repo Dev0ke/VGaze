@@ -29,6 +29,9 @@ jobs:
     - name: make linux
       run: export PATH=/go/bin:$PATH && make linux
       
+    - name: install dependency for windows compile
+      run : sudo apt-get install mingw-w64-x86-64-dev gcc-mingw-w64-x86-64 gcc-mingw-w64
+      
     - name: make windows
       run: export PATH=/go/bin:$PATH && make windows    
       
