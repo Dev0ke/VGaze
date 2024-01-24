@@ -33,4 +33,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: linux-bin
-        path: output/
+        path: output/velociraptor-v0.7.1-linux-amd64
