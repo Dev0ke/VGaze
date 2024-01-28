@@ -12,15 +12,7 @@ var (
 		"nobanner", "Suppress the Velociraptor banner").Bool()
 )
 
-var banner = `
-<green> _    __     __           _                  __
-<green>| |  / /__  / /___  _____(_)________ _____  / /_____  _____
-<green>| | / / _ \/ / __ \/ ___/ / ___/ __ ` + "`" + `/ __ \/ __/ __ \/ ___/
-<green>| |/ /  __/ / /_/ / /__/ / /  / /_/ / /_/ / /_/ /_/ / /
-<green>|___/\___/_/\____/\___/_/_/   \__,_/ .___/\__/\____/_/
-<green>                                  /_/
-<red>Digging deeper!                  <cyan>https://www.velocidex.com
-`
+var banner = ``
 
 func doBanner() {
 	if *nobanner_flag {
