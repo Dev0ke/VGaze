@@ -26,6 +26,6 @@ func doBanner() {
 
 	version := config.GetVersion()
 
-	logging.Prelog("<yellow>This is Velociraptor %v built on %v (%v)", version.Version,
+	logging.Prelog("<yellow>This is SecurityP %v built on %v (%v)", version.Version,
 		version.BuildTime, version.Commit)
 }
