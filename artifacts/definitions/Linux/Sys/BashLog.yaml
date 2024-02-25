@@ -1,0 +1,25 @@
+name: linux.sys.log
+author: dala_cheng- @mgreen27
+description: |
+Read the command line records in the linux virtual machine after script recording and secondary processing.
+In actual use, you need to change the search directory.
+type: CLIENT
+
+parameters:
+  - name: File
+    default: "/home/ylwjl/*.log" 
+  - name: HostnameRegex
+    description: "Hostname target Regex in Hostsfile"
+    default: .
+    type: regex
+
+  - name: ResolutionRegex
+    description: "Resolution target Regex in Hostsfile"
+    default: .
+    type: regex
+
+sources:
+  - query: |
+        SELECT * FROM parse_records_with_regex(
+        file=File,regex='(?sm)^XRECORDSTART(?P<Record>.+?)XRECORDEND')
+        
