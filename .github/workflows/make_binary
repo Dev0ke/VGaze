@@ -1,0 +1,42 @@
+name: make linux
+
+on:
+  push:
+    branches: [ "yuhua" ]
+  pull_request:
+    branches: [ "yuhua" ]
+  release:
+    types: [created,published] # 表示在创建新的 Release 时触发
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.3' # The Go version to download (if necessary) and use.
+        
+    - name: gui
+      run: cd gui/velociraptor/ && npm install
+      
+    - name: make gui
+      run: cd gui/velociraptor/ && make build
+      
+    - name: go mod
+      run : go mod tidy
+      
+(*     - name: make linux
+      run: export PATH=/go/bin:$PATH && make linux *)
+      
+    - name: install dependency for windows compile
+      run : sudo apt-get install mingw-w64-x86-64-dev gcc-mingw-w64-x86-64 gcc-mingw-w64
+      
+    - name: make windows
+      run: export PATH=/go/bin:$PATH && make windows    
+      
+    - name: Archive binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: binary
+        path: output/
