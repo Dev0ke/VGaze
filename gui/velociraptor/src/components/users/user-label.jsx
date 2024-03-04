@@ -279,13 +279,8 @@ class UserSettings extends React.PureComponent {
                                           lang: e.currentTarget.value,
                                       });
                                   }}>
-                      <option value="en">{T("English")}</option>
-                      <option value="de">{T("Deutsch")}</option>
-                      <option value="es">{T("Spanish")}</option>
-                      <option value="por">{T("Portuguese")}</option>
-                      <option value="fr">{T("French")}</option>
+                      <option value="en">{T("English")}</option> 
                       <option value="ch">{T("Chinese")}</option>
-                      <option value="vi">{T("Vietnamese")}</option>
                     </Form.Control>
                   </Col>
                 </Form.Group>
