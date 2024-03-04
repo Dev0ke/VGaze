@@ -1,12 +1,7 @@
 import _ from 'lodash';
 
-import Deutsch from './de.jsx';
 import Chinese from './ch.jsx';
 import English from './en.jsx';
-import French from './fr.jsx';
-import Portuguese from './por.jsx';
-import Spanish from './es.jsx';
-import Vietnamese from './vi.jsx';
 
 const debug = false;
 
@@ -19,23 +14,8 @@ function dict(item) {
      case "ch":
             return Chinese[item];
 
-    case "es":
-        return Spanish[item];
-
-    case "por":
-        return Portuguese[item];
-
-    case "de":
-        return Deutsch[item];
-
-    case "fr":
-        return French[item];
-
-    case "vi":
-        return Vietnamese[item];
-
     default:
-        return English[item];
+        return ch[item];
     }
 };
 
