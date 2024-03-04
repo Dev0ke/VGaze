@@ -566,10 +566,6 @@ const Chinese = {
     "Select a language":"选择语言",
     "Chinese" :"汉语",
     "English":"英語",
-    "Deutsch":"德语",
-    "Spanish": "西班牙语",
-    "Portuguese": "葡萄牙语",
-    "French": "法语",
 
     "Type":"类型",
     "Export notebooks":"笔记的导出",
