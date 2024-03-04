@@ -6,13 +6,14 @@ import English from './en.jsx';
 const debug = false;
 
 function dict(item) {
-    let lang = (window.globals && window.globals.lang) || "en";
+    let lang = (window.globals && window.globals.lang) || "ch";
     switch (lang) {
-    case "en":
-        return English[item];
 
      case "ch":
             return Chinese[item];
+            
+    case "en":
+           return English[item];
 
     default:
         return ch[item];
@@ -24,7 +25,7 @@ function T(item, ...args) {
     let d = dict(item);
 
     if(_.isUndefined(d)) {
-        if (debug && lang !== "en") {
+        if (debug && lang !== "ch") {
             let x = window.globals.dict || {};
             x[item] = item;
             window.globals["dict"] = x;
@@ -34,7 +35,7 @@ function T(item, ...args) {
         // If there is no specific translation in the target language
         // we use the English one, and failing that the name of the
         // item directly.
-        d = English[item] || item;
+        d = Chinese[item] || item;
     }
     if (typeof d === 'function') {
         return d.call(null, ...args);
