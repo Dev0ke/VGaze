@@ -38,7 +38,7 @@ import (
 type CommandHandler func(command string) bool
 
 var (
-	app = kingpin.New("velociraptor",
+	app = kingpin.New("VGaze",
 		"An advanced incident response and monitoring agent.")
 
 	config_path = app.Flag("config", "The configuration file.").
