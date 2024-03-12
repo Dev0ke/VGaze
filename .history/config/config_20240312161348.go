@@ -123,7 +123,7 @@ func GetDefaultConfig() *config_proto.Config {
 				// 	NewTab:  true,
 				// 	Type:    "sidebar",
 				// 	IconUrl: VeloIconDataURL,
-				// },
+				// }, 
 			},
 		},
 		CA: &config_proto.CAConfig{},

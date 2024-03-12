@@ -46,7 +46,7 @@ func doConfigFrontend() error {
 	doit := false
 	err = survey.AskOne(&survey.Confirm{
 		Message: `
-Welcome to the VGaze multi-frontend configuration generator
+Welcome to the Velociraptor multi-frontend configuration generator
 ------------------------------------------------------------------
 
 Warning: This configuration is currently experiemental. Read more about

@@ -8,7 +8,7 @@ sources:
   - notebook:
     - type: markdown
       template: |
-        # Welcome to VGaze notebooks!
+        # Welcome to VGame notebooks!
 
         * Update this notebook with any VQL or markdown cells.
         * You can copy cells into this notebook from other collection or hunt notebooks.
