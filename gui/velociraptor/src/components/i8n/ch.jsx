@@ -605,7 +605,7 @@ const Chinese = {
 
     // Below need verification
     "Role_administrator" : "服务器管理员",
-     "Role_org_admin" : "组织管理者",
+     "Role_org_admin" : "组管理者",
      "Role_reader" : "只读用户",
      "Role_analyst" : "分析师",
      "Role_investigator" : "捜査官",
@@ -625,7 +625,7 @@ const Chinese = {
      "Perm_EXECVE" : "EXECVE",
      "Perm_NOTEBOOK_EDITOR": "笔记编辑器",
      "Perm_SERVER_ADMIN": "服务器管理员",
-     "Perm_ORG_ADMIN": "组织管理者",
+     "Perm_ORG_ADMIN": "组管理者",
      "Perm_IMPERSONATION": "伪装",
      "Perm_FILESYSTEM_READ": "读取文件系统",
      "Perm_FILESYSTEM_WRITE": "文件系统写入",
@@ -647,7 +647,7 @@ const Chinese = {
      "ToolPerm_EXECVE": "允许客户端执行任何命令",
      "ToolPerm_NOTEBOOK_EDITOR": "允许修改笔记和单元格",
      "ToolPerm_SERVER_ADMIN": "允许管理服务器配置",
-     "ToolPerm_ORG_ADMIN": "组织的管理许可",
+     "ToolPerm_ORG_ADMIN": "组的管理许可",
      "ToolPerm_IMPERSONATION": "允许用户在 query()插件中指定另一个用户名",
      "ToolPerm_FILESYSTEM_READ": "可以从文件系统读取任何文件",
      "ToolPerm_FILESYSTEM_WRITE": "允许在文件系统中创建文件",
