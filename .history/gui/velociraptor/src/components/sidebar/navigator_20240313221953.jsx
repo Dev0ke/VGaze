@@ -132,7 +132,7 @@ class VeloNavigator extends Component {
                           {T("View Artifacts")}
                         </NavLink>
                       </li>
-                      
+
                       {/* Add Exception Records Link */}
                       <li className="nav-link">
                         <NavLink to="/exception-records">
@@ -310,13 +310,6 @@ class VeloNavigator extends Component {
                               rel="noreferrer"
                               target={x.new_tab ? "_blank" : ""}
                             >
-                              {/* <span>
-                                <img
-                                  className="sidebar-icon"
-                                  alt=""
-                                  src={api.src_of(x.icon_url)}
-                                />
-                              </span> */}
                               {T(x.text)}
                             </a>
                           </li>
