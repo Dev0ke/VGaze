@@ -46,7 +46,7 @@ reports:
 
       {{ $time := Query "SELECT timestamp(epoch=now()) AS Now FROM scope()" | Expand }}
 
-      ## 服务器 状态 @ {{ Get $time "0.Now" }}
+      ## 服务器状态 @ {{ Get $time "0.Now" }}
 
       <p>所有前端的总数据如下.</p>
           <span class="container">
