@@ -15,10 +15,10 @@ import T from '../i8n/i8n.jsx';
 import { withRouter }  from "react-router-dom";
 
 const ranges = [
-    {desc: "Last Hour", sec: 60*60, sample: 1, rows: 400},
-    {desc: "Last Day", sec: 60*60*24, sample: 6, rows: 2000},
-    {desc: "Last 2 days", sec: 60*60*24*2, sample: 10, rows: 2000},
-    {desc: "Last Week", sec: 60*60*24*7, sample: 40, rows: 2000},
+    {desc: "最近一小时", sec: 60*60, sample: 1, rows: 400},
+    {desc: "昨天", sec: 60*60*24, sample: 6, rows: 2000},
+    {desc: "最近2天", sec: 60*60*24*2, sample: 10, rows: 2000},
+    {desc: "最近一周", sec: 60*60*24*7, sample: 40, rows: 2000},
   ];
 
 

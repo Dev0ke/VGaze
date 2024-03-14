@@ -37,7 +37,7 @@ var (
 
 	server_type_question = &survey.Select{
 		Message: `
-Welcome to the VGaze configuration generator
+Welcome to the Velociraptor configuration generator
 ---------------------------------------------------
 
 I will be creating a new deployment configuration for you. I will
