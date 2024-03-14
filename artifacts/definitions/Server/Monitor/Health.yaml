@@ -62,7 +62,7 @@ reports:
             </span>
       </span>
 
-      ## 现有机构
+      ## 现有用户组
 
       {{ Query "LET ColumnTypes <= dict(ClientConfig='url_internal') \
                 SELECT Name, OrgId, \
@@ -76,7 +76,7 @@ reports:
 
       {{ Query "SELECT * FROM Artifact.Generic.Client.DiskSpace()" | Table }}
 
-      ## 使用者
+      ## 用户
 
       {{ define "UserPermissions" }}
         SELECT name, effective_policy AS _EffectivePolicy,
