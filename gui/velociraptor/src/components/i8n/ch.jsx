@@ -177,7 +177,11 @@ const Chinese = {
     "Unlimited": "无限制",
     "rows": "行数",
     "Request sent to client": "请求已发送到客户端",
+<<<<<<< HEAD
     "Description": "搜寻描述",
+=======
+    "Description": "详细描述",
+>>>>>>> 41118336 (Update ch.jsx)
     "Created": "创建于",
     "Manually add collection to hunt": "手动添加收集到 搜寻",
     "No compatible hunts.": "没有兼容的 搜寻。",
@@ -315,17 +319,28 @@ const Chinese = {
     "date":"日期",
     "New Hunt - Configure Hunt":"新搜寻-配置搜寻",
     "Hunt description":"搜寻的描述",
+<<<<<<< HEAD
     "Modify Hunt":"修改搜寻配置",
+=======
+>>>>>>> 41118336 (Update ch.jsx)
     "Expiry":"过期时间",
     "Include Condition":"条件",
     "Run everywhere":"在全终端上运行",
     "Exclude Condition":"排除条件",
     "Configure Hunt":"搜寻配置",
+<<<<<<< HEAD
     "Estimated affected clients":"预计运行的客户端数量",
     "All Known Clients":"所有客户端",
     "1 Day actives":"一天内客户端",
     "1 Week actives":"一周内客户端",
     "1 Month actives":"一个月内客户端",
+=======
+    "Estimated affected clients":"受影响的客户端估计数",
+    "All Known Clients":"所有客户端",
+    "1 Day actives":"活动时间大于1天的客户端",
+    "1 Week actives":"活动时间大于1周的客户端",
+    "1 Month actives":"活动时间大于1月的客户端",
+>>>>>>> 41118336 (Update ch.jsx)
     "Create Hunt: Select artifacts to collect":"搜寻创建:选择要收集的工件",
     "Create Hunt: Configure artifact parameters":"搜寻创建:设置工件参数",
     "Create Hunt: Specify resource limits":"搜寻创建:设定资源限制",
