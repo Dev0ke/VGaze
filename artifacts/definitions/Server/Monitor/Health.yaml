@@ -46,23 +46,23 @@ reports:
 
       {{ $time := Query "SELECT timestamp(epoch=now()) AS Now FROM scope()" | Expand }}
 
-      ## Server status @ {{ Get $time "0.Now" }}
+      ## 服务器 状态 @ {{ Get $time "0.Now" }}
 
-      <p>The following are total across all frontends.</p>
+      <p>所有前端的总数据如下.</p>
           <span class="container">
             <span class="row">
               <span class="col-sm panel">
-               CPU and Memory Utilization
+               CPU和内存利用率
                {{- Query "CPU" | LineChart "xaxis_mode" "time" "RSS.yaxis" 2 -}}
               </span>
               <span class="col-sm panel">
-               Currently Connected Clients
+                当前连接的客户端
                {{- Query "CurrentConnections" | LineChart "xaxis_mode" "time" "RSS.yaxis" 2 -}}
               </span>
             </span>
       </span>
 
-      ## Current Orgs
+      ## 现有机构
 
       {{ Query "LET ColumnTypes <= dict(ClientConfig='url_internal') \
                 SELECT Name, OrgId, \
@@ -72,11 +72,11 @@ reports:
                               name='client.'+OrgId+'.config.yaml') AS _Upload \
                 FROM orgs() " | Table }}
 
-      ## Disk Space
+      ## 磁盘空间
 
       {{ Query "SELECT * FROM Artifact.Generic.Client.DiskSpace()" | Table }}
 
-      ## Users
+      ## 使用者
 
       {{ define "UserPermissions" }}
         SELECT name, effective_policy AS _EffectivePolicy,
@@ -86,6 +86,6 @@ reports:
 
       {{ Query "UserPermissions" | Table }}
 
-      ## Server version
+      ## 服务器版本
 
       {{ Query "SELECT Version FROM config" | Table }}
