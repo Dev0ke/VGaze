@@ -135,7 +135,7 @@ class VeloNavigator extends Component {
                       
                       {/* Add Exception Records Link */}
                       <li className="nav-link">
-                        <NavLink to="/records/exception">
+                        <NavLink to="/exception-records">
                           <span>
                             <i className="navicon">
                               <FontAwesomeIcon icon="circle-exclamation" />
@@ -147,7 +147,7 @@ class VeloNavigator extends Component {
 
                       {/* Add Application Records Link */}
                       <li className="nav-link">
-                        <NavLink to="/records/application">
+                        <NavLink to="/application-records">
                           <span>
                             <i className="navicon">
                               <FontAwesomeIcon icon="desktop" />
@@ -296,7 +296,7 @@ class VeloNavigator extends Component {
                           {T("Client Events")}
                         </NavLink>
                       </li>
-{/* 
+
                       {_.map(sidebar_links, (x) => {
                         return (
                           <li
@@ -305,7 +305,7 @@ class VeloNavigator extends Component {
                               "nav-link": true,
                             })}
                           >
-                            <a
+                            {/* <a
                               href={x.url}
                               rel="noreferrer"
                               target={x.new_tab ? "_blank" : ""}
@@ -318,10 +318,10 @@ class VeloNavigator extends Component {
                                 />
                               </span>
                               {T(x.text)}
-                            </a>
+                            </a> */}
                           </li>
                         );
-                      })} */}
+                      })}
                     </ul>
                   </nav>
                 </div>

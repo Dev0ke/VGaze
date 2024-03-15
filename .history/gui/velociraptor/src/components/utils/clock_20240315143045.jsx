@@ -20,15 +20,16 @@ export default class VeloLiveClock extends Component {
         date: new Date(),
     }
 
-    render() {
-        // 获取当前时间，并转换为中国时区时间
-        const chinaTime = this.state.date.toLocaleString("zh-CN", {
-            timeZone: "Asia/Shanghai",
-            hour12: false // 24小时制
-        });
-    
-        return (
-            <div className="float-right">{chinaTime}</div>
-        );
-    }
+render() {
+    // 获取当前时间，并转换为中国时区时间
+    const chinaTime = this.state.date.toLocaleString("zh-CN", {
+        timeZone: "Asia/Shanghai",
+        hour12: false // 24小时制
+    });
+
+    return (
+        <div className="float-right">{chinaTime}</div>
+    );
+}
+
 }

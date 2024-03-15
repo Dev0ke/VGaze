@@ -135,7 +135,7 @@ class VeloNavigator extends Component {
                       
                       {/* Add Exception Records Link */}
                       <li className="nav-link">
-                        <NavLink to="/records/exception">
+                        <NavLink to="/exception-records">
                           <span>
                             <i className="navicon">
                               <FontAwesomeIcon icon="circle-exclamation" />
@@ -147,7 +147,7 @@ class VeloNavigator extends Component {
 
                       {/* Add Application Records Link */}
                       <li className="nav-link">
-                        <NavLink to="/records/application">
+                        <NavLink to="/application-records">
                           <span>
                             <i className="navicon">
                               <FontAwesomeIcon icon="desktop" />
@@ -296,32 +296,32 @@ class VeloNavigator extends Component {
                           {T("Client Events")}
                         </NavLink>
                       </li>
-{/* 
+
                       {_.map(sidebar_links, (x) => {
                         return (
-                          <li
-                            key={x.text}
-                            className={classNames({
-                              "nav-link": true,
-                            })}
-                          >
-                            <a
-                              href={x.url}
-                              rel="noreferrer"
-                              target={x.new_tab ? "_blank" : ""}
-                            >
-                              <span>
-                                <img
-                                  className="sidebar-icon"
-                                  alt=""
-                                  src={api.src_of(x.icon_url)}
-                                />
-                              </span>
-                              {T(x.text)}
-                            </a>
-                          </li>
+                          // <li
+                          //   key={x.text}
+                          //   className={classNames({
+                          //     "nav-link": true,
+                          //   })}
+                          // >
+                          //   <a
+                          //     href={x.url}
+                          //     rel="noreferrer"
+                          //     target={x.new_tab ? "_blank" : ""}
+                          //   >
+                          //     <span>
+                          //       <img
+                          //         className="sidebar-icon"
+                          //         alt=""
+                          //         src={api.src_of(x.icon_url)}
+                          //       />
+                          //     </span>
+                          //     {T(x.text)}
+                          //   </a>
+                          // </li>
                         );
-                      })} */}
+                      })}
                     </ul>
                   </nav>
                 </div>

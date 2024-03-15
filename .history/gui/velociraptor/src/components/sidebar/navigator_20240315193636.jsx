@@ -135,7 +135,7 @@ class VeloNavigator extends Component {
                       
                       {/* Add Exception Records Link */}
                       <li className="nav-link">
-                        <NavLink to="/records/exception">
+                        <NavLink to="/exception-records">
                           <span>
                             <i className="navicon">
                               <FontAwesomeIcon icon="circle-exclamation" />
@@ -147,7 +147,7 @@ class VeloNavigator extends Component {
 
                       {/* Add Application Records Link */}
                       <li className="nav-link">
-                        <NavLink to="/records/application">
+                        <NavLink to="/records">
                           <span>
                             <i className="navicon">
                               <FontAwesomeIcon icon="desktop" />

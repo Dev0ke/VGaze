@@ -36,8 +36,6 @@ import { Join } from './components/utils/paths.jsx';
 
 /*新增*************************************/
 import RecordsApplication from './components/records/records-application.jsx';
-
-
 /*新增*************************************/
 
 
@@ -181,7 +179,6 @@ class App extends Component {
                                   node={this.state.current_node}
                                   vfs_path={this.state.vfs_path} />
                      </Route>
-                    {/*新增*************************************/}
                      <Route path="/records/application" component={RecordsApplication} />
                      {/* ClientFlowsView will only be invoked when the
                        * client looks like a client id - the

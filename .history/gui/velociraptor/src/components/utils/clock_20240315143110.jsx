@@ -31,4 +31,5 @@ export default class VeloLiveClock extends Component {
             <div className="float-right">{chinaTime}</div>
         );
     }
+
 }
