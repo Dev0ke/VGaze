@@ -183,7 +183,12 @@
     "Windows Only": "仅限Windows",
     "X509 Certificate/Frontend Cert": "X509 证书/前端证书",
     
-    "modify Hunt": "修改配置"
-
+    "modify Hunt": "修改配置",
+    "Search clients": "搜索客户端",
+    "Search": "搜索",
+    "Copy Collection": "复制收藏",
+    "Save Collection": "保存收藏",
+    "Client ID":        "客户端ID",
+    "FQDN":            "主机完整域名"
 
 }

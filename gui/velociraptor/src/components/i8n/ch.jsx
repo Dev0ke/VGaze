@@ -60,7 +60,7 @@ const Chinese = {
     },
     "Online": "在线",
     "Label Clients": "客户端标签",
-    "Existing": "既存",
+    "Existing": "现有",
     "A new label": "新标签",
     "Add it!": "追加",
     "Delete Clients": "客户端删除",
@@ -143,7 +143,7 @@ const Chinese = {
     "Set All": "设置所有",
     "Clear All": "清除一切",
     "Exit Fullscreen": "关闭全屏",
-    "Artifact Collection": "工件收藏",
+    "Artifact Collection": "工件",
     "Uploaded Files": "上传文件",
     "Results": "结果",
     "Flow Details": "流的细节",
@@ -177,18 +177,17 @@ const Chinese = {
     "Unlimited": "无限制",
     "rows": "行数",
     "Request sent to client": "请求已发送到客户端",
-<<<<<<< HEAD
     "Description": "搜寻描述",
-=======
-    "Description": "详细描述",
->>>>>>> 41118336 (Update ch.jsx)
     "Created": "创建于",
     "Manually add collection to hunt": "手动添加收集到 搜寻",
     "No compatible hunts.": "没有兼容的 搜寻。",
     "Please create a hunt that collects one or more of the following artifacts.":"请创建一个搜索，收集以下一个或多个工件。",
     "Requests": "请求",
-    "Notebook": "笔记",
+    "Notebook": "搜寻结果",
     "Permanently delete collection": "永久删除收藏",
+
+    "Overview": "总览",
+    "Parameters": "参数",
     "ArtifactDeletionDialog": (session_id, artifacts, total_bytes, total_rows)=>
     <>
       我打算永久删除我的艺术收藏。
@@ -201,7 +200,7 @@ const Chinese = {
 
       { total_bytes.toFixed(0) } Mb数据{ total_rows }行被删除。
     </>,
-    "Save this collection to your Favorites": "收藏这个收藏品",
+    "Save this collection to your Favorites": "收藏这个收藏",
     "ArtifactFavorites": artifacts=>
     <>
       今后，可以很容易地从收藏夹中收集到同样的收藏品。
@@ -212,17 +211,18 @@ const Chinese = {
     "New Favorite name": "新收藏的名字",
     "Describe this favorite": "设置收藏夹",
     "New Collection": "收集",
-    "Add to hunt": "添加到 hunt",
+    "Add to hunt": "添加到搜寻",
     "Delete Artifact Collection": "删除工件",
     "Cancel Artifact Collection": "取消工件收藏",
     "Copy Collection": "复制收藏",
     "Save Collection": "保存收藏",
+    //"Stats Toggle"  : "切换显示",
     "Build offline collector": "创建离线收集器",
     "Notebooks": "笔记",
     "Full Screen": "全屏",
-    "Delete Notebook": "删除笔记",
-    "Notebook Uploads": "笔记上传",
-    "Export Notebook": "笔记导出",
+    "Delete Notebook": "删除搜寻结果",
+    "Notebook Uploads": "结果上传",
+    "Export Notebook": "结果导出",
     "FINISHED": "结束",
     "RUNNING": "运行中",
     "STOPPED": "停止",
@@ -238,7 +238,7 @@ const Chinese = {
     "Collected Artifacts": "收集的工件",
     "Flow ID": "任务ID",
     "FlowId": "任务ID",
-    "Goto notebooks": "跳转到笔记",
+    "Goto notebooks": "跳转到搜寻结果",
     "Max Mb": "最大数据容量",
     "Mb": "数据容量",
     "Name": "名字",
@@ -303,7 +303,7 @@ const Chinese = {
     "No hunts exist in the system. You can start a new hunt by clicking the New Hunt button above.":"系统内不存在搜寻任务。点击上面的“搜寻任务”按钮。",
     "Please select a hunt above":"请从上面选择搜寻任务。",
     "Clients":"客户端",
-    "Notebook for Hunt": hunt_id=>hunt_id + "搜寻的笔记",
+    "Notebook for Hunt": hunt_id=>hunt_id + "搜寻的结果",
 
     "Hunt ID":"Hunt ID",
     "Creation Time":"创建时间",
@@ -319,28 +319,17 @@ const Chinese = {
     "date":"日期",
     "New Hunt - Configure Hunt":"新搜寻-配置搜寻",
     "Hunt description":"搜寻的描述",
-<<<<<<< HEAD
     "Modify Hunt":"修改搜寻配置",
-=======
->>>>>>> 41118336 (Update ch.jsx)
     "Expiry":"过期时间",
     "Include Condition":"条件",
     "Run everywhere":"在全终端上运行",
     "Exclude Condition":"排除条件",
     "Configure Hunt":"搜寻配置",
-<<<<<<< HEAD
     "Estimated affected clients":"预计运行的客户端数量",
     "All Known Clients":"所有客户端",
     "1 Day actives":"一天内客户端",
     "1 Week actives":"一周内客户端",
     "1 Month actives":"一个月内客户端",
-=======
-    "Estimated affected clients":"受影响的客户端估计数",
-    "All Known Clients":"所有客户端",
-    "1 Day actives":"活动时间大于1天的客户端",
-    "1 Week actives":"活动时间大于1周的客户端",
-    "1 Month actives":"活动时间大于1月的客户端",
->>>>>>> 41118336 (Update ch.jsx)
     "Create Hunt: Select artifacts to collect":"搜寻创建:选择要收集的工件",
     "Create Hunt: Configure artifact parameters":"搜寻创建:设置工件参数",
     "Create Hunt: Specify resource limits":"搜寻创建:设定资源限制",
@@ -462,14 +451,14 @@ const Chinese = {
     "Fetch from Client": "从客户端获取",
     "Last Collected": "最后的收集",
     "Offset": "偏移",
-    "Show All": "显示所有",
+    "Show All": "显示所有客户端",
     "Recent Hosts": "显示最近的客户端",
     "Download JSON": "下载 JSON",
     "Download CSV": "下载 CSV",
     "Transform Table": "转换表",
     "Transformed": "已改变",
 
-    "Select a notebook from the list above.":"从以上列表中选择笔记。",
+    "Select a notebook from the list above.":"从以上列表中选择搜寻结果。",
     "Cancel":"取消",
     "Recalculate":"再计算",
     "Stop Calculating":"停止计算",
@@ -576,7 +565,7 @@ const Chinese = {
     "Log":"日志",
     "Report":"报告",
 
-    "NotebookId":"笔记ID",
+    "NotebookId":"搜寻结果ID",
     "Modified Time":"变更时间",
     "Time": "时间",
     "No events": "没有事件",
@@ -595,12 +584,12 @@ const Chinese = {
     "English":"英語",
 
     "Type":"类型",
-    "Export notebooks":"笔记的导出",
+    "Export notebooks":"搜寻结果的导出",
     "Export to HTML":"HTML的导出",
     "Export to Zip":"Zip的输出",
 
-    "Permanently delete Notebook":"永久删除笔记",
-    "You are about to permanently delete the notebook for this hunt":"我打算永久删除这个搜寻的笔记。",
+    "Permanently delete Notebook":"永久删除搜寻",
+    "You are about to permanently delete the notebook for this hunt":"我打算永久删除这个搜寻。",
 
     "Data":"数据",
     "Served from GitHub":"由 GitHub 提供",
@@ -655,7 +644,7 @@ const Chinese = {
      "ToolPerm_ALL_QUERY": "任意发布所有查询",
      "ToolPerm_ANY_QUERY": "发布所有查询(AllQuery 表示 AnyQuery)",
      "ToolPerm_PUBISH": "发布事件到服务器端队列(通常不需要)",
-     "ToolPerm_READ_RESULTS": "从已执行的猎、流或笔记本读取结果",
+     "ToolPerm_READ_RESULTS": "从已执行的搜寻、流或笔记读取结果",
      "ToolPerm_LABEL_CLIENT": "可以操作客户端标签和元数据",
      "ToolPerm_COLLECT_CLIENT": "客户端新收藏的日程或取消",
      "ToolPerm_START_HUNT": "开始新的搜寻",
@@ -663,7 +652,7 @@ const Chinese = {
      "ToolPerm_ARTIFACT_WRITER": "添加或编辑在服务器上运行的自定义工件",
      "ToolPerm_SERVER_ARTIFACT_WRITER": "添加或编辑在服务器上运行的自定义工件",
      "ToolPerm_EXECVE": "允许客户端执行任何命令",
-     "ToolPerm_NOTEBOOK_EDITOR": "允许修改笔记和单元格",
+     "ToolPerm_NOTEBOOK_EDITOR": "允许修改搜寻结果和单元格",
      "ToolPerm_SERVER_ADMIN": "允许管理服务器配置",
      "ToolPerm_ORG_ADMIN": "组的管理许可",
      "ToolPerm_IMPERSONATION": "允许用户在 query()插件中指定另一个用户名",
