@@ -1,6 +1,6 @@
 /*
    Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+   Copyright (C) 2019-2024 Rapid7 Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Affero General Public License as published
@@ -309,6 +309,8 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 
 func initDebugServer(config_obj *config_proto.Config) error {
 	if *debug_flag {
+		config_obj.DebugMode = true
+
 		logger := logging.GetLogger(config_obj, &logging.FrontendComponent)
 		logger.Info("<green>Starting</> debug server on <cyan>http://127.0.0.1:%v/debug/pprof", *debug_flag_port)
 

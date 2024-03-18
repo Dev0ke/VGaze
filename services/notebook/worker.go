@@ -56,13 +56,15 @@ func (self *NotebookWorker) ProcessUpdateRequest(
 
 	// Set the cell as calculating
 	notebook_cell := &api_proto.NotebookCell{
-		Input:            in.Input,
-		CellId:           in.CellId,
-		Type:             in.Type,
-		Timestamp:        utils.GetTime().Now().Unix(),
-		CurrentlyEditing: in.CurrentlyEditing,
-		Calculating:      true,
-		Env:              in.Env,
+		Input:             in.Input,
+		CellId:            in.CellId,
+		Type:              in.Type,
+		Timestamp:         utils.GetTime().Now().Unix(),
+		CurrentlyEditing:  in.CurrentlyEditing,
+		Calculating:       true,
+		Env:               in.Env,
+		CurrentVersion:    in.Version,
+		AvailableVersions: in.AvailableVersions,
 	}
 
 	notebook_path_manager := paths.NewNotebookPathManager(
@@ -95,9 +97,11 @@ func (self *NotebookWorker) ProcessUpdateRequest(
 
 	tmpl, err := reporting.NewGuiTemplateEngine(
 		config_obj, query_ctx, nil, acl_manager, global_repo,
-		notebook_path_manager.Cell(in.CellId),
+		notebook_path_manager.Cell(in.CellId, in.Version),
 		"Server.Internal.ArtifactDescription")
 	if err != nil {
+		logger.Debug("NotebookWorker: While evaluating template: %v", err)
+
 		return nil, err
 	}
 	defer tmpl.Close()
@@ -110,6 +114,7 @@ func (self *NotebookWorker) ProcessUpdateRequest(
 		config_obj:    config_obj,
 		notebook_cell: notebook_cell,
 		notebook_id:   in.NotebookId,
+		version:       in.Version,
 		start:         utils.GetTime().Now(),
 		store:         store,
 	}
@@ -136,7 +141,7 @@ func (self *NotebookWorker) ProcessUpdateRequest(
 	}
 
 	// The notification is removed either inline or in the background.
-	cancel_notify, remove_notification := notifier.ListenForNotification(in.CellId)
+	cancel_notify, remove_notification := notifier.ListenForNotification(in.CellId + in.Version)
 	defer remove_notification()
 
 	// Watcher thread: Wait for cancellation from the GUI or a 10 min timeout.
@@ -168,7 +173,8 @@ func (self *NotebookWorker) ProcessUpdateRequest(
 	// ensure we can still write after query cancellation.
 	resp, err := self.updateCellContents(ctx, config_obj, store, tmpl,
 		in.CurrentlyEditing, in.NotebookId,
-		in.CellId, cell_type, in.Env, query_cancel, input, in.Input)
+		in.CellId, in.Version, in.AvailableVersions,
+		cell_type, in.Env, query_cancel, input, in.Input)
 	if err != nil {
 		logger.Error("Rendering error: %v", err)
 	}
@@ -184,14 +190,16 @@ func (self *NotebookWorker) updateCellContents(
 	store NotebookStore,
 	tmpl *reporting.GuiTemplateEngine,
 	currently_editing bool,
-	notebook_id, cell_id, cell_type string,
+	notebook_id, cell_id, version string,
+	available_versions []string,
+	cell_type string,
 	env []*api_proto.Env,
 	query_cancel func(),
 	input, original_input string) (res *api_proto.NotebookCell, err error) {
 
 	// Start a nanny to watch this calculation
 	go self.startNanny(ctx, config_obj, tmpl.Scope, store, query_cancel,
-		notebook_id, cell_id)
+		notebook_id, cell_id, version)
 
 	output := ""
 	now := utils.GetTime().Now().Unix()
@@ -217,6 +225,10 @@ func (self *NotebookWorker) updateCellContents(
 			Timestamp:        now,
 			CurrentlyEditing: currently_editing,
 			Duration:         int64(time.Since(tmpl.Start).Seconds()),
+
+			// Version management
+			CurrentVersion:    version,
+			AvailableVersions: available_versions,
 		}
 	}
 
@@ -349,11 +361,12 @@ func (self *NotebookWorker) Start(
 	config_obj *config_proto.Config,
 	name string,
 	scheduler services.Scheduler) {
+
 	for {
 		err := self.RegisterWorker(ctx, config_obj, name, scheduler)
 		if err != nil {
 			logger := logging.GetLogger(config_obj, &logging.GUIComponent)
-			logger.Error("NotebookWorker: %v", err)
+			logger.Info("NotebookWorker: %v", err)
 		}
 
 		select {
@@ -406,11 +419,14 @@ func (self *NotebookWorker) RegisterWorker(
 	for {
 		select {
 		case <-ctx.Done():
-			return errors.New("Cancellation")
+			return nil
 
 		case job, ok := <-job_chan:
 			if !ok {
-				return errors.New("Cancellation")
+				if job.Done != nil {
+					job.Done("", errors.New("Cancellation"))
+				}
+				return nil
 			}
 
 			request := &NotebookRequest{}
@@ -418,6 +434,7 @@ func (self *NotebookWorker) RegisterWorker(
 			if err != nil {
 				logger.Error("NotebookManager: Invalid job request in worker: %v: %v",
 					err, job.Job)
+				job.Done("", err)
 				continue
 			}
 
@@ -494,8 +511,8 @@ func (self *NotebookManager) Start(
 	wg *sync.WaitGroup) error {
 
 	// Only start this once for all orgs. Otherwise we would have as
-	// many workers as orgs. Orgs will switch into the correct org for
-	// processing
+	// many workers as orgs. Workers will switch into the correct org
+	// for processing
 	if !utils.IsRootOrg(config_obj.OrgId) {
 		return nil
 	}
@@ -519,7 +536,7 @@ func (self *NotebookWorker) startNanny(
 	ctx context.Context, config_obj *config_proto.Config,
 	scope vfilter.Scope,
 	store NotebookStore, query_cancel func(),
-	notebook_id, cell_id string) {
+	notebook_id, cell_id, version string) {
 
 	// Reduce memory use now so the next measure of memory use is more
 	// reflective of our current workload.
@@ -556,7 +573,7 @@ func (self *NotebookWorker) startNanny(
 		}
 
 		// Check the cell for cancellation or errors
-		notebook_cell, err := store.GetNotebookCell(notebook_id, cell_id)
+		notebook_cell, err := store.GetNotebookCell(notebook_id, cell_id, version)
 		if err != nil || notebook_cell.CellId != cell_id {
 			continue
 		}
@@ -569,7 +586,9 @@ func (self *NotebookWorker) startNanny(
 				return
 			}
 			scope.Log("ERROR:NotebookManager: Detected cell %v is cancelled. Stopping.", cell_id)
-			notifier.NotifyDirectListener(cell_id)
+			notifier.NotifyDirectListener(cell_id + version)
+
+			return
 		}
 	}
 }

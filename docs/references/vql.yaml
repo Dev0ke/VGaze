@@ -157,7 +157,26 @@
   metadata:
     permissions: ARTIFACT_WRITER,SERVER_ARTIFACT_WRITER
 - name: artifact_set_metadata
-  description: Sets metadata about the artifact.
+  description: |
+    Sets metadata about the artifact.
+
+    This VQL function is used to clean up the artifact search screen
+    and guide users to assist with investigations.
+
+    Velociraptor comes with a lot of built in artifacts which may be
+    confusing to some users and in specialized deployments it may be
+    preferable to guide users into a small subset of artifacts and
+    hide the rest.
+
+    For example, say you have a set of custom artifacts that you only
+    want to show. Then I would add a special keyword to their
+    description (for example a company name - say "Written by ACME
+    inc"). Then a query like this will hide the others:
+
+    ```vql
+    SELECT name, artifact_set_metadata(name=name, hidden=TRUE)
+    FROM artifact_definitions() WHERE NOT description =~ "ACME"
+    ```
   type: Function
   args:
   - name: name
@@ -168,6 +187,10 @@
     type: bool
     description: Set to true make the artifact hidden in the GUI, false to make it
       visible again.
+  - name: basic
+    type: bool
+    description: Set to true make the artifact a 'basic' artifact. This allows users
+      with the COLLECT_BASIC permission able to collect it.
   metadata:
     permissions: ARTIFACT_WRITER,SERVER_ARTIFACT_WRITER
 - name: atexit
@@ -248,6 +271,22 @@
   category: windows
   metadata:
     permissions: MACHINE_STATE
+- name: backup
+  description: Generates a backup file.
+  type: Plugin
+  args:
+  - name: name
+    type: string
+    description: The name of the backup file.
+    required: true
+- name: backup_restore
+  description: Restore state from a backup file.
+  type: Plugin
+  args:
+  - name: name
+    type: string
+    description: The name of the backup file.
+    required: true
 - name: base64decode
   description: Decodes a base64 encoded string.
   type: Function
@@ -489,12 +528,24 @@
     Velociraptor maintains basic information about the client in the
     data store, such as its hostname, OS etc.
 
-    This information is refreshed each time the `Generic.Client.Info`
-    artifact is collected from the endpoint so it can be out of
-    date. This process is called "interrogation" of the endpoint.
+    You can use this function to enrich information about clients in
+    VQL output. NOTE: This function queries the internal in-memory
+    database so it is very fast and suitable to be called frequently
+    on each row.
 
-    You can refresh the entire fleet's datastore by scheduling a
-    `Generic.Client.Info` hunt.
+    # Example - enriching hostnames
+
+    Internally, Velociraptor uses client id to uniquely identify the
+    client. But often we want to provide a hostname as well. In the
+    below we look at collection output from the `source()` plugin and
+    add an additional Hostname column by resolving the client id on
+    each row to its hostname.
+
+    ```vql
+    SELECT *,
+       client_info(client_id=client_id).os_info.hostname AS Hostname
+    FROM source()
+    ```
   type: Function
   args:
   - name: client_id
@@ -702,6 +753,37 @@
     NOTE: When constructing the dictionaries for the spec parameter
     you will often need to specify a field name containing full
     stop. You can escape this using the backticks like the example above.
+
+    # Example - conditional collections
+
+    In this example we wish to create an artifact with check buttons
+    for selecting groups of artifacts to launch. Assume `Do1` and
+    `Do2` are boolean parameters:
+
+    1. Depending on the checkbox condition we set a set of dicts and
+       potential arguments.
+
+    2. Next we rely on the fact that dict additions merge the keys of
+       each dict to create a merged dict. The `Spec` dict is
+       constructed by joining the different parts together
+
+    3. To obtain the list of unique artifacts we use the `items()`
+       plugin to extract the keys from the spec dict.
+
+    ```vql
+    LET X1 = if(condition=Do1, then=dict(`Generic.Client.Info`=dict()), else=dict())
+    LET X2 = if(condition=Do2, then=dict(`Generic.System.Pstree`=dict()), else=dict())
+
+    LET Spec = X1 + X2
+
+    LET ArtifactNames = SELECT _key FROM items(item=Spec)
+
+    SELECT collect_client(
+             spec=Spec,
+             artifacts=ArtifactNames._key,
+             client_id='C.49982ba4c2ccef20') AS collection
+    FROM scope()
+    ```
   type: Function
   args:
   - name: client_id
@@ -714,10 +796,10 @@
     repeated: true
     required: true
   - name: env
-    type: Any
+    type: ordereddict.Dict
     description: Parameters to apply to the artifact (an alternative to a full spec)
   - name: spec
-    type: Any
+    type: ordereddict.Dict
     description: Parameters to apply to the artifacts
   - name: timeout
     type: uint64
@@ -874,6 +956,9 @@
   - name: append
     type: bool
     description: If true we append to the target file otherwise truncate it
+  - name: create_directories
+    type: bool
+    description: If true we ensure the destination directories exist
   category: basic
   metadata:
     permissions: FILESYSTEM_WRITE,FILESYSTEM_READ
@@ -988,6 +1073,10 @@
     type: string
     description: Notebook ID to export.
     required: true
+  - name: filename
+    type: string
+    description: The name of the export. If not set this will be named according to
+      the notebook id and timestamp
   metadata:
     permissions: PREPARE_RESULTS
 - name: crypto_rc4
@@ -1403,6 +1492,36 @@
     tools on the client.
 
     https://docs.velociraptor.app/docs/extending_vql/#using-external-tools
+
+    NOTE: The plugin receives an array of arguments which are passed
+    to the `execve()` system call as an array (on Windows they are
+    properly escaped into a command line). This means that you do not
+    need to escape or quote any special characters in the command.
+
+    We noticed people often do this or variations on it:
+    ```vql
+    LET PathToCacls = "C:/Program Files"
+    LET CommandLine <= "cacls.exe " + '"' + PathToCacls + '"'
+    SELECT * FROM execve(argv=["powershell", "-c", CommandLine])
+    ```
+
+    While this appears to work it is incorrect, fragile and
+    susceptible to a simple shell injection (for example if the
+    `PathToCacls` contains quotes).
+
+    As a rule we prefer to not run commands through the shell at all
+    since it is not needed and unsafe. The correct approach is always
+    to split the `argv` into an array of distinct arguments:
+
+    ```vql
+    LET PathToCacls = "C:/Program Files"
+    SELECT * FROM execve(argv=["cacls.exe", PathToCacls])
+    ```
+
+    This calls the program directly and is not susceptible to escaping
+    or quoting issues (since there is no shell involved). Additionally
+    it does not invoke powershell which means that any execution
+    artifacts are not trampled by this VQL.
   type: Plugin
   args:
   - name: argv
@@ -2201,6 +2320,45 @@
   category: plugin
   metadata:
     permissions: FILESYSTEM_READ
+- name: host
+  description: |
+    Perform a DNS resolution.
+
+    This function allows DNS to be resolved from within VQL. You can
+    use the regular system resolver (for example on windows will go
+    through the resolver cache service).
+
+    You can also specify an external DNS server, causing the query to
+    contact the DNS server for resolving the names.
+
+    NOTE: No caching is currently provided so this may generate a lot
+    of load on DNS servers when scanning many rows.
+
+    Example: The first query resolves through an external DNS server
+    while the second uses the local resolver.
+
+    ```
+    SELECT host(name='www.google.com', server='8.8.8.8:53'),
+       host(name='www.google.com')
+    FROM scope()
+    ```
+  type: Function
+  args:
+  - name: name
+    type: string
+    description: The name to lookup
+    required: true
+  - name: server
+    type: string
+    description: A DNS server to query - if not provided uses the system resolver.
+  - name: type
+    type: string
+    description: Type of lookup, can be CNAME, NS, SOA, TXT, DNSKEY, AXFR, A (default)
+  - name: prefer_go
+    type: bool
+    description: Prefer calling the native Go implementation rather than the system.
+  metadata:
+    permissions: MACHINE_STATE
 - name: http_client
   description: |
     Make a http request.
@@ -2262,28 +2420,25 @@
 
     ### Example: Uploading files
 
-    Many API handlers support uploading files via POST messages. While
-    this is not directly supported by http_client it is possible to
-    upload a file using simple VQL - by formatting the POST body using
-    the multipart rules.
+    Many API handlers support uploading files via POST messages. This
+    is supported using the `files` parameter for this plugin. The
+    plugin will automatically switch to `multipart/form` mode and
+    stream the file content. This allows you to upload very large
+    files with minimal memory impact. Here is an example:
 
     ```vql
-    LET file_bytes = read_file(filename="/bin/ls")
-
     SELECT *
     FROM http_client(
         url='http://localhost:8002/test/',
         method='POST',
-        headers=dict(
-            `Content-Type`="multipart/form-data;boundary=83fcda3640aca670"
-        ),
-        data='--83fcda3640aca670\r\nContent-Disposition: form-data; name="file";filename="ls"\r\nContent-Type: application/octet-stream\r\n\r\n' +
-             file_bytes + '\r\n--83fcda3640aca670--')
+        files=dict(file='file.txt', key='file', path='/etc/passwd', accessor="file")
+    )
     ```
-
-    Note how custom headers can be provided using a dict - note also
-    how dict keys with special characters in them can be constructed
-    using the backtick quoting.
+    Here the files can be an array of dicts with the following fields:
+    * file: The name of the file that will be stored on the server
+    * key: The name of the form element that will receive the file
+    * path: This is an OSPath object that we open and stream into the form.
+    * accessor: Any accessor required for the path.
   type: Plugin
   version: 2
   args:
@@ -2292,10 +2447,10 @@
     description: The URL to fetch
     required: true
   - name: params
-    type: Any
+    type: ordereddict.Dict
     description: Parameters to encode as POST or GET query strings
   - name: headers
-    type: Any
+    type: ordereddict.Dict
     description: A dict of headers to send.
   - name: method
     type: string
@@ -2330,6 +2485,15 @@
   - name: user_agent
     type: string
     description: If specified, set a HTTP User-Agent.
+  - name: secret
+    type: string
+    description: If specified, use this managed secret. The secret should be of type
+      'HTTP Secrets'. Alternatively specify the Url as secret://name
+  - name: files
+    type: ordereddict.Dict
+    description: If specified, upload these files using multipart form upload. For
+      example [dict(file="My filename.txt", path=OSPath, accessor="auto"),]
+    repeated: true
   category: plugin
   metadata:
     permissions: COLLECT_SERVER
@@ -2342,7 +2506,16 @@
   args:
   - name: bytes
     type: int64
-    description: Format bytes with units
+    description: Format bytes with units (e.g. MB)
+  - name: ibytes
+    type: int64
+    description: Format bytes with units (e.g. MiB)
+  - name: time
+    type: time.Time
+    description: Format time (e.g. 2 hours ago)
+  - name: comma
+    type: int64
+    description: Format integer with comma (e.g. 1,230)
   category: basic
 - name: hunt
   description: |
@@ -3502,6 +3675,10 @@
   - name: notebook_cell_id
     type: string
     description: The notebook cell read from (should also include notebook id)
+  - name: notebook_cell_version
+    type: string
+    description: The notebook cell version to read from (should also include notebook
+      id and notebook cell)
   - name: notebook_cell_table
     type: int64
     description: A notebook cell can have multiple tables.)
@@ -3511,6 +3688,10 @@
   - name: count
     type: int64
     description: Maximum number of clients to fetch (default unlimited)'
+  - name: orgs
+    type: string
+    description: Run the query over these orgs. If empty use the current org.'
+    repeated: true
   category: server
   metadata:
     permissions: READ_RESULTS
@@ -3571,6 +3752,32 @@
   category: plugin
   metadata:
     permissions: MACHINE_STATE
+- name: notebook_create
+  description: Create a new notebook.
+  type: Function
+  args:
+  - name: name
+    type: string
+    description: The name of the notebook
+  - name: description
+    type: string
+    description: The description of the notebook
+  - name: collaborators
+    type: string
+    description: A list of users to share the notebook with.
+    repeated: true
+  - name: public
+    type: bool
+    description: If set the notebook will be public.
+  - name: artifacts
+    type: string
+    description: A list of NOTEBOOK artifacts to create the notebook with (Notebooks.Default)
+    repeated: true
+  - name: env
+    type: ordereddict.Dict
+    description: An environment to initialize the notebook with
+  metadata:
+    permissions: COLLECT_SERVER
 - name: notebook_delete
   description: 'Delete a notebook with all its cells. '
   type: Plugin
@@ -3583,6 +3790,58 @@
   category: server
   metadata:
     permissions: SERVER_ADMIN
+- name: notebook_export
+  description: Exports a notebook to a zip file or HTML.
+  type: Function
+  args:
+  - name: notebook_id
+    type: string
+    description: The id of the notebook to export
+    required: true
+  - name: filename
+    type: string
+    description: The name of the export. If not set this will be named according to
+      the notebook id and timestamp
+  - name: type
+    type: string
+    description: Set the type of the export (html or zip).
+  metadata:
+    permissions: PREPARE_RESULTS
+- name: notebook_get
+  description: Get a notebook.
+  type: Function
+  args:
+  - name: notebook_id
+    type: string
+    description: The id of the notebook to fetch
+    required: true
+  metadata:
+    permissions: READ_RESULTS
+- name: notebook_update_cell
+  description: Update a notebook cell.
+  type: Function
+  args:
+  - name: notebook_id
+    type: string
+    description: The id of the notebook to update
+    required: true
+  - name: cell_id
+    type: string
+    description: The cell of the notebook to update. If this is empty we add a new
+      cell to the notebook
+  - name: type
+    type: string
+    description: Set the type of the cell if needed (markdown or vql).
+  - name: input
+    type: string
+    description: The new cell content.
+    required: true
+  - name: output
+    type: string
+    description: If this is set, we do not calculate the cell but set this as the
+      rendered output.
+  metadata:
+    permissions: COLLECT_SERVER
 - name: now
   description: Returns current time in seconds since epoch.
   type: Function
@@ -5472,6 +5731,10 @@
   - name: notebook_cell_id
     type: string
     description: The notebook cell read from (should also include notebook id)
+  - name: notebook_cell_version
+    type: string
+    description: The notebook cell version to read from (should also include notebook
+      id and notebook cell)
   - name: notebook_cell_table
     type: int64
     description: A notebook cell can have multiple tables.)
@@ -5481,6 +5744,10 @@
   - name: count
     type: int64
     description: Maximum number of clients to fetch (default unlimited)'
+  - name: orgs
+    type: string
+    description: Run the query over these orgs. If empty use the current org.'
+    repeated: true
   category: server
   metadata:
     permissions: READ_RESULTS
@@ -6207,6 +6474,7 @@
 - name: upload_s3
   description: Upload files to S3.
   type: Function
+  version: 2
   args:
   - name: file
     type: accessors.OSPath
@@ -6225,31 +6493,34 @@
   - name: region
     type: string
     description: The region the bucket is in
-    required: true
-  - name: credentialskey
+  - name: credentials_key
     type: string
     description: The AWS key credentials to use
-  - name: credentialssecret
+  - name: credentials_secret
     type: string
     description: The AWS secret credentials to use
+  - name: credentials_token
+    type: string
+    description: The AWS session token to use (only needed for temporary credentials)
   - name: endpoint
     type: string
     description: The Endpoint to use
-  - name: serversideencryption
+  - name: serverside_encryption
     type: string
     description: The server side encryption method to use
-  - name: kmsencryptionkey
+  - name: kms_encryption_key
     type: string
     description: The server side KMS key to use
-  - name: s3uploadroot
+  - name: s3upload_root
     type: string
     description: Prefix for the S3 object
-  - name: noverifycert
-    type: bool
-    description: Skip TLS Verification (deprecated in favor of SkipVerify)
   - name: skip_verify
     type: bool
     description: Skip TLS Verification
+  - name: secret
+    type: string
+    description: Alternatively use a secret from the secrets service. Secret must
+      be of type 'AWS S3 Creds'
   category: plugin
   metadata:
     permissions: FILESYSTEM_READ
@@ -6697,6 +6968,23 @@
   category: event
   metadata:
     permissions: FILESYSTEM_READ
+- name: watch_jsonl
+  description: Watch a jsonl file and stream events from it.
+  type: Plugin
+  args:
+  - name: filename
+    type: accessors.OSPath
+    description: A list of log files to parse.
+    repeated: true
+    required: true
+  - name: accessor
+    type: string
+    description: The accessor to use.
+  - name: buffer_size
+    type: int
+    description: Maximum size of line buffer.
+  metadata:
+    permissions: FILESYSTEM_READ
 - name: watch_monitoring
   description: |
     Watch clients' monitoring log. This is an event plugin. This
@@ -6849,8 +7137,37 @@
     type: StoredQuery
     description: query to write into the file.
     required: true
+  - name: buffer_size
+    type: int
+    description: Maximum size of buffer before flushing to file.
   metadata:
     permissions: FILESYSTEM_WRITE
+- name: xattr
+  description: |
+    Query a file for the specified extended attribute.
+
+    If no attributes are provided, this function will return all extended attributes
+    for the file.
+
+    Please note: this API is not reliable, so please provided extended attributes
+    where possible.
+
+    Note: This function only works on Mac and Linux.
+  type: Function
+  args:
+  - name: filename
+    type: accessors.OSPath
+    description: Filename to inspect.
+    required: true
+  - name: attribute
+    type: string
+    description: 'Attribute to collect. '
+    repeated: true
+  - name: accessor
+    type: string
+    description: File accessor
+  metadata:
+    permissions: FILESYSTEM_READ
 - name: xor
   description: Apply xor to the string and key.
   type: Function
@@ -6873,10 +7190,18 @@
     accessor is used to open the various files which allows this plugin to
     work across raw ntfs, zip members or indeed process memory.
 
-    Scanning proceeds by reading a block from the file, then applying the
-    yara rule on the block. This will fail if the signature is split
-    across block boundary. You can choose the block size to be
-    appropriate.
+    There are two modes supported. If the accessor is "process" or
+    "file", we delegate scanning directly to the yara library. This
+    allows yara to see the entire file and apply signatures that span
+    large offset differences (e.g. a signature looking for a string in
+    the middle of the file and the header).
+
+    For other accessors we need to use buffer scanning. In this mode,
+    Velociraptor will read buffers from the accessor and apply the
+    yara library to the buffer. Due to limitations in the yara API, it
+    is not possible to match signatures that are split on buffer
+    boundaries. You can choose the block size to try to fit the entire
+    signature with each block.
 
     If the accessor is **not** specified we use the yara library to
     directly open the file itself without Velociraptor's accessor
@@ -6903,26 +7228,17 @@
     recommended that the `key` parameter be specified because it makes
     it more efficient since we do not need to hash the rules each time.
 
-    ### Shorthand rules
+    You can supply a `compiled yara rule` as produced by the `yarac`
+    program. This is not recommended because it is not portable - the
+    rule must have been compiled with the exact same version of Yara
+    that is embedded in Velociraptor (Currently 4.5.0). Compiled rules
+    are generally larger too than the plain text rules.
 
-    This plugin accepts yara rules in the `rules` parameter. But typically
-    we only search for keywords so writing a full yara syntax rule is
-    tedious. Therefore we provide a shorthand way to specify the
-    keywords. For example:
-
-    ```
-    wide nocase:foo,bar,baz
-    ```
-
-    When the rule is provided in the above form, the plugin will
-    automatically generate a yara rule which matches any of the specified
-    keywords. The specification before the `:` means the same thing as the
-    yara DSL and the following combinations are supported `wide`,
-    `wide ascii`, `wide nocase`, `wide nocase ascii`.
-
-    This shorthand notation is less useful because recent Velociraptor
-    versions offer a context sensitive Yara rule editor in the GUI
-    (simply press ? to bring up a rule template).
+    When creating an artifact which requires a yara rule, set the type
+    of the parameter to `yara` and Velociraptor will offer a context
+    sensitive Yara rule editor in the GUI (simply press ? to bring up
+    a rule template). This makes it easier to write quick rules in the
+    GUI.
 
     {{% notice note %}}
 
@@ -6952,8 +7268,7 @@
   args:
   - name: rules
     type: string
-    description: Yara rules in the yara DSL.
-    required: true
+    description: Yara rules in the yara DSL or after being compiled by the yarac compiler.
   - name: files
     type: Any
     description: The list of files to scan.

@@ -141,7 +141,7 @@ func (self *CreateHuntDownload) Call(ctx context.Context,
 
 	config_obj, ok := vql_subsystem.GetServerConfig(scope)
 	if !ok {
-		scope.Log("Command can only run on the server")
+		scope.Log("create_hunt_download: Command can only run on the server")
 		return vfilter.Null{}
 	}
 
@@ -220,20 +220,14 @@ func createDownloadFile(
 
 	// zip_writer now owns fd and will close it when it closes below.
 
-	// Report the progress as we write the container.
-	progress_reporter := reporting.NewProgressReporter(config_obj,
-		flow_path_manager.GetDownloadsStats(hostname, password != ""),
-		download_file, zip_writer)
-
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
 	// Write the bulk of the data asyncronously.
 	go func() {
 		defer wg.Done()
-		defer progress_reporter.Close()
 
-		// Will also close the underlying fd.
+		// Will also close the underlying container when done.
 		defer zip_writer.Close()
 
 		timeout := int64(600)
@@ -246,6 +240,12 @@ func createDownloadFile(
 			time.Second*time.Duration(timeout))
 		defer cancel()
 
+		// Report the progress as we write the container.
+		progress_reporter := reporting.NewProgressReporter(ctx, config_obj,
+			flow_path_manager.GetDownloadsStats(hostname, password != ""),
+			download_file, zip_writer)
+		defer progress_reporter.Close()
+
 		err := downloadFlowToZip(ctx, scope, config_obj, format,
 			client_id, path_specs.NewUnsafeFilestorePath(),
 			flow_id, expand_sparse, zip_writer)
@@ -257,6 +257,8 @@ func createDownloadFile(
 
 	if wait {
 		wg.Wait()
+
+		file_store.FlushFilestore(config_obj)
 	}
 
 	return download_file, nil
@@ -724,7 +726,7 @@ func createHuntDownloadFile(
 		return nil, err
 	}
 
-	hunt_details, pres := hunt_dispatcher.GetHunt(hunt_id)
+	hunt_details, pres := hunt_dispatcher.GetHunt(ctx, hunt_id)
 	if !pres {
 		fd.Close()
 		return nil, errors.New("Hunt not found")
@@ -741,19 +743,12 @@ func createHuntDownloadFile(
 
 	// zip_writer now owns fd and will close it when it closes below.
 
-	// Report the progress as we write the container.
-	progress_reporter := reporting.NewProgressReporter(config_obj,
-		hunt_path_manager.GetHuntDownloadsStats(only_combined,
-			base_filename, password != ""),
-		download_file, zip_writer)
-
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
 	// Write the bulk of the data asyncronously.
 	go func() {
 		defer wg.Done()
-		defer progress_reporter.Close()
 
 		// Will also close the underlying fd.
 		defer zip_writer.Close()
@@ -767,6 +762,13 @@ func createHuntDownloadFile(
 		sub_ctx, cancel := context.WithTimeout(context.Background(),
 			time.Duration(timeout)*time.Second)
 		defer cancel()
+
+		// Report the progress as we write the container.
+		progress_reporter := reporting.NewProgressReporter(sub_ctx, config_obj,
+			hunt_path_manager.GetHuntDownloadsStats(only_combined,
+				base_filename, password != ""),
+			download_file, zip_writer)
+		defer progress_reporter.Close()
 
 		err = zip_writer.WriteJSON(
 			paths.ZipPathFromFSPathSpec(path_specs.NewUnsafeFilestorePath().AddChild("hunt_info")),
@@ -789,8 +791,14 @@ func createHuntDownloadFile(
 			return
 		}
 
-		for flow_details := range hunt_dispatcher.GetFlows(sub_ctx,
-			config_obj, scope, hunt_id, 0) {
+		options := result_sets.ResultSetOptions{}
+		flow_chan, _, err := hunt_dispatcher.GetFlows(sub_ctx,
+			config_obj, options, scope, hunt_id, 0)
+		if err != nil {
+			return
+		}
+
+		for flow_details := range flow_chan {
 
 			if flow_details == nil || flow_details.Context == nil {
 				continue
@@ -823,6 +831,8 @@ func createHuntDownloadFile(
 
 	if wait {
 		wg.Wait()
+
+		file_store.FlushFilestore(config_obj)
 	}
 
 	return download_file, nil
@@ -857,8 +867,14 @@ func generateCombinedResults(
 		defer maybeClose(json_writer)
 		defer maybeClose(csv_writer)
 
-		for flow_details := range hunt_dispatcher.GetFlows(ctx,
-			config_obj, scope, hunt_details.HuntId, 0) {
+		options := result_sets.ResultSetOptions{}
+		flow_chan, _, err := hunt_dispatcher.GetFlows(ctx,
+			config_obj, options, scope, hunt_details.HuntId, 0)
+		if err != nil {
+			return err
+		}
+
+		for flow_details := range flow_chan {
 
 			if flow_details == nil || flow_details.Context == nil {
 				continue

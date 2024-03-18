@@ -4,10 +4,12 @@
   "Request": {
    "hunt_id": "H.1234",
    "create_time": "100000000",
+   "creator": "admin",
    "start_time": "100000000",
    "expires": "604900000000",
    "hunt_description": "foo",
    "start_request": {
+    "creator": "admin",
     "flow_id": "F.1234.H",
     "artifacts": [
      "Test.Artifact"
@@ -31,7 +33,10 @@
    "artifacts": [
     "Test.Artifact"
    ],
-   "state": "RUNNING"
+   "state": "RUNNING",
+   "org_ids": [
+    "root"
+   ]
   }
  },
  "exclude label hunt": {
@@ -39,10 +44,12 @@
   "Request": {
    "hunt_id": "H.1234",
    "create_time": "100000000",
+   "creator": "admin",
    "start_time": "100000000",
    "expires": "604900000000",
    "hunt_description": "foo",
    "start_request": {
+    "creator": "admin",
     "flow_id": "F.1234.H",
     "artifacts": [
      "Test.Artifact"
@@ -66,7 +73,10 @@
    "artifacts": [
     "Test.Artifact"
    ],
-   "state": "RUNNING"
+   "state": "RUNNING",
+   "org_ids": [
+    "root"
+   ]
   }
  },
  "include label hunt": {
@@ -74,10 +84,12 @@
   "Request": {
    "hunt_id": "H.1234",
    "create_time": "100000000",
+   "creator": "admin",
    "start_time": "100000000",
    "expires": "604900000000",
    "hunt_description": "foo",
    "start_request": {
+    "creator": "admin",
     "flow_id": "F.1234.H",
     "artifacts": [
      "Test.Artifact"
@@ -101,7 +113,10 @@
    "artifacts": [
     "Test.Artifact"
    ],
-   "state": "RUNNING"
+   "state": "RUNNING",
+   "org_ids": [
+    "root"
+   ]
   }
  },
  "include and exclude label hunt": {
@@ -109,10 +124,12 @@
   "Request": {
    "hunt_id": "H.1234",
    "create_time": "100000000",
+   "creator": "admin",
    "start_time": "100000000",
    "expires": "604900000000",
    "hunt_description": "foo",
    "start_request": {
+    "creator": "admin",
     "flow_id": "F.1234.H",
     "artifacts": [
      "Test.Artifact"
@@ -141,7 +158,10 @@
    "artifacts": [
     "Test.Artifact"
    ],
-   "state": "RUNNING"
+   "state": "RUNNING",
+   "org_ids": [
+    "root"
+   ]
   }
  },
  "os hunt": {
@@ -149,10 +169,12 @@
   "Request": {
    "hunt_id": "H.1234",
    "create_time": "100000000",
+   "creator": "admin",
    "start_time": "100000000",
    "expires": "604900000000",
    "hunt_description": "foo",
    "start_request": {
+    "creator": "admin",
     "flow_id": "F.1234.H",
     "artifacts": [
      "Test.Artifact"
@@ -174,7 +196,10 @@
    "artifacts": [
     "Test.Artifact"
    ],
-   "state": "RUNNING"
+   "state": "RUNNING",
+   "org_ids": [
+    "root"
+   ]
   }
  },
  "os and label hunt": {
@@ -182,10 +207,12 @@
   "Request": {
    "hunt_id": "H.1234",
    "create_time": "100000000",
+   "creator": "admin",
    "start_time": "100000000",
    "expires": "604900000000",
    "hunt_description": "foo",
    "start_request": {
+    "creator": "admin",
     "flow_id": "F.1234.H",
     "artifacts": [
      "Test.Artifact"
@@ -207,7 +234,10 @@
    "artifacts": [
     "Test.Artifact"
    ],
-   "state": "RUNNING"
+   "state": "RUNNING",
+   "org_ids": [
+    "root"
+   ]
   }
  }
 }

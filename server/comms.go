@@ -1,19 +1,19 @@
 /*
-   Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+Velociraptor - Dig Deeper
+Copyright (C) 2019-2024 Rapid7 Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License as published
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-   You should have received a copy of the GNU Affero General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 package server
 
@@ -27,6 +27,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"sync/atomic"
 	"time"
 
@@ -47,10 +48,12 @@ import (
 	"www.velocidex.com/golang/velociraptor/constants"
 	crypto_proto "www.velocidex.com/golang/velociraptor/crypto/proto"
 	"www.velocidex.com/golang/velociraptor/logging"
+	http_utils "www.velocidex.com/golang/velociraptor/utils/http"
 )
 
 var (
 	packetTooLargeError = errors.New("Packet too large!")
+	notFoundError       = errors.New("Not Found")
 
 	currentConnections = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "client_comms_current_connections",
@@ -132,14 +135,15 @@ func PrepareFrontendMux(
 
 	base := config_obj.Frontend.BasePath
 	router.Handle(base+"/healthz", healthz(server_obj))
-	router.Handle(base+"/server.pem", server_pem(config_obj))
+	router.Handle(base+"/server.pem", server_pem(config_obj, server_obj))
 
 	// DEPRECATED: These are the old handler names - not great
 	// but here for backwards compatibility.
 	router.Handle(base+"/control",
 		RecordHTTPStats(receive_client_messages(config_obj, server_obj)))
+
 	router.Handle(base+"/reader",
-		RecordHTTPStats(send_client_messages(server_obj)))
+		RecordHTTPStats(send_client_messages(config_obj, server_obj)))
 
 	// Send a message to the server.
 	router.Handle(base+"/send_messages",
@@ -147,7 +151,7 @@ func PrepareFrontendMux(
 
 	// Receive new messages from the server.
 	router.Handle(base+"/receive_messages",
-		RecordHTTPStats(send_client_messages(server_obj)))
+		RecordHTTPStats(send_client_messages(config_obj, server_obj)))
 
 	// Publicly accessible part of the filestore. NOTE: this
 	// does not have to be a physical directory - it is served
@@ -169,8 +173,18 @@ func healthz(server_obj *Server) http.Handler {
 	})
 }
 
-func server_pem(config_obj *config_proto.Config) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func server_pem(config_obj *config_proto.Config, server_obj *Server) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+
+		if is_ws_connection(req) {
+			err := ws_server_pem(config_obj, server_obj, w, req)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			return
+		}
+
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		flusher, _ := w.(http.Flusher)
@@ -271,6 +285,17 @@ func receive_client_messages(
 	serialized_pad, _ := proto.Marshal(pad)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+
+		// Handle WS connections transparently.
+		if is_ws_connection(req) {
+			err := ws_receive_client_messages(config_obj, server_obj, w, req)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			return
+		}
+
 		flusher, ok := w.(http.Flusher)
 		if !ok {
 			panic("http handler is not a flusher")
@@ -456,7 +481,9 @@ func receive_client_messages(
 // connection will persist up to Client.MaxPoll so we always have a
 // channel to the client. This allows us to send the client jobs
 // immediately with low latency.
-func send_client_messages(server_obj *Server) http.Handler {
+func send_client_messages(
+	config_obj *config_proto.Config,
+	server_obj *Server) http.Handler {
 	pad := &crypto_proto.ClientCommunication{}
 	pad.Padding = append(pad.Padding, 0)
 	serialized_pad, _ := proto.Marshal(pad)
@@ -464,16 +491,26 @@ func send_client_messages(server_obj *Server) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 
+		// Keep track of currently connected clients - this account
+		// for clients using http and websocket.
+		currentConnections.Inc()
+		defer currentConnections.Dec()
+
+		if is_ws_connection(req) {
+			err := ws_send_client_messages(config_obj, server_obj, w, req)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			return
+		}
+
 		flusher, ok := w.(http.Flusher)
 		if !ok {
 			panic("http handler is not a flusher")
 		}
 
 		sendCounter.Inc()
-
-		// Keep track of currently connected clients.
-		currentConnections.Inc()
-		defer currentConnections.Dec()
 
 		body, err := ioutil.ReadAll(
 			io.LimitReader(req.Body, constants.MAX_MEMORY))
@@ -684,33 +721,12 @@ func send_client_messages(server_obj *Server) http.Handler {
 	})
 }
 
-// Record the status of the request so we can log it.
-type statusRecorder struct {
-	http.ResponseWriter
-	http.Flusher
-	status int
-	error  []byte
-}
-
-func (self *statusRecorder) WriteHeader(code int) {
-	self.status = code
-	self.ResponseWriter.WriteHeader(code)
-}
-
-func (self *statusRecorder) Write(buf []byte) (int, error) {
-	if self.status == 500 {
-		self.error = buf
-	}
-
-	return self.ResponseWriter.Write(buf)
-}
-
 func GetLoggingHandler(config_obj *config_proto.Config,
 	handler string) func(http.Handler) http.Handler {
 	logger := logging.GetLogger(config_obj, &logging.FrontendComponent)
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			rec := &statusRecorder{
+			rec := &http_utils.StatusRecorder{
 				w,
 				w.(http.Flusher),
 				200, nil}
@@ -722,7 +738,7 @@ func GetLoggingHandler(config_obj *config_proto.Config,
 						"url":        r.URL.Path,
 						"remote":     r.RemoteAddr,
 						"user-agent": r.UserAgent(),
-						"status":     rec.status,
+						"status":     rec.Status,
 						"handler":    handler,
 					}).Info("Access to handler")
 			}()
@@ -740,7 +756,7 @@ func downloadPublic(
 		// make sure the prefix is correct
 		for i, p := range prefix {
 			if len(components) <= i || p != components[i] {
-				returnError(w, 404, "Not Found")
+				returnError(config_obj, w, 404, notFoundError)
 				return
 			}
 		}
@@ -748,7 +764,7 @@ func downloadPublic(
 		file_store_factory := file_store.GetFileStore(config_obj)
 		fd, err := file_store_factory.ReadFile(path_spec)
 		if err != nil {
-			returnError(w, 404, err.Error())
+			returnError(config_obj, w, 404, err)
 			return
 		}
 
@@ -764,9 +780,23 @@ func downloadPublic(
 	})
 }
 
-func returnError(w http.ResponseWriter, code int, message string) {
+func returnError(
+	config_obj *config_proto.Config,
+	w http.ResponseWriter, code int, err error) {
 	w.WriteHeader(code)
-	_, _ = w.Write([]byte(html.EscapeString(message)))
+
+	if config_obj.DebugMode {
+		_, _ = w.Write([]byte(html.EscapeString(err.Error())))
+		return
+	}
+
+	// In production provide generic errors.
+	if errors.Is(err, os.ErrNotExist) {
+		_, _ = w.Write([]byte("Not Found"))
+
+	} else {
+		_, _ = w.Write([]byte("Error"))
+	}
 }
 
 // Calculate QPS

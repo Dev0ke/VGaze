@@ -41,7 +41,12 @@ func (self *MinionSchedulerTestSuite) SetupTest() {
 	// Do not start local workers to force us to go through the remote
 	// one.
 	self.ConfigObj.Defaults.NotebookNumberOfLocalWorkers = -1
+	self.ConfigObj.Defaults.NotebookWaitTimeForWorkerMs = -1
 	self.ConfigObj.API.BindPort = 8345
+
+	// Mock out cell ID generation for tests
+	gen := utils.ConstantIdGenerator("XXX")
+	utils.SetIdGenerator(gen)
 
 	self.LoadArtifactsIntoConfig(mock_definitions)
 	self.TestSuite.SetupTest()
@@ -60,7 +65,6 @@ func (self *MinionSchedulerTestSuite) startAPIServer() {
 func (self *MinionSchedulerTestSuite) TestNotebookMinionScheduler() {
 	closer := utils.MockTime(utils.NewMockClock(time.Unix(10, 10)))
 	defer closer()
-	defer notebook.SetTestMode()()
 
 	self.startAPIServer()
 
@@ -108,6 +112,7 @@ func (self *MinionSchedulerTestSuite) TestNotebookMinionScheduler() {
 		})
 	assert.NoError(self.T(), err)
 
+	cell.Timestamp = 0
 	golden := ordereddict.NewDict().
 		Set("Updated Cell", cell)
 
@@ -146,7 +151,8 @@ func (self *MinionSchedulerTestSuite) TestNotebookMinionScheduler() {
 	assert.Error(self.T(), err)
 	assert.Contains(self.T(), err.Error(), "No workers available")
 
-	err = notebook_manager.CancelNotebookCell(self.Ctx, notebook.NotebookId, cell_id)
+	err = notebook_manager.CancelNotebookCell(
+		self.Ctx, notebook.NotebookId, cell_id, cell.CurrentVersion)
 	assert.NoError(self.T(), err)
 
 	// Wait here until the cell is cancelled
@@ -154,7 +160,7 @@ func (self *MinionSchedulerTestSuite) TestNotebookMinionScheduler() {
 
 	// Check the cell contents
 	cell, err = notebook_manager.GetNotebookCell(
-		self.Ctx, notebook.NotebookId, cell_id)
+		self.Ctx, notebook.NotebookId, cell_id, cell.CurrentVersion)
 	assert.NoError(self.T(), err)
 
 	goldie.Assert(self.T(), "TestNotebookMinionScheduler",

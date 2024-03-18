@@ -1,6 +1,6 @@
 /*
    Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+   Copyright (C) 2019-2024 Rapid7 Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Affero General Public License as published
@@ -164,6 +164,7 @@ type LogContext struct {
 	enabled map[string]bool
 
 	listeners map[uint64]chan string
+	component string
 }
 
 func (self *LogContext) AddListener(c chan string) func() {
@@ -281,7 +282,8 @@ func (self *LogManager) GetLogger(
 				Hooks:     make(logrus.LevelHooks),
 				Level:     logrus.DebugLevel,
 			},
-			enabled: make(map[string]bool),
+			component: *component,
+			enabled:   make(map[string]bool),
 		}
 	}
 	return ctx
@@ -427,8 +429,9 @@ func (self *LogManager) makeNewComponent(
 	}
 
 	return &LogContext{
-		Logger:  Log,
-		enabled: enabled,
+		Logger:    Log,
+		enabled:   enabled,
+		component: *component,
 	}, nil
 }
 

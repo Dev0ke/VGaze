@@ -13,6 +13,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/alexmullins/zip"
 	"github.com/dustin/go-humanize"
@@ -303,7 +304,21 @@ func formatFilename(filename *accessors.OSPath, accessor string) string {
 
 	// These paths can be very large so we elide them.
 	switch accessor {
-	case "data", "sparse":
+	case "data":
+		elided_result := "data:"
+		for _, r := range result {
+			if unicode.IsPrint(r) {
+				elided_result += string(r)
+			}
+			if len(elided_result) > 50 {
+				elided_result += " ..."
+				break
+			}
+		}
+
+		return elided_result
+
+	case "sparse":
 		if len(result) > 50 {
 			result = result[:50] + "..."
 		}
@@ -328,6 +343,7 @@ func (self *Container) Upload(
 	atime time.Time,
 	ctime time.Time,
 	btime time.Time,
+	mode os.FileMode,
 	reader io.Reader) (*uploads.UploadResponse, error) {
 
 	result := &uploads.UploadResponse{
@@ -366,6 +382,12 @@ func (self *Container) Upload(
 	// Where to store the file inside the Zip file.
 	result.StoredName = store_path.String()
 	result.Components = store_path.Components
+
+	// When uploading a directory we ensure that the name ends with a
+	// / which will create a zip directory
+	if mode.IsDir() && !strings.HasSuffix(result.StoredName, "/") {
+		result.StoredName += "/"
+	}
 
 	scope.Log("Collecting file %s into %s (%v bytes)",
 		formatFilename(filename, accessor), result.StoredName, expected_size)

@@ -2,7 +2,7 @@
 
 /*
    Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+   Copyright (C) 2019-2024 Rapid7 Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Affero General Public License as published
@@ -533,6 +533,12 @@ func timestamp_of(path string) int64 {
 }
 
 func UpdateDependentTools() error {
+	// Do not update dependencies for dev builds as the uploaded
+	// binaries do not exist yet.
+	if strings.Contains(constants.VERSION, "dev") {
+		return nil
+	}
+
 	v, err := semver.NewVersion(constants.VERSION)
 	if err != nil {
 		return err

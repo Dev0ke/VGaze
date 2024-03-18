@@ -30,6 +30,12 @@ func (self *MultiGetSubjectRequest) Message() proto.Message {
 	return proto.Clone(self.message)
 }
 
+func (self *MultiGetSubjectRequest) Error() error {
+	self.mu.Lock()
+	defer self.mu.Unlock()
+	return self.Err
+}
+
 func NewMultiGetSubjectRequest(message proto.Message, path api.DSPathSpec, data interface{}) *MultiGetSubjectRequest {
 	return &MultiGetSubjectRequest{
 		message: proto.Clone(message),
@@ -136,4 +142,29 @@ func GetImplementationName(
 	}
 
 	return config_obj.Datastore.Implementation, nil
+}
+
+type Flusher interface {
+	Flush()
+}
+
+func FlushDatastore(config_obj *config_proto.Config) error {
+	var wg sync.WaitGroup
+	defer wg.Wait()
+
+	db, err := GetDB(config_obj)
+	if err != nil {
+		return err
+	}
+
+	flusher, ok := db.(Flusher)
+	if ok {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			flusher.Flush()
+		}()
+	}
+
+	return nil
 }

@@ -98,7 +98,7 @@ class OfflineCollectorParameters  extends React.Component {
                      <Col sm="8">
                        <Form.Control
                          as="textarea"
-                         placeholder={T("Public Key/Certificate To Encrypt With. If X509, Defaults To Frontend Cert")}
+                         placeholder={T("Public Key/Certificate To Encrypt With. If empty, defaults To Frontend Cert")}
                          spellCheck="false"
                          value={this.props.parameters.encryption_args.public_key}
                          onChange={e => {
@@ -292,6 +292,22 @@ class OfflineCollectorParameters  extends React.Component {
                             value={this.props.parameters.target_args.credentialsSecret}
                             onChange={e => {
                                 this.props.parameters.target_args.credentialsSecret = e.target.value;
+                                this.props.setParameters(this.props.parameters);
+                            }}
+                          />
+                        </Col>
+                      </Form.Group>
+
+                      <Form.Group as={Row}>
+                        <Form.Label column sm="3">{T("Credentials Token")}</Form.Label>
+                        <Col sm="8">
+                          <Form.Control
+                            as="textarea" rows={3}
+                            placeholder={T("Credentials Token")}
+                            spellCheck="false"
+                            value={this.props.parameters.target_args.credentialsToken}
+                            onChange={e => {
+                                this.props.parameters.target_args.credentialsToken = e.target.value;
                                 this.props.setParameters(this.props.parameters);
                             }}
                           />
@@ -728,6 +744,7 @@ export default class OfflineCollectorWizard extends React.Component {
                 // For S3 buckets.
                 credentialsKey: "",
                 credentialsSecret: "",
+                credentialsToken: "",
                 region: "",
                 endpoint: "",
                 serverSideEncryption: "",

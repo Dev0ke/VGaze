@@ -1,19 +1,19 @@
 /*
-   Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+Velociraptor - Dig Deeper
+Copyright (C) 2019-2024 Rapid7 Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License as published
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-   You should have received a copy of the GNU Affero General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 package flows
 
@@ -33,6 +33,7 @@ import (
 	"www.velocidex.com/golang/velociraptor/vql"
 	vql_subsystem "www.velocidex.com/golang/velociraptor/vql"
 	"www.velocidex.com/golang/velociraptor/vql/server/hunts"
+	vql_utils "www.velocidex.com/golang/velociraptor/vql/utils"
 	"www.velocidex.com/golang/vfilter"
 	"www.velocidex.com/golang/vfilter/arg_parser"
 )
@@ -75,12 +76,15 @@ type SourcePluginArgs struct {
 	// allows post processing in multiple stages - one query
 	// reduces the data into a result set and subsequent queries
 	// operate on that reduced set.
-	NotebookId        string `vfilter:"optional,field=notebook_id,doc=The notebook to read from (should also include cell id)"`
-	NotebookCellId    string `vfilter:"optional,field=notebook_cell_id,doc=The notebook cell read from (should also include notebook id)"`
-	NotebookCellTable int64  `vfilter:"optional,field=notebook_cell_table,doc=A notebook cell can have multiple tables.)"`
+	NotebookId          string `vfilter:"optional,field=notebook_id,doc=The notebook to read from (should also include cell id)"`
+	NotebookCellId      string `vfilter:"optional,field=notebook_cell_id,doc=The notebook cell read from (should also include notebook id)"`
+	NotebookCellVersion string `vfilter:"optional,field=notebook_cell_version,doc=The notebook cell version to read from (should also include notebook id and notebook cell)"`
+	NotebookCellTable   int64  `vfilter:"optional,field=notebook_cell_table,doc=A notebook cell can have multiple tables.)"`
 
 	StartRow int64 `vfilter:"optional,field=start_row,doc=Start reading the result set from this row"`
 	Limit    int64 `vfilter:"optional,field=count,doc=Maximum number of clients to fetch (default unlimited)'"`
+
+	OrgIds []string `vfilter:"optional,field=orgs,doc=Run the query over these orgs. If empty use the current org.'"`
 }
 
 type SourcePlugin struct{}
@@ -127,7 +131,8 @@ func (self SourcePlugin) Call(
 		new_args := ordereddict.NewDict().
 			Set("hunt_id", arg.HuntId).
 			Set("artifact", arg.Artifact).
-			Set("source", arg.Source)
+			Set("source", arg.Source).
+			Set("orgs", arg.OrgIds)
 
 		// Just delegate to the hunt_results() plugin.
 		return hunts.HuntResultsPlugin{}.Call(ctx, scope, new_args)
@@ -135,7 +140,7 @@ func (self SourcePlugin) Call(
 
 	// Event artifacts just proxy for the monitoring plugin.
 	if arg.NotebookCellId == "" && arg.Artifact != "" {
-		ok, _ := isArtifactEvent(ctx, config_obj, arg)
+		ok, _ := isArtifactEvent(scope, ctx, config_obj, arg)
 		if ok {
 			// Just delegate directly to the monitoring plugin.
 			return MonitoringPlugin{}.Call(ctx, scope, args)
@@ -147,7 +152,7 @@ func (self SourcePlugin) Call(
 
 		// Depending on the parameters, we need to read from
 		// different places.
-		result_set_reader, err := getResultSetReader(ctx, config_obj, arg)
+		result_set_reader, err := getResultSetReader(ctx, config_obj, scope, arg)
 		if err != nil {
 			scope.Log("source: %v", err)
 			return
@@ -191,15 +196,10 @@ func (self SourcePlugin) Info(
 // Figure out if the artifact is an event artifact based on its
 // definition.
 func isArtifactEvent(
-	ctx context.Context, config_obj *config_proto.Config,
+	scope vfilter.Scope, ctx context.Context, config_obj *config_proto.Config,
 	arg *SourcePluginArgs) (bool, error) {
 
-	manager, err := services.GetRepositoryManager(config_obj)
-	if err != nil {
-		return false, err
-	}
-
-	repository, err := manager.GetGlobalRepository(config_obj)
+	repository, err := vql_utils.GetRepository(scope)
 	if err != nil {
 		return false, err
 	}
@@ -230,6 +230,7 @@ func isArtifactEvent(
 func getResultSetReader(
 	ctx context.Context,
 	config_obj *config_proto.Config,
+	scope vfilter.Scope,
 	arg *SourcePluginArgs) (result_sets.ResultSetReader, error) {
 
 	file_store_factory := file_store.GetFileStore(config_obj)
@@ -240,8 +241,9 @@ func getResultSetReader(
 		if table == 0 {
 			table = 1
 		}
-		path_manager := paths.NewNotebookPathManager(
-			arg.NotebookId).Cell(arg.NotebookCellId).QueryStorage(table)
+		path_manager := paths.NewNotebookPathManager(arg.NotebookId).
+			Cell(arg.NotebookCellId, arg.NotebookCellVersion).
+			QueryStorage(table)
 
 		return result_sets.NewResultSetReader(
 			file_store_factory, path_manager.Path())
@@ -253,7 +255,7 @@ func getResultSetReader(
 			arg.Source = ""
 		}
 
-		is_event, err := isArtifactEvent(ctx, config_obj, arg)
+		is_event, err := isArtifactEvent(scope, ctx, config_obj, arg)
 		if err != nil {
 			return nil, err
 		}

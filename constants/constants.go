@@ -1,19 +1,19 @@
 /*
-   Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+Velociraptor - Dig Deeper
+Copyright (C) 2019-2024 Rapid7 Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License as published
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-   You should have received a copy of the GNU Affero General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 package constants
 
@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	VERSION = "0.7.1"
+	VERSION = "0.72-rc1"
 
 	ENROLLMENT_WELL_KNOWN_FLOW = "E:Enrol"
 	MONITORING_WELL_KNOWN_FLOW = FLOW_PREFIX + "Monitoring"
@@ -59,6 +59,7 @@ const (
 	SCOPE_ROOT              = "$root"
 	SCOPE_STACK             = "$stack"
 	SCOPE_DEVICE_MANAGER    = "$device_manager"
+	SCOPE_REPOSITORY        = "$repository"
 	SCOPE_RESPONDER_CONTEXT = "_Context"
 
 	// Artifact names from packs should start with this
@@ -124,6 +125,18 @@ const (
 	// by the sqlite() plugin.
 	SQLITE_ALWAYS_MAKE_TEMPFILE = "SQLITE_ALWAYS_MAKE_TEMPFILE"
 
+	// This variable in the scope can set a dict that maps columns to
+	// their types. For example
+	// LET ColumnTypes <= dict(Column1="preview_upload")
+	COLUMN_TYPES = "ColumnTypes"
+
+	// Setting this in the scope causes times to be serialized in the
+	// specified timezone instead of UTC. NOTE: The GUI changes times
+	// to the timezone specified in the user preferences so this may
+	// not be immediately visible in the GUI but will affect the
+	// timezone actually serialized.
+	TZ = "TZ"
+
 	PinnedServerName = "VelociraptorServer"
 	PinnedGwName     = "GRPC_GW"
 
@@ -137,6 +150,11 @@ const (
 	CLIENT_API_VERSION_0_6_8 = uint32(4)
 
 	DISABLE_DANGEROUS_API_CALLS = "DISABLE_DANGEROUS_API_CALLS"
+
+	// Fixed secret types - definitions in the sanity service
+	AWS_S3_CREDS    = "AWS S3 Creds"
+	SSH_PRIVATE_KEY = "SSH PrivateKey"
+	HTTP_SECRETS    = "HTTP Secrets"
 )
 
 type key int
