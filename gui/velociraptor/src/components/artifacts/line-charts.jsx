@@ -51,7 +51,7 @@ class CustomTooltip extends React.Component {
           if (_.isNaN(now)) {
               value = "";
           } else if(_.isDate(now)) {
-              value = now.toISOString();
+              value = now.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '');
           }
 
           return (
