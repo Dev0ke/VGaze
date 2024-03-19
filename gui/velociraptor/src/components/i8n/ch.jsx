@@ -177,7 +177,7 @@ const Chinese = {
     "Unlimited": "无限制",
     "rows": "行数",
     "Request sent to client": "请求已发送到客户端",
-    "Description": "搜寻描述",
+    "Description": "任务描述",
     "Created": "创建于",
     "Manually add collection to hunt": "手动添加收集到 搜寻",
     "No compatible hunts.": "没有兼容的 搜寻。",
@@ -294,7 +294,7 @@ const Chinese = {
 
     "Started":"开始于",
     "Expires":"过期于",
-    "Scheduled":"预期",
+    "Scheduled":"已完成",
     "New Hunt":"新的搜寻任务",
     "Run Hunt":"开始搜寻任务",
     "Stop Hunt":"停止搜寻任务",
@@ -305,7 +305,7 @@ const Chinese = {
     "Clients":"客户端",
     "Notebook for Hunt": hunt_id=>hunt_id + "搜寻的结果",
 
-    "Hunt ID":"Hunt ID",
+    "Hunt ID":"任务ID",
     "Creation Time":"创建时间",
     "Expiry Time":"过期于",
     "Total scheduled":"正在运行任务的客户端数量",
@@ -321,6 +321,7 @@ const Chinese = {
     "Hunt description":"搜寻的描述",
     "Modify Hunt":"修改搜寻配置",
     "Expiry":"过期时间",
+    "Time hunt will expire":"搜寻任务的过期时间",
     "Include Condition":"条件",
     "Run everywhere":"在全终端上运行",
     "Exclude Condition":"排除条件",
@@ -460,7 +461,7 @@ const Chinese = {
 
     "Select a notebook from the list above.":"从以上列表中选择搜寻结果。",
     "Cancel":"取消",
-    "Recalculate":"再计算",
+    "Recalculate":"刷新",
     "Stop Calculating":"停止计算",
     "Edit Cell":"编辑单元格",
     "Up Cell":"上传单元格",
@@ -581,7 +582,7 @@ const Chinese = {
 
     "Select a language":"选择语言",
     "Chinese" :"汉语",
-    "English":"英語",
+    "English":"英语",
 
     "Type":"类型",
     "Export notebooks":"搜寻结果的导出",
