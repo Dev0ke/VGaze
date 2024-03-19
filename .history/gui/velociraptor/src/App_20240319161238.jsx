@@ -36,7 +36,7 @@ import { Join } from './components/utils/paths.jsx';
 import SecretManager from './components/secrets/secrets.jsx';
 
 /*新增*************************************/
-import RecordsHunts from './components/records/records.jsx';
+import RecordsApplication from './components/records/records-application.jsx';
 
 
 /*新增*************************************/
@@ -187,10 +187,8 @@ class App extends Component {
                      </Route>
                     {/*新增*************************************/}
                      <Route path="/records/application/:hunt_id?/:tab?">
-                        <RecordsHunts/>
+                        <VeloHunts/>
                      </Route>
-                    {/*新增*************************************/}
-                     
                      {/* ClientFlowsView will only be invoked when the
                        * client looks like a client id - the
                        * ServerFlowsView is invoked when client_id ==

@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import SplitPane from 'react-split-pane';
-import HuntList from './records-list.jsx';
-import HuntInspector from './records-inspector.jsx';
+import HuntList from './hunt-list.jsx';
+import HuntInspector from './hunt-inspector.jsx';
 import _ from 'lodash';
 import api from '../core/api-service.jsx';
 
@@ -13,7 +13,7 @@ import { withRouter }  from "react-router-dom";
 
 const POLL_TIME = 5000;
 
-class RecordsHunts extends React.Component {
+class RHunts extends React.Component {
     static propTypes = {
         // React router props.
         match: PropTypes.object,
@@ -59,9 +59,9 @@ class RecordsHunts extends React.Component {
         }
         let tab = this.props.match && this.props.match.params && this.props.match.params.tab;
         if (tab) {
-            this.props.history.push("/records/application/" + hunt_id + "/" + tab);
+            this.props.history.push("/hunts/" + hunt_id + "/" + tab);
         } else {
-            this.props.history.push("/records/application/" + hunt_id);
+            this.props.history.push("/hunts/" + hunt_id);
         }
         this.setState({selected_hunt_id: hunt_id});
         this.loadFullHunt(hunt_id);

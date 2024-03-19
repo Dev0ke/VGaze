@@ -189,8 +189,6 @@ class App extends Component {
                      <Route path="/records/application/:hunt_id?/:tab?">
                         <RecordsHunts/>
                      </Route>
-                    {/*新增*************************************/}
-                     
                      {/* ClientFlowsView will only be invoked when the
                        * client looks like a client id - the
                        * ServerFlowsView is invoked when client_id ==

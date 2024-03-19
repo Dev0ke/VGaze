@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import SplitPane from 'react-split-pane';
-import HuntList from './records-list.jsx';
-import HuntInspector from './records-inspector.jsx';
+import HuntList from './hunt-list.jsx';
+import HuntInspector from './hunt-inspector.jsx';
 import _ from 'lodash';
 import api from '../core/api-service.jsx';
 
@@ -13,7 +13,7 @@ import { withRouter }  from "react-router-dom";
 
 const POLL_TIME = 5000;
 
-class RecordsHunts extends React.Component {
+class VeloHunts extends React.Component {
     static propTypes = {
         // React router props.
         match: PropTypes.object,
@@ -59,9 +59,9 @@ class RecordsHunts extends React.Component {
         }
         let tab = this.props.match && this.props.match.params && this.props.match.params.tab;
         if (tab) {
-            this.props.history.push("/records/application/" + hunt_id + "/" + tab);
+            this.props.history.push("/hunts/" + hunt_id + "/" + tab);
         } else {
-            this.props.history.push("/records/application/" + hunt_id);
+            this.props.history.push("/hunts/" + hunt_id);
         }
         this.setState({selected_hunt_id: hunt_id});
         this.loadFullHunt(hunt_id);
@@ -93,24 +93,40 @@ class RecordsHunts extends React.Component {
     }
 
     render() {
-        return (
-            <>
-              <SplitPane
-                size={this.state.topPaneSize}
-                split="horizontal"
-                defaultSize="30%">
-                <HuntList
-                  collapseToggle={this.collapse}
-                  updateHunts={this.fetchSelectedHunt}
-                  selected_hunt={this.state.full_selected_hunt}
-                  setSelectedHuntId={this.setSelectedHuntId} />
-                <HuntInspector
-                  fetch_hunts={this.fetchSelectedHunt}
-                  hunt={this.state.full_selected_hunt} />
-              </SplitPane>
+    //     return (
+    //         <>
+    //           <SplitPane
+    //             size={this.state.topPaneSize}
+    //             split="horizontal"
+    //             defaultSize="30%">
+    //             <HuntList
+    //               collapseToggle={this.collapse}
+    //               updateHunts={this.fetchSelectedHunt}
+    //               selected_hunt={this.state.full_selected_hunt}
+    //               setSelectedHuntId={this.setSelectedHuntId} />
+    //             <HuntInspector
+    //               fetch_hunts={this.fetchSelectedHunt}
+    //               hunt={this.state.full_selected_hunt} />
+    //           </SplitPane>
+    //         </>
+    //     );
+    // }
+    return (
+        <>
+        {/* <HuntList
+            collapseToggle={this.collapse}
+            updateHunts={this.fetchSelectedHunt}
+            selected_hunt={this.state.full_selected_hunt}
+            setSelectedHuntId={this.setSelectedHuntId} /> */}
+            <HuntInspector
+                collapseToggle={this.collapse}
+            updateHunts={this.fetchSelectedHunt}
+            selected_hunt={this.state.full_selected_hunt}
+                fetch_hunts={this.fetchSelectedHunt}
+                hunt={this.state.full_selected_hunt} />
             </>
-        );
-    }
+    );
+}
 };
 
-export default withRouter(RecordsHunts);
+export default withRouter(VeloHunts);

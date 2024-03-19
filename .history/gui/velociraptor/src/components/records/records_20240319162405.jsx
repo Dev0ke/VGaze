@@ -13,7 +13,7 @@ import { withRouter }  from "react-router-dom";
 
 const POLL_TIME = 5000;
 
-class RecordsHunts extends React.Component {
+class RecordsApplication extends React.Component {
     static propTypes = {
         // React router props.
         match: PropTypes.object,
@@ -21,15 +21,15 @@ class RecordsHunts extends React.Component {
     };
 
     state = {
-        // The currently selected hunt summary.
-        selected_hunt_id: {},
+        // The currently selected records summary.
+        selected_records_id: {},
 
-        // The full detail of the current selected hunt.
-        full_selected_hunt: {},
+        // The full detail of the current selected records.
+        full_selected_records: {},
 
-        // A list of hunt summary objects - contains just enough info
+        // A list of records summary objects - contains just enough info
         // to render tables.
-        hunts: [],
+        records: [],
 
         filter: "",
 
@@ -38,11 +38,11 @@ class RecordsHunts extends React.Component {
     }
 
     componentDidMount = () => {
-        this.get_hunts_source = CancelToken.source();
+        this.get_records_source = CancelToken.source();
     }
 
     componentWillUnmount() {
-        this.get_hunts_source.cancel();
+        this.get_records_source.cancel();
     }
 
     collapse = () => {
@@ -53,8 +53,8 @@ class RecordsHunts extends React.Component {
         }
     }
 
-    setSelectedHuntId = (hunt_id) => {
-        if (!hunt_id) {
+    setSelectedrecordsId = (records_id) => {
+        if (!records_id) {
             return;
         }
         let tab = this.props.match && this.props.match.params && this.props.match.params.tab;
@@ -113,4 +113,4 @@ class RecordsHunts extends React.Component {
     }
 };
 
-export default withRouter(RecordsHunts);
+export default withRouter(RecordsApplication);

@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import SplitPane from 'react-split-pane';
-import HuntList from './records-list.jsx';
-import HuntInspector from './records-inspector.jsx';
+import HuntList from './hunt-list.jsx';
+import HuntInspector from './hunt-inspector.jsx';
 import _ from 'lodash';
 import api from '../core/api-service.jsx';
 
