@@ -140,9 +140,9 @@ class UserSettings extends React.PureComponent {
     componentDidMount = () => {
         if (this.context.traits) {
             this.setState({
-                theme: this.context.traits.theme || "veloci-light",
-                timezone: this.context.traits.timezone || "UTC",
-                lang: this.context.traits.lang || "en",
+                theme: this.context.traits.theme || "no-theme",
+                timezone: this.context.traits.timezone || "Asia/Shanghai",
+                lang: this.context.traits.lang || "ch",
                 org: this.context.traits.org || "root",
                 default_password: this.context.traits.default_password || "",
             });
@@ -302,9 +302,9 @@ class UserSettings extends React.PureComponent {
                           as="button"
                           className="btn btn-default"
                           onClick={()=>{
-                              this.setState({timezone: "UTC"});
+                              this.setState({timezone: "Asia/Shanghai"});
                               this.props.setSetting({
-                                  timezone: "UTC",
+                                  timezone: "Asia/Shanghai",
                               });
                           }}>
                           UTC
