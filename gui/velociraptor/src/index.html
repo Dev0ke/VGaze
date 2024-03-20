@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
+    <meta charset="utf-8" />
     <link rel="shortcut icon" href="{{.BasePath}}/app/favicon.ico" />
     <script type="text/javascript">
       window.globals = {
@@ -24,7 +25,7 @@
       window.ErrorState = {{ if .ErrState }}{{.ErrState}}{{else}}[]{{end}};
     </script>
 
-    <title>Velociraptor Response and Monitoring</title>
+    <title>VGaze监控系统</title>
   </head>
   <body id="body" class="{{.UserTheme}}">
     <noscript>You need to enable JavaScript to run this app.</noscript>
