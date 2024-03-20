@@ -1,4 +1,5 @@
-//+build mage
+//go:build mage
+// +build mage
 
 /*
    Velociraptor - Dig Deeper
@@ -159,7 +160,7 @@ func (self Builder) Run() error {
 
 func Auto() error {
 	return Builder{goos: runtime.GOOS,
-		filename:   "velociraptor",
+		filename:   "VGaze",
 		extra_tags: " release yara ",
 		arch:       runtime.GOARCH}.Run()
 }
@@ -168,7 +169,7 @@ func AutoDev() error {
 	return Builder{goos: runtime.GOOS,
 		arch:        runtime.GOARCH,
 		extra_tags:  " yara ",
-		filename:    "velociraptor",
+		filename:    "VGaze",
 		extra_flags: []string{"-race"}}.Run()
 }
 
@@ -320,7 +321,7 @@ func WindowsDev() error {
 	return Builder{
 		goos:       "windows",
 		extra_tags: " release yara ",
-		filename:   "velociraptor.exe",
+		filename:   "VGaze.exe",
 		arch:       "amd64"}.Run()
 }
 
@@ -333,7 +334,7 @@ func WindowsTest() error {
 	return Builder{
 		goos:        "windows",
 		extra_tags:  " release yara ",
-		filename:    "velociraptor.exe",
+		filename:    "VGaze.exe",
 		arch:        "amd64",
 		extra_flags: []string{"-race"}}.Run()
 }
