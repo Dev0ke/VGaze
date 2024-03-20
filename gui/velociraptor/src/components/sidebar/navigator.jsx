@@ -181,7 +181,7 @@ class VeloNavigator extends Component {
                         </NavLink>
                       </li>
 
-                      <li className="nav-link">
+                      {/* <li className="nav-link">
                         <NavLink to="/notebooks">
                           <span>
                             <i className="navicon">
@@ -190,7 +190,7 @@ class VeloNavigator extends Component {
                           </span>
                           {T("Notebooks")}
                         </NavLink>
-                      </li>
+                      </li> */}
 
                       {user_is_admin && !customization.disable_user_management && (
                         <li className="nav-link">
