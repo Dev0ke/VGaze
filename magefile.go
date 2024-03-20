@@ -55,7 +55,7 @@ var (
 	// apt-get install gcc-mingw-w64
 	mingw_xcompiler_32 = "i686-w64-mingw32-gcc"
 	musl_xcompiler     = "musl-gcc"
-	name               = "velociraptor"
+	name               = "VGaze"
 	version            = "v" + constants.VERSION
 	base_tags          = " server_vql extras "
 )
