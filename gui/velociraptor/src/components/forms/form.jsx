@@ -361,13 +361,13 @@ export default class VeloForm extends React.Component {
                           } else if(this.state.isUTC) {
                               let local_time = convertToDate(value);
                               let utc_time = utcTimeFromLocalTime(local_time);
-                              this.props.setValue(utc_time.toISOString());
+                              this.props.setValue(utc_time.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, ''));
 
                           } else {
                               // When in local time we just set the
                               // time as it is.
                               let local_time = convertToDate(value);
-                              this.props.setValue(local_time.toISOString());
+                              this.props.setValue(local_time.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, ''));
                           }
                       }}
                       value={date}
