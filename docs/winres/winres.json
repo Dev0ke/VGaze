@@ -13,7 +13,7 @@
           "name": "",
           "version": ""
         },
-        "description": "Velociraptor: Digging deeper!",
+        "description": "VGaze: Best Monitoring Tool!",
         "minimum-os": "win7",
         "execution-level": "highest",
         "ui-access": false,
@@ -41,15 +41,15 @@
         "info": {
           "0409": {
             "Comments": "",
-            "CompanyName": "Rapid 7 Inc",
-            "FileDescription": "Velociraptor: Digging Deeper!",
+            "CompanyName": "Security Pride",
+            "FileDescription": "VGaze: Best Monitoring Tool!",
             "FileVersion": "",
             "InternalName": "",
-            "LegalCopyright": "Rapid 7 Inc",
+            "LegalCopyright": "Security Pride",
             "LegalTrademarks": "",
-            "OriginalFilename": "Velociraptor.exe",
+            "OriginalFilename": "VGaze.exe",
             "PrivateBuild": "",
-            "ProductName": "Velociraptor",
+            "ProductName": "VGaze",
             "ProductVersion": "",
             "SpecialBuild": ""
           }
