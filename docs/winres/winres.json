@@ -13,7 +13,7 @@
           "name": "",
           "version": ""
         },
-        "description": "VGaze: Best Monitoring Tool!",
+        "description": "VGaze: 强大的监控工具!",
         "minimum-os": "win7",
         "execution-level": "highest",
         "ui-access": false,
@@ -42,7 +42,7 @@
           "0409": {
             "Comments": "",
             "CompanyName": "Security Pride",
-            "FileDescription": "VGaze: Best Monitoring Tool!",
+            "FileDescription": "VGaze: 强大的监控工具!",
             "FileVersion": "",
             "InternalName": "",
             "LegalCopyright": "Security Pride",
