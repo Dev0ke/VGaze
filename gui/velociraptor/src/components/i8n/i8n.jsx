@@ -16,7 +16,7 @@ function dict(item) {
            return English[item];
 
     default:
-        return ch[item];
+        return chinese[item];
     }
 };
 

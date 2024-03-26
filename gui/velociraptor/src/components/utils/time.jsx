@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'moment-timezone';
 import Tooltip from 'react-bootstrap/Tooltip';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import T from '../i8n/i8n.jsx';
+import  T from '../i8n/i8n.jsx';
 import UserConfig from '../core/user.jsx';
 
 const renderToolTip = (props, ts) => {
@@ -104,13 +104,16 @@ class VeloTimestamp extends Component {
 
         let timezone = this.context.traits.timezone || "UTC";
         var when = moment(ts);
-        return <OverlayTrigger
-                 delay={{show: 250, hide: 400}}
-                 overlay={(props)=>renderToolTip(props, ts)}>
-                 <div className="timestamp">
+        // return <OverlayTrigger
+        //          delay={{show: 250, hide: 400}}
+        //          overlay={(props)=>renderToolTip(props, ts)}>
+        //          <div className="timestamp">
+        //            {moment.tz(when, timezone).format('YYYY-MM-DD HH:mm:ss')}
+        //          </div>
+        //        </OverlayTrigger>;
+        return <div className="timestamp">
                    {moment.tz(when, timezone).format('YYYY-MM-DD HH:mm:ss')}
-                 </div>
-               </OverlayTrigger>;
+               </div>;
     };
 }
 
