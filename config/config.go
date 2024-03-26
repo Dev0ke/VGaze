@@ -42,7 +42,7 @@ func GetVersion() *config_proto.Version {
 		Version:    constants.VERSION,
 		BuildTime:  build_time,
 		Commit:     commit_hash,
-		CiBuildUrl: "",
+		CiBuildUrl: " ",
 		Compiler:   runtime.Version(),
 	}
 }
