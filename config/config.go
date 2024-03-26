@@ -51,12 +51,12 @@ func GetVersion() *config_proto.Version {
 func GetDefaultConfig() *config_proto.Config {
 	result := &config_proto.Config{
 		Client: &config_proto.ClientConfig{
-			WritebackDarwin: "/etc/velociraptor.writeback.yaml",
-			WritebackLinux:  "/etc/velociraptor.writeback.yaml",
-			WritebackWindows: "$ProgramFiles\\Velociraptor\\" +
-				"velociraptor.writeback.yaml",
+			WritebackDarwin: "/etc/VGaze.writeback.yaml",
+			WritebackLinux:  "/etc/VGaze.writeback.yaml",
+			WritebackWindows: "$ProgramFiles\\VGaze\\" +
+				"VGaze.writeback.yaml",
 			Level2WritebackSuffix: ".bak",
-			TempdirWindows:        "$ProgramFiles\\Velociraptor\\Tools",
+			TempdirWindows:        "$ProgramFiles\\VGaze\\Tools",
 			MaxPoll:               60,
 
 			// By default restart the client if we are unable to
@@ -73,23 +73,23 @@ func GetDefaultConfig() *config_proto.Config {
 			LocalBuffer: &config_proto.RingBufferConfig{
 				MemorySize:      50 * 1024 * 1024,
 				DiskSize:        1024 * 1024 * 1024,
-				FilenameLinux:   "/var/tmp/Velociraptor_Buffer.bin",
-				FilenameWindows: "$TEMP/Velociraptor_Buffer.bin",
-				FilenameDarwin:  "/var/tmp/Velociraptor_Buffer.bin",
+				FilenameLinux:   "/var/tmp/VGaze_Buffer.bin",
+				FilenameWindows: "$TEMP/VGaze_Buffer.bin",
+				FilenameDarwin:  "/var/tmp/VGaze_Buffer.bin",
 			},
 
 			// Specific instructions for the
 			// windows service installer.
 			WindowsInstaller: &config_proto.WindowsInstallerConfig{
-				ServiceName: "Velociraptor",
-				InstallPath: "$ProgramFiles\\Velociraptor\\" +
-					"Velociraptor.exe",
-				ServiceDescription: "Velociraptor service",
+				ServiceName: "VGaze",
+				InstallPath: "$ProgramFiles\\VGaze\\" +
+					"VGaze.exe",
+				ServiceDescription: "VGaze service",
 			},
 
 			DarwinInstaller: &config_proto.DarwinInstallerConfig{
-				ServiceName: "com.velocidex.velociraptor",
-				InstallPath: "/usr/local/sbin/velociraptor",
+				ServiceName: "com.velocidex.VGaze",
+				InstallPath: "/usr/local/sbin/VGaze",
 			},
 
 			// If set to true this will stop
@@ -97,7 +97,7 @@ func GetDefaultConfig() *config_proto.Config {
 			// client.
 			PreventExecve:    false,
 			MaxUploadSize:    constants.MAX_MEMORY,
-			PinnedServerName: "VelociraptorServer",
+			PinnedServerName: "VGazeServer",
 		},
 		API: &config_proto.APIConfig{
 			// Bind port for gRPC endpoint - this should not
@@ -155,8 +155,8 @@ func GetDefaultConfig() *config_proto.Config {
 
 			// Users would probably need to change
 			// this to something more permanent.
-			Location:           "/var/tmp/velociraptor/",
-			FilestoreDirectory: "/var/tmp/velociraptor/",
+			Location:           "/var/tmp/VGaze/",
+			FilestoreDirectory: "/var/tmp/VGaze/",
 		},
 		Logging: &config_proto.LoggingConfig{
 			// Disable debug logging by default.
