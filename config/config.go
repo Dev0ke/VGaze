@@ -38,11 +38,11 @@ var (
 
 func GetVersion() *config_proto.Version {
 	return &config_proto.Version{
-		Name:       "velociraptor",
+		Name:       "VGaze",
 		Version:    constants.VERSION,
 		BuildTime:  build_time,
 		Commit:     commit_hash,
-		CiBuildUrl: ci_run_url,
+		CiBuildUrl: "",
 		Compiler:   runtime.Version(),
 	}
 }
