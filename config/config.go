@@ -88,7 +88,7 @@ func GetDefaultConfig() *config_proto.Config {
 			},
 
 			DarwinInstaller: &config_proto.DarwinInstallerConfig{
-				ServiceName: "com.velocidex.VGaze",
+				ServiceName: "com.VG.VGaze",
 				InstallPath: "/usr/local/sbin/VGaze",
 			},
 
