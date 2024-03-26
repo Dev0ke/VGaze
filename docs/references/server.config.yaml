@@ -122,10 +122,17 @@ Client:
   ## A list of one or more URLs the clients will try to connect
   ## to. When all connections fail the client will back off for a
   ## while. Clients will choose one of these at random so it is a good
-  ## way of achieving fault tolerance and load balancing.
+  ## way of achieving fault tolerance and load balancing.  As of
+  ## version 0.72, You can choose to use websockets here for a better
+  ## experience by setting the URL to start with wss://
   server_urls:
+  - wss://192.168.1.1:8000/
   - https://192.168.1.1:8000/
   - https://192.168.1.2:8000/
+
+  ## When using websockets the server will ping the client every this
+  ## many seconds.
+  ws_ping_wait_sec: 60
 
   ## A URL to a proxy that will be used to connect to the server. Some
   ## environments have egress filtering requiring Velociraptor to use
@@ -134,6 +141,28 @@ Client:
   ## you might need to add an allow rule to the proxy config to allow
   ## the Velociraptor server URL without authentication.
   proxy: https://proxy:3128/
+
+  ## Some proxy configurations are more complex. You can specify a
+  ## more detailed configuration here instead of the proxy parameter
+  ## above.
+  proxy_config:
+    # The proxy configuration for http and https urs.
+    http:  "<not set>"
+    https: "<not set>"
+
+    # A list of url regexp to match the url and connect to the
+    # target. Use an empty string to denote direct connection.
+    proxy_url_regexp:
+       "^https://localhost/": ""
+
+    # Location of a PAC file (overrides the above settings). This can
+    # be a file:// URL or even a data: url.
+    pac: "<not set>"
+
+    # If this is set we ignore the HTTP_PROXY and HTTPS_PROXY
+    # environment variables. By default we allow these environment
+    # variables to override the settings in this file.
+    ignore_environment: false
 
   ## The Internal Velociraptor CA certificate used to verify the
   ## server certificates. Do not change this! This will be generated
@@ -506,7 +535,7 @@ GUI:
       - administrator
 
     # How long to keep the session alive between auth flows - default 24 hours
-    default_session_expiry_min: 8000
+    default_session_expiry_min: 1440
 
     # Used by the multi authenticator to provide multiple
     # authenticators. NOTE: Sub authenticators must be oauth based
@@ -557,6 +586,16 @@ Frontend:
   # an non existent setting (e.g. http://127.0.0.1:3128).
   proxy: "http://127.0.0.1:3128"
 
+  # These proxy settings are exactly the same as the
+  # Cllient.proxy_config settings but apply to the server.
+  proxy_config:
+    http: "<not set>"
+    https: "<not set>"
+    proxy_url_regexp:
+       "^https://localhost/": ""
+    pac: "<not set>"
+    ignore_environment: false
+
   ## Velociraptor can attempt to obfuscate artifact names when
   ## compiling them into raw VQL. If this is set this obfuscation is
   ## removed.
@@ -599,10 +638,16 @@ Frontend:
   ## DNS server with its public IP address. Currently we only support
   ## Google Domains although other providers may also work.
   dyn_dns:
+    # The type of DynDNS provider (Can be cloudfront or noip)
+    type: noip
+
     # The hostname to update
     hostname: www.velo.com
     ddns_username: 1234233452
     ddns_password: 2313e2324
+
+    # The hostname to update - if empty we use Frontend.hostname
+    ddns_hostname: "<not set>"
 
     # If empty we use Google Domains.
     update_url: http://dyndns.provider.com/
@@ -617,6 +662,12 @@ Frontend:
     # DNS server we query for our own hostname/ip mapping (default
     # 8.8.8.8:53)
     dns_server: "8.8.8.8:53"
+
+    # Used by the cloudfront provider
+    api_token: <not set>
+
+    # The zone to update (dns domain).
+    zone_name: <not set>
 
   # Header defined by the proxy containing the remote address. If this
   # is not set we use the remote IP address from the TCP
@@ -1188,6 +1239,21 @@ defaults:
   export_concurrency: 10
   export_max_timeout_sec: 600
 
+  # The server maintains an index of all hunts in order to quickly
+  # allow the GUI to filter/sort them. This setting controls how often
+  # to rebuild the hunt index (default 600 sec). You probably dont
+  # need to change it.
+  hunt_dispatcher_refresh_sec: 600
+
+  # Total number of cell versions we keep for undo/redo support.
+  notebook_versions: 5
+
+  # Watch plugin frequency sleep time in seconds: How often
+  # watch_syslog() will check for changes (default 3).
+  watch_plugin_frequency: 3
+
+  # Maximum length of the line that will be parsed (16kb)
+  watch_plugin_buffer_size: 16384
 
 # The Velociraptor server may be placed into "lockdown" mode. While in
 # lockdown mode certain permissions are denied - even for
@@ -1196,6 +1262,9 @@ defaults:
 # compromised. The server can be taken out of lockdown mode by setting
 # lockdown to false and restarting the server.
 lockdown: false
+
+# This will be set when Velociraptor is started with the --debug flag.
+debug_mode: false
 
 # This configuration applies for minions. On minions this will
 # override the settings elsewhere in the config file allowing an easy

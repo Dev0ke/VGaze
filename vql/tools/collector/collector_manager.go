@@ -2,12 +2,15 @@ package collector
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"reflect"
 	"runtime"
 	"sync"
 	"time"
 
 	"github.com/Velocidex/ordereddict"
+	"gopkg.in/yaml.v2"
 	"www.velocidex.com/golang/velociraptor/actions"
 	actions_proto "www.velocidex.com/golang/velociraptor/actions/proto"
 	api_proto "www.velocidex.com/golang/velociraptor/api/proto"
@@ -28,6 +31,7 @@ import (
 	"www.velocidex.com/golang/velociraptor/vql"
 	"www.velocidex.com/golang/velociraptor/vql/acl_managers"
 	"www.velocidex.com/golang/velociraptor/vql/psutils"
+	vql_utils "www.velocidex.com/golang/velociraptor/vql/utils"
 	"www.velocidex.com/golang/vfilter"
 	"www.velocidex.com/golang/vfilter/types"
 )
@@ -73,12 +77,7 @@ func (self *collectionManager) GetRepository(extra_artifacts vfilter.Any) (err e
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
-	manager, err := services.GetRepositoryManager(self.config_obj)
-	if err != nil {
-		return err
-	}
-
-	self.repository, err = manager.GetGlobalRepository(self.config_obj)
+	self.repository, err = vql_utils.GetRepository(self.scope)
 	if err != nil {
 		return err
 	}
@@ -90,20 +89,19 @@ func (self *collectionManager) GetRepository(extra_artifacts vfilter.Any) (err e
 	// Private copy of the repository.
 	self.repository = self.repository.Copy()
 
-	loader := func(item *ordereddict.Dict) error {
-		serialized, err := json.Marshal(item)
-		if err != nil {
-			return err
-		}
+	definitions, err := parseExtraDefinitions(self.ctx, extra_artifacts)
+	if err != nil {
+		return err
+	}
 
-		artifact, err := self.repository.LoadYaml(
-			string(serialized), services.ArtifactOptions{
+	for _, definition := range definitions {
+		artifact, err := self.repository.LoadProto(
+			definition, services.ArtifactOptions{
 				ValidateArtifact:  true,
 				ArtifactIsBuiltIn: false})
 		if err != nil {
 			return err
 		}
-
 		self.custom_artifacts = append(self.custom_artifacts, artifact)
 
 		// Check if we are allows to add these artifacts
@@ -111,53 +109,68 @@ func (self *collectionManager) GetRepository(extra_artifacts vfilter.Any) (err e
 		if err != nil {
 			return err
 		}
-
-		return nil
-	}
-
-	switch t := extra_artifacts.(type) {
-	case []*ordereddict.Dict:
-		for _, item := range t {
-			err := loader(item)
-			if err != nil {
-				return err
-			}
-		}
-
-	case *ordereddict.Dict:
-		err := loader(t)
-		if err != nil {
-			return err
-		}
-
-	case []string:
-		for _, item := range t {
-			artifact, err := self.repository.LoadYaml(item,
-				services.ArtifactOptions{ValidateArtifact: true})
-			if err != nil {
-				return err
-			}
-
-			err = CheckArtifactModification(self.scope, artifact)
-			if err != nil {
-				return err
-			}
-		}
-
-	case string:
-		artifact, err := self.repository.LoadYaml(t,
-			services.ArtifactOptions{ValidateArtifact: true})
-		if err != nil {
-			return err
-		}
-
-		err = CheckArtifactModification(self.scope, artifact)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
+}
+
+func parseSingleArtifact(
+	ctx context.Context,
+	custom_artifact vfilter.Any) (
+	*artifacts_proto.Artifact, error) {
+
+	// Allow the definition to be either a string, an ordereddict, an
+	// existing artifact or a lazy expression.
+	switch t := custom_artifact.(type) {
+	case *artifacts_proto.Artifact:
+		return t, nil
+
+	case *ordereddict.Dict:
+		serialized, err := json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		return parseSingleArtifact(ctx, string(serialized))
+
+	case string:
+		result := &artifacts_proto.Artifact{}
+		err := yaml.UnmarshalStrict([]byte(t), result)
+		return result, err
+
+	case vfilter.LazyExpr:
+		return parseSingleArtifact(ctx, t.Reduce(ctx))
+	}
+	return nil, fmt.Errorf("%w: Unable to parse type %T as an artifact definition",
+		utils.TypeError, custom_artifact)
+}
+
+func parseExtraDefinitions(
+	ctx context.Context,
+	extra_artifacts vfilter.Any) (
+	result []*artifacts_proto.Artifact, err error) {
+
+	a_value := reflect.Indirect(reflect.ValueOf(extra_artifacts))
+	a_type := a_value.Type()
+
+	// Handle slices specifically
+	if a_type.Kind() == reflect.Slice {
+		for i := 0; i < a_value.Len(); i++ {
+			element := a_value.Index(i).Interface()
+			definition, err := parseSingleArtifact(ctx, element)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, definition)
+		}
+		return result, nil
+	}
+
+	definition, err := parseSingleArtifact(ctx, extra_artifacts)
+	if err != nil {
+		return nil, err
+	}
+
+	return []*artifacts_proto.Artifact{definition}, nil
 }
 
 // Install throttler into the scope.
@@ -274,11 +287,15 @@ func (self *collectionManager) collectQuery(
 		}
 		for row := range vql.Eval(self.ctx, subscope) {
 			status.ResultRows++
+			row_dict := vfilter.RowToDict(self.ctx, subscope, row)
+			if query.Name != "" {
+				row_dict.Set("_Source", query.Name)
+			}
 			select {
 			case <-self.ctx.Done():
 				query_log.Close()
 				return nil
-			case self.output_chan <- row:
+			case self.output_chan <- row_dict:
 			}
 		}
 		query_log.Close()
@@ -311,11 +328,11 @@ func (self *collectionManager) collectQuery(
 }
 
 func (self *collectionManager) Collect(request *flows_proto.ArtifactCollectorArgs) error {
-	self.mu.Lock()
-	defer self.mu.Unlock()
-
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
+
+	self.mu.Lock()
+	defer self.mu.Unlock()
 
 	self.start_time = Clock.Now()
 	self.collection_context.Request = request
@@ -375,6 +392,9 @@ func (self *collectionManager) Collect(request *flows_proto.ArtifactCollectorArg
 		go func(vql_request *actions_proto.VQLCollectorArgs) {
 			defer wg.Done()
 
+			self.mu.Lock()
+			defer self.mu.Unlock()
+
 			// Create a new environment for each request.
 			env := ordereddict.NewDict()
 			for _, env_spec := range vql_request.Env {
@@ -394,9 +414,6 @@ func (self *collectionManager) Collect(request *flows_proto.ArtifactCollectorArg
 			query_start_time := Clock.Now()
 
 			defer func() {
-				// self.collection_context is already locked with
-				// self.mu because this goroutine does not run outside
-				// our Collect() function
 				status.Duration = Clock.Now().UnixNano() - query_start_time.UnixNano()
 				self.collection_context.QueryStats = append(
 					self.collection_context.QueryStats, status)
@@ -478,7 +495,7 @@ func (self *collectionManager) MakeContainer(filename, password string, level in
 
 	self.scope.Log("Will create container at %s", filename)
 
-	self.collection_context.SessionId = launcher.NewFlowId("")
+	self.collection_context.SessionId = utils.NewFlowId("")
 	self.log_file, err = reporting.NewResultSetWriter(
 		self.container, "log.json")
 	return err

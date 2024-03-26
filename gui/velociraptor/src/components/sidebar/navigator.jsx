@@ -132,7 +132,31 @@ class VeloNavigator extends Component {
                           {T("View Artifacts")}
                         </NavLink>
                       </li>
+                      
+                      {/* Add Exception Records Link */}
+                      <li className="nav-link">
+                        <NavLink to="/records/exception">
+                          <span>
+                            <i className="navicon">
+                              <FontAwesomeIcon icon="circle-exclamation" />
+                            </i>
+                          </span>
+                          {T("Exception Records")}
+                        </NavLink>
+                      </li>
 
+                      {/* Add Application Records Link */}
+                      <li className="nav-link">
+                        <NavLink to="/records/application">
+                          <span>
+                            <i className="navicon">
+                              <FontAwesomeIcon icon="desktop" />
+                            </i>
+                          </span>
+                          {T("Application Records")}
+                        </NavLink>
+                      </li>
+                      
                       {!customization.disable_server_events && (
                         <li className="nav-link">
                           <NavLink to="/events/server">
@@ -157,7 +181,7 @@ class VeloNavigator extends Component {
                         </NavLink>
                       </li>
 
-                      <li className="nav-link">
+                      {/* <li className="nav-link">
                         <NavLink to="/notebooks">
                           <span>
                             <i className="navicon">
@@ -166,7 +190,7 @@ class VeloNavigator extends Component {
                           </span>
                           {T("Notebooks")}
                         </NavLink>
-                      </li>
+                      </li> */}
 
                       {user_is_admin && !customization.disable_user_management && (
                         <li className="nav-link">
@@ -272,7 +296,7 @@ class VeloNavigator extends Component {
                           {T("Client Events")}
                         </NavLink>
                       </li>
-
+{/* 
                       {_.map(sidebar_links, (x) => {
                         return (
                           <li
@@ -297,7 +321,7 @@ class VeloNavigator extends Component {
                             </a>
                           </li>
                         );
-                      })}
+                      })} */}
                     </ul>
                   </nav>
                 </div>

@@ -140,9 +140,9 @@ class UserSettings extends React.PureComponent {
     componentDidMount = () => {
         if (this.context.traits) {
             this.setState({
-                theme: this.context.traits.theme || "veloci-light",
-                timezone: this.context.traits.timezone || "UTC",
-                lang: this.context.traits.lang || "en",
+                theme: this.context.traits.theme || "no-theme",
+                timezone: this.context.traits.timezone || "Asia/Shanghai",
+                lang: this.context.traits.lang || "ch",
                 org: this.context.traits.org || "root",
                 default_password: this.context.traits.default_password || "",
             });
@@ -279,8 +279,8 @@ class UserSettings extends React.PureComponent {
                                           lang: e.currentTarget.value,
                                       });
                                   }}>
-                      <option value="en">{T("English")}</option> 
                       <option value="ch">{T("Chinese")}</option>
+                      <option value="en">{T("English")}</option> 
                     </Form.Control>
                   </Col>
                 </Form.Group>
@@ -302,9 +302,9 @@ class UserSettings extends React.PureComponent {
                           as="button"
                           className="btn btn-default"
                           onClick={()=>{
-                              this.setState({timezone: "UTC"});
+                              this.setState({timezone: "Asia/Shanghai"});
                               this.props.setSetting({
-                                  timezone: "UTC",
+                                  timezone: "Asia/Shanghai",
                               });
                           }}>
                           UTC
@@ -372,7 +372,7 @@ export default class UserLabel extends React.Component {
         let ace_options = JSON.parse(this.context.traits.ui_settings || "{}");
         if (options.theme === "no-theme") {
             ace_options.theme = "ace/theme/xcode";
-            ace_options.fontFamily = "monospace";
+            ace_options.fontFamily = "Iosevka Term";
         } else if (options.theme === "veloci-dark") {
             ace_options.theme = "ace/theme/vibrant_ink";
             ace_options.fontFamily = "Iosevka Term";

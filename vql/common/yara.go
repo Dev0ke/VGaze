@@ -1,8 +1,9 @@
+//go:build cgo && yara
 // +build cgo,yara
 
 /*
    Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+   Copyright (C) 2019-2024 Rapid7 Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Affero General Public License as published
@@ -62,7 +63,7 @@ type YaraResult struct {
 }
 
 type YaraScanPluginArgs struct {
-	Rules         string            `vfilter:"required,field=rules,doc=Yara rules in the yara DSL."`
+	Rules         string            `vfilter:"optional,field=rules,doc=Yara rules in the yara DSL or after being compiled by the yarac compiler."`
 	Files         []types.Any       `vfilter:"required,field=files,doc=The list of files to scan."`
 	Accessor      string            `vfilter:"optional,field=accessor,doc=Accessor (e.g. ntfs,file)"`
 	Context       int               `vfilter:"optional,field=context,doc=How many bytes to include around each hit"`
@@ -195,39 +196,16 @@ func getYaraRules(key, namespace, rules string,
 	}
 	cached_result := vql_subsystem.CacheGet(scope, key)
 	if cached_result == nil {
-		generated_rules := RuleGenerator(scope, rules)
-		compiler, err := yara.NewCompiler()
-		if err != nil {
-			return nil, err
-		}
-
-		if vars != nil {
-			for _, k := range vars.Keys() {
-				v, _ := vars.Get(k)
-				err := compiler.DefineVariable(k, v)
-				if err != nil {
-					vql_subsystem.CacheSet(scope, key, err)
-					return nil, err
-				}
-			}
-		}
-
-		err = compiler.AddString(generated_rules, namespace)
-		if err != nil {
-			// Cache the compile failure so only one log is emitted.
-			vql_subsystem.CacheSet(scope, key, err)
-			return nil, err
-		}
-
-		rules, err := compiler.GetRules()
+		compiled_rules, err := compileRules(
+			scope, vars, key, namespace, rules)
 		if err != nil {
 			vql_subsystem.CacheSet(scope, key, err)
 			return nil, err
 		}
 
 		// Cache the successful rules for further use
-		vql_subsystem.CacheSet(scope, key, rules)
-		return rules, nil
+		vql_subsystem.CacheSet(scope, key, compiled_rules)
+		return compiled_rules, nil
 	}
 
 	switch t := cached_result.(type) {
@@ -238,6 +216,43 @@ func getYaraRules(key, namespace, rules string,
 	default:
 		return nil, errors.New("Error")
 	}
+}
+
+func compileRules(scope vfilter.Scope,
+	vars *ordereddict.Dict,
+	key, namespace, rules string) (*yara.Rules, error) {
+
+	// Might be a compiled ruleset.
+	if strings.HasPrefix(rules, "YARA") {
+		return yara.ReadRules(strings.NewReader(rules))
+	}
+
+	generated_rules := RuleGenerator(scope, rules)
+	compiler, err := yara.NewCompiler()
+	if err != nil {
+		return nil, err
+	}
+
+	if vars != nil {
+		for _, k := range vars.Keys() {
+			v, _ := vars.Get(k)
+			err := compiler.DefineVariable(k, v)
+			if err != nil {
+				vql_subsystem.CacheSet(scope, key, err)
+				return nil, err
+			}
+		}
+	}
+
+	err = compiler.AddString(generated_rules, namespace)
+	if err != nil {
+		// Cache the compile failure so only one log is emitted.
+		vql_subsystem.CacheSet(scope, key, err)
+		return nil, err
+	}
+
+	return compiler.GetRules()
+
 }
 
 func (self *scanReporter) scanFileByAccessor(
@@ -475,7 +490,7 @@ func (self *scanReporter) RuleMatching(
 
 		// Make a copy of the underlying data.
 		data := make([]byte, context_end-context_start)
-		n, _ := self.reader.ReadAt(data, int64(context_start))
+		n, _ := self.reader.ReadAt(data, int64(context_start)+int64(match_string.Base))
 		data = data[:n]
 
 		res := &YaraResult{
@@ -486,7 +501,7 @@ func (self *scanReporter) RuleMatching(
 			FileName: self.filename,
 			String: &YaraHit{
 				Name:    match_string.Name,
-				Offset:  match_string.Offset + self.base_offset,
+				Offset:  match_string.Offset + self.base_offset + match_string.Base,
 				Data:    data,
 				HexData: strings.Split(hex.Dump(data), "\n"),
 			},
@@ -583,6 +598,28 @@ func (self YaraProcPlugin) Call(
 			return
 		}
 
+		accessor, err := accessors.GetAccessor("process", scope)
+		if err != nil {
+			scope.Log("proc_yara: %v", err)
+			return
+		}
+
+		filename := fmt.Sprintf("/%v", arg.Pid)
+		process_stat, err := accessor.Lstat(filename)
+		if err != nil {
+			scope.Log("proc_yara: %v", err)
+			return
+		}
+
+		// Open a handle into the process so we can read context out
+		process_address_space, err := accessor.OpenWithOSPath(
+			process_stat.OSPath())
+		if err != nil {
+			scope.Log("proc_yara: %v", err)
+			return
+		}
+		defer process_address_space.Close()
+
 		rules, err := getYaraRules(arg.Key, arg.Namespace,
 			arg.Rules, arg.YaraVariables, scope)
 		if err != nil {
@@ -606,9 +643,12 @@ func (self YaraProcPlugin) Call(
 			number_of_hits: arg.NumberOfHits,
 			context:        arg.Context,
 			ctx:            ctx,
+			reader:         utils.MakeReaderAtter(process_address_space),
 
 			rules:     rules,
 			scope:     scope,
+			filename:  process_stat.OSPath(),
+			file_info: process_stat,
 			yara_flag: yara_flag,
 		}
 

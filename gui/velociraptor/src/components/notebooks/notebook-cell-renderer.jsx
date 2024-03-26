@@ -20,13 +20,13 @@ import filterFactory from 'react-bootstrap-table2-filter';
 import CreateArtifactFromCell from './create-artifact-from-cell.jsx';
 import AddCellFromFlowDialog from './add-cell-from-flow.jsx';
 import Completer from '../artifacts/syntax.jsx';
-import { getHuntColumns } from '../hunts/hunt-list.jsx';
 import VeloTimestamp from "../utils/time.jsx";
 import { AddTimelineDialog, AddVQLCellToTimeline } from "./timelines.jsx";
 import T from '../i8n/i8n.jsx';
 import ViewCellLogs from "./logs.jsx";
 import CopyCellToNotebookDialog from './notebook-copy-cell.jsx';
 import FormatTableDialog from './notebook-format-tables.jsx';
+import NotebookUploads from '../notebooks/notebook-uploads.jsx';
 
 import {CancelToken} from 'axios';
 import api from '../core/api-service.jsx';
@@ -108,7 +108,6 @@ class AddCellFromHunt extends React.PureComponent {
                     headerClasses="alert alert-secondary"
                     bodyClasses="fixed-table-body"
                     data={this.state.hunts}
-                    columns={getHuntColumns()}
                     filter={ filterFactory() }
                     selectRow={ selectRow }
                   />
@@ -175,6 +174,7 @@ export default class NotebookCellRenderer extends React.Component {
         showSuggestionSubmenu: false,
         showMoreLogs: false,
         showFormatTablesDialog: false,
+        showNotebookUploadsDialog: false,
 
         local_completions_lookup: {},
         local_completions: [],
@@ -209,13 +209,15 @@ export default class NotebookCellRenderer extends React.Component {
         let props_cell_id = this.props.cell_metadata &&
             this.props.cell_metadata.cell_id;
 
-        if (props_cell_timestamp !== this.state.cell_timestamp ||
+        if (prevProps.notebook_id !== this.props.notebook_id ||
+            props_cell_timestamp !== this.state.cell_timestamp ||
             props_cell_id !== current_cell_id) {
 
             // Prevent further updates to this cell by setting the
             // cell id and timestamp.
             this.setState({cell_timestamp: props_cell_timestamp,
-                           cell_id: props_cell_id});
+                           cell_id: props_cell_id,
+                           });
             this.fetchCellContents();
         }
     };
@@ -246,9 +248,12 @@ export default class NotebookCellRenderer extends React.Component {
         this.source.cancel();
         this.source = CancelToken.source();
 
+        let cell_version = (this.props.cell_metadata && this.props.cell_metadata.current_version);
+
         api.get("v1/GetNotebookCell", {
             notebook_id: this.props.notebook_id,
             cell_id: this.props.cell_metadata.cell_id,
+            version: cell_version,
         }, this.source.token).then((response) => {
             if (response.cancel) {
                 return;
@@ -421,6 +426,7 @@ export default class NotebookCellRenderer extends React.Component {
         api.post("v1/CancelNotebookCell", {
             notebook_id: this.props.notebook_id,
             cell_id: this.state.cell.cell_id,
+            version: this.state.cell.current_version,
         }, this.source.token).then(response=>{
             if (response.cancel) {
                 return;
@@ -439,10 +445,13 @@ export default class NotebookCellRenderer extends React.Component {
             if (item.kind === 'file') {
                 let blob = item.getAsFile();
                 let reader = new FileReader();
+                let current_cell_id = this.state.cell_id;
+
                 reader.onload = (event) => {
                     let request = {
                         data: reader.result.split(",")[1],
                         notebook_id: this.props.notebook_id,
+                        cell_id: current_cell_id,
                         filename: blob.name,
                         size: blob.size,
                     };
@@ -451,7 +460,23 @@ export default class NotebookCellRenderer extends React.Component {
                         'v1/UploadNotebookAttachment', request, this.source.token
                     ).then((response) => {
                         if (response.cancel) return;
-                        this.state.ace.insert("\n!["+blob.name+"]("+response.data.url+")\n");
+
+                        // Add direct html to ensure exports recognize
+                        // it.
+                        let filename = encodeURI(blob.name);
+                        let url = encodeURI(response.data.url);
+                        if (/image/.test(response.mime_type)) {
+                            this.state.ace.insert(
+                                "\n<img src=\"" +
+                                    url + "\" alt=\"" +
+                                    filename + "\"/>\n");
+                        } else {
+                            this.state.ace.insert(
+                                "\n<a href=\"" +
+                                    url + "\">" +
+                                    filename + "</a>\n");
+                        }
+
                     }, function failure(response) {
                         console.log("Error " + response.data);
                     });
@@ -516,6 +541,92 @@ export default class NotebookCellRenderer extends React.Component {
                      })}
                    </Dropdown.Menu>
                </>;
+    }
+
+    undo_available = ()=>{
+        if(!this.state.cell || this.state.loading) {
+            return false;
+        }
+
+        let available_versions = this.state.cell.available_versions || [];
+        let current_version = this.state.cell.current_version;
+
+        return available_versions.length > 0 && current_version !== available_versions[0];
+    }
+
+    redo_available = ()=>{
+        if(!this.state.cell || this.state.loading) {
+            return false;
+        }
+
+        let available_versions = this.state.cell.available_versions || [];
+        let current_version = this.state.cell.current_version;
+
+        return available_versions.length > 0 &&
+            current_version !== available_versions[available_versions.length-1];
+    }
+
+    undo = ()=>{
+        if(!this.state.cell) {
+            return;
+        }
+
+        let available_versions = this.state.cell.available_versions || [];
+        let current_version = this.state.cell.current_version;
+
+        for(let i=0; i<available_versions.length; i++) {
+            if (available_versions[i]===current_version && i > 0) {
+                this.setState({loading: true});
+
+                api.post("v1/RevertNotebookCell", {
+                    notebook_id: this.props.notebook_id,
+                    cell_id: this.state.cell.cell_id,
+                    version: available_versions[i-1],
+                }, this.source.token).then(response=>{
+                    if (response.cancel) {
+                        return;
+                    }
+                    let cell = response.data;
+                    this.setState({cell: cell,
+                                   input: cell.input,
+                                   loading: false});
+                });
+
+                return;
+            }
+        };
+    }
+
+    redo = ()=>{
+        if(!this.state.cell) {
+            return;
+        }
+
+        let available_versions = this.state.cell.available_versions || [];
+        let current_version = this.state.cell.current_version;
+
+        for(let i=0; i<available_versions.length; i++) {
+            if (available_versions[i]===current_version &&
+                i < available_versions.length) {
+                this.setState({loading: true});
+
+                api.post("v1/RevertNotebookCell", {
+                    notebook_id: this.props.notebook_id,
+                    cell_id: this.state.cell.cell_id,
+                    version: available_versions[i+1],
+                }, this.source.token).then(response=>{
+                    if (response.cancel) {
+                        return;
+                    }
+                    let cell = response.data;
+                    this.setState({cell: cell,
+                                   input: cell.input,
+                                   loading: false});
+                });
+
+                return;
+            }
+        };
     }
 
     render() {
@@ -600,6 +711,23 @@ export default class NotebookCellRenderer extends React.Component {
                 <FontAwesomeIcon icon="arrow-down"/>
               </Button>
 
+              <Button data-tooltip={T("Undo")}
+                      data-position="right"
+                      disabled={!this.undo_available()}
+                      className="btn-tooltip"
+                      onClick={this.undo}
+                      variant="default">
+                <FontAwesomeIcon icon="rotate-left"/>
+              </Button>
+              <Button data-tooltip={T("Redo")}
+                      data-position="right"
+                      disabled={!this.redo_available()}
+                      className="btn-tooltip"
+                      onClick={this.redo}
+                      variant="default">
+                <FontAwesomeIcon icon="rotate-right"/>
+              </Button>
+
               <Button data-tooltip={T("Copy Cell")}
                       data-position="right"
                       className="btn-tooltip"
@@ -624,6 +752,15 @@ export default class NotebookCellRenderer extends React.Component {
                          onClick={()=>this.setState({showFormatTablesDialog: true})}
                          variant="default">
                    <FontAwesomeIcon icon="table"/>
+                 </Button>
+
+                 <Button data-tooltip={T("Notebook Uploads")}
+                         data-position="left"
+                         className="btn-tooltip"
+                         onClick={() => this.setState({ showNotebookUploadsDialog: true })}
+                         variant="default">
+                   <FontAwesomeIcon icon="fa-file-download" />
+                   <span className="sr-only">{T("Notebook Uploads")}</span>
                  </Button>
                </>
               }
@@ -837,6 +974,14 @@ export default class NotebookCellRenderer extends React.Component {
 
                 </CopyCellToNotebookDialog>
               }
+              {this.state.showNotebookUploadsDialog &&
+               <NotebookUploads
+                 notebook={this.props.notebook_metadata}
+                 cell={this.state.cell}
+                 closeDialog={() => this.setState({ showNotebookUploadsDialog: false })}
+               />
+              }
+
               <div className={classNames({selected: selected, "notebook-cell": true})} >
                 <div className='notebook-input'>
                   { this.state.currently_editing && selected &&

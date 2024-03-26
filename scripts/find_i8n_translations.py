@@ -21,7 +21,7 @@ def DiscoverTranslations(path):
         for name in files:
             if not name.endswith(".jsx"):
                 continue
-            with open(os.path.join(root, name)) as fd:
+            with open(os.path.join(root, name),encoding='utf8') as fd:
                 for line in fd:
                     m = translation_regex.search(line)
                     if m:
@@ -40,8 +40,7 @@ def Decode(k):
 
 def ProcessFile(filename):
     translations = dict()
-
-    with open(filename) as fd:
+    with open(filename,encoding='utf-8') as fd:
         for line in fd:
             m = key_regex.search(line)
             if m:
@@ -49,7 +48,7 @@ def ProcessFile(filename):
 
     discovered = DiscoverTranslations('./gui/velociraptor/src/components/')
 
-    with open(os.path.splitext(filename)[0] + ".json") as fd:
+    with open(os.path.splitext(filename)[0] + ".json",encoding='utf-8') as fd:
         encoded_existing = json.loads(fd.read())
         existing = dict()
         existing_translations = dict()
@@ -83,6 +82,7 @@ def ProcessDirectory(path):
             json_path = jsx_path.replace(".jsx", ".json")
             if os.access(json_path, os.R_OK|os.W_OK):
                 ProcessFile(jsx_path)
+
 
 
 if __name__ == "__main__":

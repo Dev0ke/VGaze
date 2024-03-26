@@ -1,12 +1,10 @@
 name: Server.Monitor.Health
 description: |
-  This is the main server health dashboard. It is shown on the
-  homescreen and enabled by default on all new installs.
+  这是主服务器状况仪表盘。它显示在主屏幕上，并且默认启用。
 
-  You may edit this artifact to customize your server dashboard.
+  您可以编辑此工件以自定义服务器仪表盘。
 
-  Alternatively, edit the Welcome screen at the
-  `Server.Internal.Welcome` artifact.
+  或者，您可以编辑“Server.Internal.Welcome”工件上的开始菜单。
 
 type: SERVER_EVENT
 
@@ -46,7 +44,7 @@ reports:
 
       {{ $time := Query "SELECT timestamp(epoch=now()) AS Now FROM scope()" | Expand }}
 
-      ## 服务器状态 @ {{ Get $time "0.Now" }}
+      ## 服务器状态 @ {{ Get $time "0.Now"  }}
 
       <p>所有前端的总数据如下.</p>
           <span class="container">
@@ -86,6 +84,3 @@ reports:
 
       {{ Query "UserPermissions" | Table }}
 
-      ## 服务器版本
-
-      {{ Query "SELECT Version FROM config" | Table }}

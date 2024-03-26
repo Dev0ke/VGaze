@@ -33,6 +33,15 @@ import { UserSettings } from './components/core/user.jsx';
 import { ContextMenuPopup } from './components/utils/context.jsx';
 import { Switch, Route, withRouter } from "react-router-dom";
 import { Join } from './components/utils/paths.jsx';
+import SecretManager from './components/secrets/secrets.jsx';
+
+/*新增*************************************/
+import RecordsHunts from './components/records/records.jsx';
+
+
+/*新增*************************************/
+
+
 
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
@@ -146,6 +155,9 @@ class App extends Component {
                          setClient={this.setClient}
                        />
                      </Route>
+                     <Route path="/secrets/">
+                       <SecretManager/>
+                     </Route>
                      <Route path="/artifacts/:artifact?">
                        <ArtifactInspector client={this.state.client}/>
                      </Route>
@@ -173,6 +185,12 @@ class App extends Component {
                                   node={this.state.current_node}
                                   vfs_path={this.state.vfs_path} />
                      </Route>
+                    {/*新增*************************************/}
+                     <Route path="/records/application/:hunt_id?/:tab?">
+                        <RecordsHunts/>
+                     </Route>
+                    {/*新增*************************************/}
+                     
                      {/* ClientFlowsView will only be invoked when the
                        * client looks like a client id - the
                        * ServerFlowsView is invoked when client_id ==

@@ -1,25 +1,26 @@
 /*
-   Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+Velociraptor - Dig Deeper
+Copyright (C) 2019-2024 Rapid7 Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License as published
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-   You should have received a copy of the GNU Affero General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 package main
 
 import (
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"os"
 	"runtime/pprof"
 	"runtime/trace"
@@ -30,6 +31,7 @@ import (
 	"www.velocidex.com/golang/velociraptor/config"
 	config_proto "www.velocidex.com/golang/velociraptor/config/proto"
 	"www.velocidex.com/golang/velociraptor/logging"
+	"www.velocidex.com/golang/velociraptor/utils/proxy"
 
 	// Import all vql plugins.
 	_ "www.velocidex.com/golang/velociraptor/vql_plugins"
@@ -148,8 +150,13 @@ func main() {
 		}
 	}
 
+	// Log the actual argv that will be run.
+	err := logArgv(append([]string{os.Args[0]}, args...))
+	if err != nil {
+		fmt.Printf("Error sending to the event log: %v\n", err)
+	}
+
 	// Automatically add config flags
-	var err error
 	default_config, err = parseFlagsToDefaultConfig(app)
 	kingpin.FatalIfError(err, "Adding config flags.")
 
@@ -231,7 +238,7 @@ func makeDefaultConfigLoader() *config.Loader {
 		WithLogFile(*logging_flag).
 		WithConfigMutator("OverrideFlag", deprecatedOverride).
 		WithConfigMutator("Mutator applyMinionRole", applyMinionRole).
-		WithCustomValidator("validator: ensureProxy", ensureProxy).
+		WithCustomValidator("validator: ensureProxy", proxy.ConfigureProxy).
 		WithConfigMutator("Mutator applyAnalysisTarget", applyAnalysisTarget).
 		WithConfigMutator("Mutator maybeAddDefinitionsDirectory", maybeAddDefinitionsDirectory)
 }

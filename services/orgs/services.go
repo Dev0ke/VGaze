@@ -13,6 +13,7 @@ import (
 	"www.velocidex.com/golang/velociraptor/services"
 	"www.velocidex.com/golang/velociraptor/services/acl_manager"
 	"www.velocidex.com/golang/velociraptor/services/audit_manager"
+	"www.velocidex.com/golang/velociraptor/services/backup"
 	"www.velocidex.com/golang/velociraptor/services/broadcast"
 	"www.velocidex.com/golang/velociraptor/services/client_info"
 	"www.velocidex.com/golang/velociraptor/services/client_monitoring"
@@ -31,6 +32,7 @@ import (
 	"www.velocidex.com/golang/velociraptor/services/repository"
 	"www.velocidex.com/golang/velociraptor/services/sanity"
 	"www.velocidex.com/golang/velociraptor/services/scheduler"
+	"www.velocidex.com/golang/velociraptor/services/secrets"
 	"www.velocidex.com/golang/velociraptor/services/server_artifacts"
 	"www.velocidex.com/golang/velociraptor/services/server_monitoring"
 	"www.velocidex.com/golang/velociraptor/services/users"
@@ -59,6 +61,8 @@ type ServiceContainer struct {
 	server_artifact_manager services.ServerArtifactRunner
 	notifier                services.Notifier
 	acl_manager             services.ACLManager
+	secrets                 services.SecretsService
+	backups                 services.BackupService
 }
 
 func (self *ServiceContainer) MockFrontendManager(svc services.FrontendManager) {
@@ -131,6 +135,17 @@ func (self *ServiceContainer) NotebookManager() (services.NotebookManager, error
 	}
 
 	return self.notebook_manager, nil
+}
+
+func (self *ServiceContainer) SecretsService() (services.SecretsService, error) {
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
+	if self.secrets == nil {
+		return nil, errors.New("Secrets service not initialized")
+	}
+
+	return self.secrets, nil
 }
 
 func (self *ServiceContainer) AuditManager() (services.AuditManager, error) {
@@ -254,6 +269,16 @@ func (self *ServiceContainer) BroadcastService() (services.BroadcastService, err
 	return self.broadcast, nil
 }
 
+func (self *ServiceContainer) BackupService() (services.BackupService, error) {
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
+	if self.backups == nil {
+		return nil, errors.New("Backup Service not ready")
+	}
+	return self.backups, nil
+}
+
 func (self *ServiceContainer) ACLManager() (services.ACLManager, error) {
 	self.mu.Lock()
 	defer self.mu.Unlock()
@@ -367,6 +392,12 @@ func (self *OrgManager) startOrgFromContext(org_ctx *OrgContext) (err error) {
 		spec = org_config.Services
 	}
 
+	if spec.BackupService {
+		service_container.mu.Lock()
+		service_container.backups = backup.NewBackupService(ctx, wg, org_config)
+		service_container.mu.Unlock()
+	}
+
 	if spec.FrontendServer {
 		f, err := frontend.NewFrontendService(ctx, wg, org_config)
 		if err != nil {
@@ -405,6 +436,15 @@ func (self *OrgManager) startOrgFromContext(org_ctx *OrgContext) (err error) {
 
 		service_container.mu.Lock()
 		service_container.acl_manager = m
+		service_container.mu.Unlock()
+
+		s, err := secrets.NewSecretsService(ctx, wg, org_config)
+		if err != nil {
+			return err
+		}
+
+		service_container.mu.Lock()
+		service_container.secrets = s
 		service_container.mu.Unlock()
 	}
 
@@ -677,37 +717,14 @@ func maybeFlushFilesOnClose(
 		return nil
 	}
 
-	// Flush the filestore if needed. Not all filestores need
-	// flushing.
-	file_store_factory := file_store.GetFileStore(org_config)
-	flusher, ok := file_store_factory.(Flusher)
-	if ok {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			<-ctx.Done()
-			if flusher != nil {
-				flusher.Flush()
-			}
-		}()
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		<-ctx.Done()
 
-	db, err := datastore.GetDB(org_config)
-	if err != nil {
-		return err
-	}
-
-	flusher, ok = db.(Flusher)
-	if ok {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			<-ctx.Done()
-			if flusher != nil {
-				flusher.Flush()
-			}
-		}()
-	}
+		file_store.FlushFilestore(org_config)
+		datastore.FlushDatastore(org_config)
+	}()
 
 	return nil
 }

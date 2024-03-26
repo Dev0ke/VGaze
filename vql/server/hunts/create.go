@@ -1,19 +1,19 @@
 /*
-   Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+Velociraptor - Dig Deeper
+Copyright (C) 2019-2024 Rapid7 Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License as published
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-   You should have received a copy of the GNU Affero General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 package hunts
 
@@ -34,6 +34,7 @@ import (
 	"www.velocidex.com/golang/velociraptor/vql/acl_managers"
 	"www.velocidex.com/golang/velociraptor/vql/functions"
 	"www.velocidex.com/golang/velociraptor/vql/tools/collector"
+	vql_utils "www.velocidex.com/golang/velociraptor/vql/utils"
 	"www.velocidex.com/golang/vfilter/arg_parser"
 
 	"www.velocidex.com/golang/vfilter"
@@ -109,15 +110,10 @@ func (self *ScheduleHuntFunction) Call(ctx context.Context,
 
 	} else {
 		// Schedule on the current org
-		arg.OrgIds = append(arg.OrgIds, config_obj.OrgId)
+		arg.OrgIds = append(arg.OrgIds, utils.NormalizedOrgId(config_obj.OrgId))
 	}
 
-	manager, err := services.GetRepositoryManager(config_obj)
-	if err != nil {
-		scope.Log("hunt: %v", err)
-		return vfilter.Null{}
-	}
-	repository, err := manager.GetGlobalRepository(config_obj)
+	repository, err := vql_utils.GetRepository(scope)
 	if err != nil {
 		scope.Log("hunt: %v", err)
 		return vfilter.Null{}
@@ -247,8 +243,15 @@ func (self *ScheduleHuntFunction) Call(ctx context.Context,
 			continue
 		}
 
+		// Only mark the org ids in the root org version of the hunt.
+		org_hunt_request := hunt_request
+		if utils.IsRootOrg(org_id) {
+			org_hunt_request = proto.Clone(hunt_request).(*api_proto.Hunt)
+			org_hunt_request.OrgIds = arg.OrgIds
+		}
+
 		new_hunt, err = hunt_dispatcher.CreateHunt(
-			ctx, org_config_obj, acl_manager, hunt_request)
+			ctx, org_config_obj, acl_manager, org_hunt_request)
 		if err != nil {
 			scope.Log("hunt: %v", err)
 			continue
@@ -330,7 +333,7 @@ func (self *AddToHuntFunction) Call(ctx context.Context,
 			return vfilter.Null{}
 		}
 
-		hunt_obj, pres := hunt_dispatcher.GetHunt(arg.HuntId)
+		hunt_obj, pres := hunt_dispatcher.GetHunt(ctx, arg.HuntId)
 		if !pres || hunt_obj == nil ||
 			hunt_obj.StartRequest == nil ||
 			hunt_obj.StartRequest.CompiledCollectorArgs == nil {

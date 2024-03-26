@@ -1,6 +1,6 @@
 /*
    Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+   Copyright (C) 2019-2024 Rapid7 Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Affero General Public License as published
@@ -34,6 +34,7 @@ import (
 	"www.velocidex.com/golang/velociraptor/services/hunt_dispatcher"
 	"www.velocidex.com/golang/velociraptor/vql"
 	vql_subsystem "www.velocidex.com/golang/velociraptor/vql"
+	vql_utils "www.velocidex.com/golang/velociraptor/vql/utils"
 	"www.velocidex.com/golang/vfilter"
 	"www.velocidex.com/golang/vfilter/arg_parser"
 )
@@ -86,7 +87,7 @@ func (self HuntsPlugin) Call(
 
 		// Show a specific hunt
 		if arg.HuntId != "" {
-			hunt_obj, pres := hunt_dispatcher.GetHunt(arg.HuntId)
+			hunt_obj, pres := hunt_dispatcher.GetHunt(ctx, arg.HuntId)
 			if pres {
 				select {
 				case <-ctx.Done():
@@ -176,7 +177,7 @@ func (self HuntResultsPlugin) Call(
 				return
 			}
 
-			hunt_obj, pres := hunt_dispatcher_service.GetHunt(arg.HuntId)
+			hunt_obj, pres := hunt_dispatcher_service.GetHunt(ctx, arg.HuntId)
 			if !pres {
 				return
 			}
@@ -196,12 +197,7 @@ func (self HuntResultsPlugin) Call(
 			// first named source from the artifact
 			// definition.
 			if arg.Source == "" {
-				manager, err := services.GetRepositoryManager(config_obj)
-				if err != nil {
-					scope.Log("hunt_results: %v", err)
-					return
-				}
-				repo, err := manager.GetGlobalRepository(config_obj)
+				repo, err := vql_utils.GetRepository(scope)
 				if err == nil {
 					artifact_def, ok := repo.Get(ctx, config_obj, arg.Artifact)
 					if ok {
@@ -224,6 +220,8 @@ func (self HuntResultsPlugin) Call(
 			arg.Orgs = append(arg.Orgs, config_obj.OrgId)
 		}
 
+		principal := vql_subsystem.GetPrincipal(scope)
+
 		org_manager, err := services.GetOrgManager()
 		if err != nil {
 			return
@@ -232,6 +230,14 @@ func (self HuntResultsPlugin) Call(
 		for _, org_id := range arg.Orgs {
 			org_config_obj, err := org_manager.GetOrgConfig(org_id)
 			if err != nil {
+				continue
+			}
+
+			// Make sure the principal has read access in this org.
+			permissions := acls.READ_RESULTS
+			perm, err := services.CheckAccess(
+				org_config_obj, principal, permissions)
+			if !perm || err != nil {
 				continue
 			}
 
@@ -245,9 +251,15 @@ func (self HuntResultsPlugin) Call(
 				return
 			}
 
-			for flow_details := range hunt_dispatcher.GetFlows(
-				ctx, org_config_obj, scope, arg.HuntId, 0) {
+			options := result_sets.ResultSetOptions{}
+			flow_chan, _, err := hunt_dispatcher.GetFlows(
+				ctx, org_config_obj, options, scope, arg.HuntId, 0)
+			if err != nil {
+				scope.Log("hunt_results: %v", err)
+				return
+			}
 
+			for flow_details := range flow_chan {
 				api_client, err := indexer.FastGetApiClient(ctx,
 					org_config_obj, flow_details.Context.ClientId)
 				if err != nil {
@@ -352,8 +364,16 @@ func (self HuntFlowsPlugin) Call(
 			return
 		}
 
-		for flow_details := range hunt_dispatcher.GetFlows(
-			ctx, config_obj, scope, arg.HuntId, int(arg.StartRow)) {
+		options := result_sets.ResultSetOptions{}
+		flow_chan, _, err := hunt_dispatcher.GetFlows(
+			ctx, config_obj, options,
+			scope, arg.HuntId, int(arg.StartRow))
+		if err != nil {
+			scope.Log("hunt_flows: %v", err)
+			return
+		}
+
+		for flow_details := range flow_chan {
 
 			client_id := ""
 			flow_id := ""

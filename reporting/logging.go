@@ -1,8 +1,8 @@
 package reporting
 
 import (
+	"context"
 	"sync"
-	"time"
 
 	"github.com/Velocidex/ordereddict"
 	config_proto "www.velocidex.com/golang/velociraptor/config/proto"
@@ -11,10 +11,11 @@ import (
 	"www.velocidex.com/golang/velociraptor/json"
 	"www.velocidex.com/golang/velociraptor/logging"
 	"www.velocidex.com/golang/velociraptor/result_sets"
+	"www.velocidex.com/golang/velociraptor/services"
 	"www.velocidex.com/golang/velociraptor/utils"
 )
 
-type notebooCellLogger struct {
+type notebookCellLogger struct {
 	mu       sync.Mutex
 	messages []string
 
@@ -22,11 +23,15 @@ type notebooCellLogger struct {
 
 	// If true we have more messages in the result set.
 	more_messages bool
+
+	ctx        context.Context
+	config_obj *config_proto.Config
 }
 
 func newNotebookCellLogger(
+	ctx context.Context,
 	config_obj *config_proto.Config, log_path api.FSPathSpec) (
-	*notebooCellLogger, error) {
+	*notebookCellLogger, error) {
 	file_store_factory := file_store.GetFileStore(config_obj)
 
 	// Create a new result set to write the logs
@@ -37,17 +42,23 @@ func newNotebookCellLogger(
 		return nil, err
 	}
 
-	return &notebooCellLogger{
-		rs_writer: rs_writer,
+	return &notebookCellLogger{
+		ctx:        ctx,
+		config_obj: config_obj,
+		rs_writer:  rs_writer,
 	}, nil
 }
 
-func (self *notebooCellLogger) Write(b []byte) (int, error) {
+func (self *notebookCellLogger) Write(b []byte) (int, error) {
 	level, msg := logging.SplitIntoLevelAndLog(b)
 	self.rs_writer.Write(ordereddict.NewDict().
-		Set("Timestamp", time.Now().UTC().UnixNano()/1000).
+		Set("Timestamp", utils.GetTime().Now().UTC().UnixNano()/1000).
 		Set("Level", level).
 		Set("message", msg))
+
+	if level == logging.ALERT {
+		self.processAlert(msg)
+	}
 
 	// Only keep the first 10 messages in the cell. This provides a
 	// good balance between seeing if the query worked and examining
@@ -74,7 +85,29 @@ func (self *notebooCellLogger) Write(b []byte) (int, error) {
 	return len(b), nil
 }
 
-func (self *notebooCellLogger) Messages() []string {
+func (self *notebookCellLogger) processAlert(msg string) error {
+	alert := &services.AlertMessage{}
+	err := json.Unmarshal([]byte(msg), alert)
+	if err != nil {
+		return err
+	}
+
+	alert.ClientId = "server"
+	serialized, err := json.Marshal(alert)
+	if err != nil {
+		return err
+	}
+	serialized = append(serialized, '\n')
+
+	journal, err := services.GetJournal(self.config_obj)
+	if err != nil {
+		return err
+	}
+	return journal.PushJsonlToArtifact(self.ctx, self.config_obj,
+		serialized, 1, "Server.Internal.Alerts", "server", "")
+}
+
+func (self *notebookCellLogger) Messages() []string {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
@@ -82,13 +115,17 @@ func (self *notebooCellLogger) Messages() []string {
 }
 
 // Are there additional messages?
-func (self *notebooCellLogger) MoreMessages() bool {
+func (self *notebookCellLogger) MoreMessages() bool {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
 	return self.more_messages
 }
 
-func (self *notebooCellLogger) Flush() {
+func (self *notebookCellLogger) Flush() {
 	self.rs_writer.Flush()
+}
+
+func (self *notebookCellLogger) Close() {
+	self.rs_writer.Close()
 }

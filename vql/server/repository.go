@@ -12,6 +12,7 @@ import (
 	"www.velocidex.com/golang/velociraptor/services"
 	"www.velocidex.com/golang/velociraptor/vql"
 	vql_subsystem "www.velocidex.com/golang/velociraptor/vql"
+	vql_utils "www.velocidex.com/golang/velociraptor/vql/utils"
 	"www.velocidex.com/golang/vfilter"
 	"www.velocidex.com/golang/vfilter/arg_parser"
 )
@@ -128,13 +129,7 @@ func (self *ArtifactDeleteFunction) Call(ctx context.Context,
 		return vfilter.Null{}
 	}
 
-	manager, _ := services.GetRepositoryManager(config_obj)
-	if manager == nil {
-		scope.Log("artifact_delete: Command can only run on the server")
-		return vfilter.Null{}
-	}
-
-	global_repository, err := manager.GetGlobalRepository(config_obj)
+	global_repository, err := vql_utils.GetRepository(scope)
 	if err != nil {
 		scope.Log("artifact_delete: %v", err)
 		return vfilter.Null{}
@@ -162,6 +157,12 @@ func (self *ArtifactDeleteFunction) Call(ctx context.Context,
 	}
 
 	err = vql_subsystem.CheckAccess(scope, permission)
+	if err != nil {
+		scope.Log("artifact_set: %s", err)
+		return vfilter.Null{}
+	}
+
+	manager, err := services.GetRepositoryManager(config_obj)
 	if err != nil {
 		scope.Log("artifact_set: %s", err)
 		return vfilter.Null{}
@@ -223,12 +224,7 @@ func (self ArtifactsPlugin) Call(
 			return
 		}
 
-		manager, err := services.GetRepositoryManager(config_obj)
-		if err != nil {
-			scope.Log("artifact_definitions: %v", err)
-			return
-		}
-		repository, err := manager.GetGlobalRepository(config_obj)
+		repository, err := vql_utils.GetRepository(scope)
 		if err != nil {
 			scope.Log("artifact_definitions: %v", err)
 			return
@@ -325,6 +321,7 @@ func (self ArtifactsPlugin) Info(scope vfilter.Scope, type_map *vfilter.TypeMap)
 type ArtifactSetMetadataFunctionArgs struct {
 	Name   string `vfilter:"required,field=name,doc=The Artifact to update"`
 	Hidden bool   `vfilter:"optional,field=hidden,doc=Set to true make the artifact hidden in the GUI, false to make it visible again."`
+	Basic  bool   `vfilter:"optional,field=basic,doc=Set to true make the artifact a 'basic' artifact. This allows users with the COLLECT_BASIC permission able to collect it."`
 }
 
 type ArtifactSetMetadataFunction struct{}
@@ -346,21 +343,15 @@ func (self *ArtifactSetMetadataFunction) Call(ctx context.Context,
 		return vfilter.Null{}
 	}
 
-	manager, _ := services.GetRepositoryManager(config_obj)
-	if manager == nil {
-		scope.Log("artifact_set_metadata: Command can only run on the server")
-		return vfilter.Null{}
-	}
-
-	global_repository, err := manager.GetGlobalRepository(config_obj)
+	global_repository, err := vql_utils.GetRepository(scope)
 	if err != nil {
-		scope.Log("artifact_delete: %v", err)
+		scope.Log("artifact_set_metadata: %v", err)
 		return vfilter.Null{}
 	}
 
 	definition, pres := global_repository.Get(ctx, config_obj, arg.Name)
 	if !pres {
-		scope.Log("artifact_delete: Artifact '%v' not found", arg.Name)
+		scope.Log("artifact_set_metadata: Artifact '%v' not found", arg.Name)
 		return vfilter.Null{}
 	}
 
@@ -385,12 +376,25 @@ func (self *ArtifactSetMetadataFunction) Call(ctx context.Context,
 		return vfilter.Null{}
 	}
 
+	// Need to explicitly check if the arg is passed at all or just
+	// false.
 	_, pres = args.Get("hidden")
 	if pres {
 		metadata.Hidden = arg.Hidden
 	}
 
+	_, pres = args.Get("basic")
+	if pres {
+		metadata.Basic = arg.Basic
+	}
+
 	principal := vql_subsystem.GetPrincipal(scope)
+	manager, err := services.GetRepositoryManager(config_obj)
+	if err != nil {
+		scope.Log("artifact_set_metadata: %s", err)
+		return vfilter.Null{}
+	}
+
 	err = manager.SetArtifactMetadata(ctx, config_obj, principal, arg.Name, metadata)
 	if err != nil {
 		scope.Log("artifact_set_metadata: %s", err)

@@ -76,7 +76,7 @@
     "Hex Offset": "十六进制偏移",
     "Host Key": "主机密钥",
     "Hunt State": "搜寻状态",
-    "HuntId": "搜寻ID",
+    "HuntId": "任务ID",
     "Include OS": "包括操作系统",
     "Info": "信息",
     "KMS Encryption Key ARN (blank if KMS not used)": "KMS 加密密钥 ARN（如果未使用 KMS，则为空）",
@@ -183,7 +183,12 @@
     "Windows Only": "仅限Windows",
     "X509 Certificate/Frontend Cert": "X509 证书/前端证书",
     
-    "modify Hunt": "修改配置"
-
+    "modify Hunt": "修改配置",
+    "Search clients": "搜索客户端",
+    "Search": "搜索",
+    "Copy Collection": "复制收藏",
+    "Save Collection": "保存收藏",
+    "Client ID":        "客户端ID",
+    "FQDN":            "主机完整域名"
 
 }

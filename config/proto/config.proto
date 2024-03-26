@@ -149,6 +149,10 @@ message ClientConfig {
     // A proxy setting to use.
     string proxy = 32;
 
+    // For more complex proxy configurations use this setting
+    // (overrides the `proxy` configuration above).
+    ProxyConfig proxy_config = 46;
+
     string ca_certificate = 11 [(sem_type) = {
             description: "The CA's certificate encoded in PEM. The client will trust any server signed with this CA."
         }];
@@ -198,6 +202,11 @@ message ClientConfig {
             description: "The standard deviation between polls."
             default: "30",
         }];
+
+    // When using websockets the server pings the client periodically
+    // to see if it is still there. This setting controls how often
+    // this ping occurs (default 10).
+    uint64 ws_ping_wait_sec = 45;
 
     // If this is set, the nanny will exit if we are not able to send
     // messages to the server within this many seconds. NOTE - even a
@@ -262,7 +271,7 @@ message ClientConfig {
     uint64 default_server_flow_stats_update = 39;
 
     // Clients will send a Server.Internal.ClientInfo message to the
-    // server every this many seconds.This helps to keep the server
+    // server every this many seconds. This helps to keep the server
     // info up to date about each client. This should not be sent too
     // frequently. The default is 1 day (86400 seconds).
     int64 client_info_update_time = 40;
@@ -344,6 +353,25 @@ message ApiClientConfig {
         }];
 
     string pinned_server_name = 6;
+}
+
+// Fine grained configuration of proxies for http connections.
+message ProxyConfig {
+    string https = 1;
+    string http = 2;
+
+    // A list of url regexp to match the url and connect to the
+    // target. Use and empty string to denote direct connection.  For
+    // example: {"^https://localhost/": "",
+    //           "^https://www.example.com/": "http://localhost:3182"}
+    map<string,string> proxy_url_regexp = 3;
+
+    // Location of a PAC file (overrides the above settings).
+    string pac = 4;
+
+    // If this is set we ignore the HTTP_PROXY and HTTPS_PROXY
+    // environment variables.
+    bool ignore_environment = 5;
 }
 
 message GUILink {
@@ -529,9 +557,22 @@ message ReverseProxyConfig {
 message DynDNSConfig {
     string hostname = 1 [deprecated=true];
 
-    // Not used any more - we take the hostname from Frontend.Hostname.
+    // Type of DynDNS server. Currently supported:
+    // * empty string or dyndns
+    // * cloudflare
+    string type = 8;
+
     string ddns_username = 2;
     string ddns_password = 3;
+
+    // Some providers require a different hostname be updated that the
+    // actual hostname (e.g. no-ip.com uses all.ddnskey.com to hide
+    // the domain)
+    string ddns_hostname = 11;
+
+    // This can be a full golang template for example
+    // http://ip1.dynupdate.no-ip.com/nic/update?hostname={{.Hostname}}&myip={{.IP}}
+    // or just the base URL
     string update_url = 4;
     uint64 frequency = 5;
 
@@ -540,6 +581,10 @@ message DynDNSConfig {
 
     // DNS server we query for our own hostname/ip mapping (default 8.8.8.8:53)
     string dns_server = 7;
+
+    // cloudflare settings - required
+    string api_token = 9;
+    string zone_name = 10;
 }
 
 message FrontendResourceControl {
@@ -673,9 +718,14 @@ message FrontendConfig {
 
     // A proxy setting to use - Velociraptor needs to connect to
     // download tools. This setting will force it to go out over this
-    // proxy. NOTE- If you dont want to allow outbound connections,
-    // just set this to an non existant setting.
+    // proxy. NOTE- If you dont want your server to allow outbound
+    // connections, just set this to an non existant setting.
     string proxy = 33;
+
+    // For more complex proxy configurations use this setting
+    // (overrides the `proxy` configuration above).
+    ProxyConfig proxy_config = 37;
+
 
     // These are used to secure the client/server communications -
     // Even when using external TLS certificates! This certificate
@@ -986,6 +1036,7 @@ message ServerServicesConfig {
    bool launcher = 23;
    bool notebook_service = 24;
    bool scheduler_service = 29;
+   bool backup_service = 30;
 
     // Client services
    bool http_communicator = 27;
@@ -994,6 +1045,11 @@ message ServerServicesConfig {
 
 message Defaults {
     int64 hunt_expiry_hours = 1;
+
+    // How often to refresh the hunt index (default 600 sec)
+    int64 hunt_dispatcher_refresh_sec = 43;
+
+
     int64 notebook_cell_timeout_min = 2;
 
     // When calculating a new cell we do not start calculation until
@@ -1004,6 +1060,10 @@ message Defaults {
     // actively cancel in flight notebook cell calculations.
     uint64 notebook_memory_high_water_mark = 37;
 
+    // Wait this long for a worker to become available before giving
+    // up.
+    int64 notebook_wait_time_for_worker_ms = 46;
+
     // Set to -1 to disable local workers. The default is 5 local
     // workers. If you want the master to **not** perform any notebook
     // computations reduce this to -1 and set
@@ -1013,6 +1073,9 @@ message Defaults {
     // The default priority of notebook processors (Higher priority
     // will receive jobs over lower priority).
     int64 notebook_worker_priority = 39;
+
+    // Total number of cell versions we keep for undo/redo support.
+    int64 notebook_versions = 42;
 
     // The default CSV delimiter
     string csv_delimiter = 3;
@@ -1090,9 +1153,20 @@ message Defaults {
     // its own but if this is set, we prevent any external access.
     bool disable_inventory_service_external_access = 34;
 
-    // Controls how exports work (creating hunt or colletion exports to a zip file).
+    // Controls how exports work (creating hunt or colletion exports
+    // to a zip file).
     int64 export_concurrency = 40;
     int64 export_max_timeout_sec = 41;
+
+    // Watch plugin frequency sleep time in seconds: How often
+    // watch_syslog() will check for changes (default 3).
+    int64 watch_plugin_frequency = 44;
+
+    // Maximum length of the line that will be parsed (16kb)
+    int64 watch_plugin_buffer_size = 45;
+
+    // Period in seconds when to produce a backup
+    int64 backup_period_seconds = 47;
 }
 
 // Configures crypto preferences
@@ -1160,6 +1234,10 @@ message RemappingConfig {
     // Human readable description of what this mapping rule should
     // produce.
     string description = 10;
+
+    // A Sequence of VQL LET statements to preconfigure the scope for
+    // the accessor in the From clause.
+    string scope = 11;
 
     // For mount options
     MountPoint from = 2;
@@ -1269,7 +1347,7 @@ message Config {
     // does not know or use its own org id.
     string org_id = 36;
     string org_name = 37;
-
+    bool debug_mode = 41;
 
     // The services that will run at initialization. Note this is not
     // set in the config file by the user but is propagated from the

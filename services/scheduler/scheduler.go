@@ -69,6 +69,8 @@ type Scheduler struct {
 	mu sync.Mutex
 
 	queues map[string][]*Worker
+
+	config_obj *config_proto.Config
 }
 
 func (self *Scheduler) RegisterWorker(
@@ -133,23 +135,52 @@ func (self *Scheduler) WriteProfile(ctx context.Context,
 
 func (self *Scheduler) Schedule(ctx context.Context,
 	job services.SchedulerJob) (chan services.JobResponse, error) {
+
+	var wait_time time.Duration
+	if self.config_obj.Defaults != nil {
+		config_wait_time := self.config_obj.Defaults.NotebookWaitTimeForWorkerMs
+		if config_wait_time > 0 {
+			wait_time = time.Millisecond * time.Duration(config_wait_time)
+		} else if config_wait_time == 0 {
+			wait_time = 10 * time.Second
+		} else if config_wait_time < 0 {
+			wait_time = 0
+		}
+	}
+
 	for {
 		// The following does not block so we can do it all under lock
-		self.mu.Lock()
-
 		var available_workers []*Worker
 
-		// Find a ready worker
-		workers, _ := self.queues[job.Queue]
-		for _, w := range workers {
-			if !w.IsBusy() {
-				available_workers = append(available_workers, w)
-			}
-		}
+		// Retry a few times to get a worker from the queue.
+		start := utils.GetTime().Now()
+		for {
+			self.mu.Lock()
 
-		if len(available_workers) == 0 {
+			// Find a ready worker
+			workers, _ := self.queues[job.Queue]
+			for _, w := range workers {
+				if !w.IsBusy() {
+					available_workers = append(available_workers, w)
+				}
+			}
+
+			// Yes we got some workers.
+			if len(available_workers) > 0 {
+				// Hold the lock on break
+				break
+			}
+
+			// Do not wait with the lock held
 			self.mu.Unlock()
-			return nil, fmt.Errorf("No workers available on queue %v!", job.Queue)
+
+			// Give up after 10 seconds.
+			if utils.GetTime().Now().Sub(start) > wait_time {
+				return nil, fmt.Errorf("No workers available on queue %v!", job.Queue)
+			}
+
+			// Try again soon
+			utils.GetTime().Sleep(100 * time.Millisecond)
 		}
 
 		result_chan := make(chan services.JobResponse)
@@ -167,20 +198,32 @@ func (self *Scheduler) Schedule(ctx context.Context,
 		})
 
 		for _, w := range available_workers {
+			// The worker can get back to the pool immediately while
+			// we wait for our consumer.
 			job.Done = func(result string, err error) {
-				result_chan <- services.JobResponse{
+				w.SetBusy(false)
+				w.SetRequest(vfilter.Null{})
+				defer close(result_chan)
+
+				select {
+				case <-ctx.Done():
+					return
+
+				case result_chan <- services.JobResponse{
 					Job: result,
 					Err: err,
+				}:
 				}
-
-				w.SetRequest(vfilter.Null{})
-				w.SetBusy(false)
-				close(result_chan)
 			}
 
 			select {
+
+			// If the caller is cancelled we can return the worker to
+			// the pool.
 			case <-ctx.Done():
 				self.mu.Unlock()
+				w.SetBusy(false)
+				w.SetRequest(vfilter.Null{})
 				close(result_chan)
 				return result_chan, errors.New("Cancelled")
 
@@ -234,7 +277,8 @@ func StartSchedulerService(
 	logger.Info("Starting Server Scheduler Service for %v", services.GetOrgName(config_obj))
 
 	scheduler := &Scheduler{
-		queues: make(map[string][]*Worker),
+		queues:     make(map[string][]*Worker),
+		config_obj: config_obj,
 	}
 
 	services.RegisterScheduler(scheduler)

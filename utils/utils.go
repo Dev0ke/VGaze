@@ -1,6 +1,6 @@
 /*
    Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+   Copyright (C) 2019-2024 Rapid7 Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Affero General Public License as published
@@ -140,6 +140,20 @@ func Stringify(value interface{}, scope vfilter.Scope, min_width int) string {
 }
 
 func SlicesEqual(a []string, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for idx, a_item := range a {
+		if a_item != b[idx] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func BytesEqual(a []byte, b []byte) bool {
 	if len(a) != len(b) {
 		return false
 	}

@@ -1,19 +1,19 @@
 /*
-   Velociraptor - Dig Deeper
-   Copyright (C) 2019-2022 Rapid7 Inc.
+Velociraptor - Dig Deeper
+Copyright (C) 2019-2024 Rapid7 Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License as published
-   by the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-   You should have received a copy of the GNU Affero General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 package api
 
@@ -164,26 +164,13 @@ func (self *ApiServer) CollectArtifact(
 	}
 	principal := user_record.Name
 
-	var acl_manager vql_subsystem.ACLManager = acl_managers.NullACLManager{}
-
 	// Internal calls from the frontend can set the creator.
 	if principal != org_config_obj.Client.PinnedServerName {
 		in.Creator = principal
-
-		permissions := acls.COLLECT_CLIENT
-		if in.ClientId == "server" {
-			permissions = acls.COLLECT_SERVER
-		}
-
-		acl_manager = acl_managers.NewServerACLManager(
-			org_config_obj, principal)
-
-		perm, err := acl_manager.CheckAccess(permissions)
-		if !perm || err != nil {
-			return nil, PermissionDenied(err,
-				"User is not allowed to launch flows.")
-		}
 	}
+
+	acl_manager := acl_managers.NewServerACLManager(
+		org_config_obj, principal)
 
 	manager, err := services.GetRepositoryManager(org_config_obj)
 	if err != nil {
@@ -328,10 +315,24 @@ func (self *ApiServer) LabelClients(
 			case "set":
 				err = labeler.SetClientLabel(ctx,
 					org_config_obj, client_id, label)
+				if err == nil {
+					services.LogAudit(ctx,
+						org_config_obj, principal, "SetClientLabel",
+						ordereddict.NewDict().
+							Set("client_id", client_id).
+							Set("label", label))
+				}
 
 			case "remove":
 				err = labeler.RemoveClientLabel(ctx,
 					org_config_obj, client_id, label)
+				if err == nil {
+					services.LogAudit(ctx,
+						org_config_obj, principal, "RemoveClientLabel",
+						ordereddict.NewDict().
+							Set("client_id", client_id).
+							Set("label", label))
+				}
 
 			default:
 				return nil, errors.New("Unknown label operation")
@@ -879,8 +880,12 @@ func (self *ApiServer) GetServerMonitoringState(
 			fmt.Sprintf("User is not allowed to read results (%v).", permissions))
 	}
 
-	result, err := getServerMonitoringState(org_config_obj)
-	return result, Status(self.verbose, err)
+	server_event_manager, err := services.GetServerEventManager(org_config_obj)
+	if err != nil {
+		return nil, Status(self.verbose, err)
+	}
+
+	return server_event_manager.Get(), nil
 }
 
 func (self *ApiServer) SetServerMonitoringState(
@@ -906,7 +911,12 @@ func (self *ApiServer) SetServerMonitoringState(
 			fmt.Sprintf("User is not allowed to modify artifacts (%v).", permissions))
 	}
 
-	err = setServerMonitoringState(ctx, org_config_obj, principal, in)
+	server_event_manager, err := services.GetServerEventManager(org_config_obj)
+	if err != nil {
+		return nil, Status(self.verbose, err)
+	}
+
+	err = server_event_manager.Update(ctx, org_config_obj, principal, in)
 	return in, Status(self.verbose, err)
 }
 

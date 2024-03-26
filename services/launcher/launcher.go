@@ -117,12 +117,8 @@ package launcher
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base32"
-	"encoding/binary"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/go-errors/errors"
 	"google.golang.org/protobuf/proto"
@@ -227,7 +223,9 @@ func (self *Launcher) CompileCollectorArgs(
 			return nil, errors.New("Unknown artifact " + spec.Artifact)
 		}
 
-		err := CheckAccess(config_obj, artifact, acl_manager)
+		// Make sure the user can collect this artifact.
+		err := CheckAccess(
+			config_obj, artifact, collector_request, acl_manager)
 		if err != nil {
 			return nil, err
 		}
@@ -610,7 +608,7 @@ func (self *Launcher) WriteArtifactCollectionRecord(
 
 	session_id := collector_request.FlowId
 	if session_id == "" {
-		session_id = NewFlowId(client_id)
+		session_id = utils.NewFlowId(client_id)
 	}
 
 	// How long to batch log messages for on the client.
@@ -759,27 +757,7 @@ func addOrReplaceParameter(
 }
 
 func (self *Launcher) SetFlowIdForTests(id string) {
-	NextFlowIdForTests = id
-}
-
-var (
-	NextFlowIdForTests string
-)
-
-func NewFlowId(client_id string) string {
-	if NextFlowIdForTests != "" {
-		result := NextFlowIdForTests
-		NextFlowIdForTests = ""
-		return result
-	}
-
-	buf := make([]byte, 8)
-	_, _ = rand.Read(buf)
-
-	binary.BigEndian.PutUint32(buf, uint32(time.Now().Unix()))
-	result := base32.HexEncoding.EncodeToString(buf)[:13]
-
-	return constants.FLOW_PREFIX + result
+	utils.SetIdGenerator(utils.ConstantIdGenerator(id))
 }
 
 func NewLauncherService(

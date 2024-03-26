@@ -108,7 +108,7 @@ class VeloTimestamp extends Component {
                  delay={{show: 250, hide: 400}}
                  overlay={(props)=>renderToolTip(props, ts)}>
                  <div className="timestamp">
-                   {moment.tz(when, timezone).format()}
+                   {moment.tz(when, timezone).format('YYYY-MM-DD HH:mm:ss')}
                  </div>
                </OverlayTrigger>;
     };

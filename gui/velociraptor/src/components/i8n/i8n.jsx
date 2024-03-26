@@ -11,7 +11,7 @@ function dict(item) {
 
      case "ch":
             return Chinese[item];
-            
+                        
     case "en":
            return English[item];
 
