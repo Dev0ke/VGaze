@@ -164,7 +164,7 @@ func configureDataStore(config_obj *config_proto.Config) error {
 	case "windows":
 		default_data_store = "C:\\Windows\\Temp"
 	default:
-		default_data_store = "/opt/velociraptor"
+		default_data_store = "/opt/VGaze"
 	}
 
 	data_store_file := []*survey.Question{
@@ -238,7 +238,7 @@ func configureRegistryWriteback(config_obj *config_proto.Config) error {
 	}
 
 	if use_registry {
-		config_obj.Client.WritebackWindows = "HKLM\\SOFTWARE\\Velocidex\\Velociraptor"
+		config_obj.Client.WritebackWindows = "HKLM\\SOFTWARE\\VG\\VGaze"
 	}
 	return nil
 }
