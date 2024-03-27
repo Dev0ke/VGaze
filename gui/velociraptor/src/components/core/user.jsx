@@ -38,6 +38,10 @@ export class UserSettings extends React.Component {
 
             traits.username = response.data.username;
             traits.orgs = response.data.orgs;
+            if(traits.timezone === undefined) {
+                traits.timezone = "Asia/Shanghai";
+            }
+
 
             this.setState({traits: traits});
 
