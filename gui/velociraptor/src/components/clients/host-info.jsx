@@ -370,7 +370,7 @@ class VeloHostInfo extends Component {
                         <dd className="col-sm-9">
                           { info.os_info.machine }
                         </dd>
-            <dt className="col-sm-3">MAC Addresses</dt>
+            <dt className="col-sm-3">MAC 地址</dt>
             <dd className="col-sm-9">
               { _.map(info.os_info.mac_addresses, (address, idx) => {
                   return <div key={idx}>{address}</div>;
