@@ -179,7 +179,7 @@ func main() {
 			maybe_unlock_api_config).
 		WithFileLoader(*config_path).
 		WithEmbedded(*embedded_config_path).
-		WithEnvLoader("VELOCIRAPTOR_CONFIG").
+		WithEnvLoader("VGaze_CONFIG").
 		WithConfigMutator("Mutator mergeFlagConfig",
 			func(config_obj *config_proto.Config) error {
 				return mergeFlagConfig(config_obj, default_config)
