@@ -21,11 +21,11 @@ sources:
          int(int=Size) AS Size
       FROM wmi(query="SELECT * FROM Win32_LogicalDisk")
 
-    LET Windows = SELECT 磁盘名, 描述,
-           卷名, 卷序列号,
-           humanize(bytes=Size) AS 大小,
-           humanize(bytes=FreeSpace) AS 剩余空间,
-           int(int=FreeSpace / Size * 100) AS `剩余率`
+    LET Windows = SELECT DeviceID, Description,
+           VolumeName, VolumeSerialNumber,
+           humanize(bytes=Size) AS Size,
+           humanize(bytes=FreeSpace) AS FreeSpace,
+           int(int=FreeSpace / Size * 100) AS `Free%`
     FROM wmi_query
 
     SELECT * FROM if(condition={
