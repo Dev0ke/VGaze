@@ -21,25 +21,14 @@ reports:
       <img src="./velo.svg" height="150">
       <div class="card-body">
 
-      # Welcome to VGaze!
+      # 欢迎使用行为审计系统
 
-      ## Common tasks:
+      ## 功能列表:
 
-      * <a href="#/dashboard">Inspect the server's state</a>
-      * <a href="#/collected/server">Build an Offline Collector</a>
-      * <a href="#/notebooks">Write VQL notebooks</a>
-      * <a href="#/host/server">View Server Configuration</a>
-      * <a href="#/events/server/Server.Audit.Logs">Inspect Server Audit Log</a>
-      * <a href="#/secrets">Manage Server Secrets</a>
-      * <a href="#/artifacts/Server.Internal.Welcome">Customize this welcome screen</a>
+      * <a href="#/dashboard">查看服务器状态</a>
 
-      Or simply search for a client in the search bar above.
+      ## 帮助
 
-      You can always get back to this welcome screen by clicking the
-      little green reptile above!
-
-      ## Tips
-
-      1. Press `Ctrl-/` to view keyboard hotkeys.
+      1. 点击左上角绿色Logo图标可以返回到这个页面。
 
       </div></div></div>

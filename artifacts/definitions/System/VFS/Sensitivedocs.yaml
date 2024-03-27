@@ -1,0 +1,36 @@
+name: System.VFS.Sensitivedocs
+description: |
+  This artifact searches for office documents by file extension and
+  glob then uses the zip filesystem accessor to launch a yara scan
+  again the uncompressed data of the document. Keywords are more
+  likely to match when scanning the decompressed XML data.
+
+  The artifact returns a context around the keyword hit.
+
+  NOTE: The InternalMtime column shows the creation time of the zip
+  member within the document which may represent when the document was
+  initially created.
+
+parameters:
+  - name: documentGlobs
+    default: /*.{txt,md,docx,docm,dotx,dotm,docb,xlsx,xlsm,xltx,xltm,pptx,pptm,potx,potm,ppam,ppsx,ppsm,sldx,sldm,odt,ott,oth,odm}
+  // */
+  - name: searchGlob
+    default: C:\Users\Admin\Desktop\
+  - name: TimeThreshold
+    default: 7  # 7 days in seconds
+
+sources:
+  - name: UnusualFileAccess
+    query: |
+      LET n_day_ago = timestamp(epoch=now() - TimeThreshold*86400)
+      SELECT OSPath, Mtime, Size,Atime,Ctime,Mode
+      FROM glob(globs=searchGlob + documentGlobs)
+      WHERE Atime > n_day_ago
+
+  - name: SensitiveFilesCreation
+    query: |
+      LET n_day_ago = timestamp(epoch=now() - TimeThreshold*86400)
+      SELECT OSPath, Mtime, Size,Atime,Ctime,Mode
+      FROM glob(globs=searchGlob + documentGlobs)
+      WHERE Ctime > n_day_ago
