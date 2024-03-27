@@ -432,7 +432,7 @@ func doSingleServerRPM(
 	fmt.Printf("Creating %s package at %s\n", variant, output_path)
 
 	r, err := rpmpack.NewRPM(rpmpack.RPMMetaData{
-		Name:    "velociraptor-server",
+		Name:    "VGaze-server",
 		Version: version,
 		Release: *rpm_command_release,
 		Arch:    arch,
