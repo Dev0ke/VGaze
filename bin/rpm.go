@@ -44,16 +44,16 @@ var (
 		"binary", "The binary to package").String()
 
 	server_rpm_post_install_template = `
-getent group VGaze >/dev/null 2>&1 || groupadd \
+getent group velociraptor >/dev/null 2>&1 || groupadd \
         -r \
-        VGaze
-getent passwd VGaze >/dev/null 2>&1 || useradd \
+        velociraptor
+getent passwd velociraptor >/dev/null 2>&1 || useradd \
         -r -l \
-        -g VGaze \
+        -g velociraptor \
         -d /proc \
         -s /sbin/nologin \
-        -c "VGaze Server" \
-        VGaze
+        -c "Velociraptor Server" \
+        velociraptor
 :;
 
 # Make the filestore path accessible to the user.
@@ -62,61 +62,61 @@ mkdir -p '%s'/config
 # Only chown two levels of the filestore directory in case
 # this is an upgrade and there are many files already there.
 # otherwise chown -R takes too long.
-chown VGaze:VGaze '%s' '%s'/*
-chown VGaze:VGaze -R /etc/VGaze/
+chown velociraptor:velociraptor '%s' '%s'/*
+chown velociraptor:velociraptor -R /etc/velociraptor/
 
 # Lock down permissions on the config file.
-chmod -R go-r /etc/VGaze/
-chmod o+x /usr/local/bin/VGaze /usr/local/bin/VGaze
+chmod -R go-r /etc/velociraptor/
+chmod o+x /usr/local/bin/velociraptor /usr/local/bin/velociraptor
 
 # Allow the server to bind to low ports and increase its fd limit.
-setcap CAP_SYS_RESOURCE,CAP_NET_BIND_SERVICE=+eip /usr/local/bin/VGaze
-/bin/systemctl enable VGaze_server.service
-/bin/systemctl start VGaze_server.service
+setcap CAP_SYS_RESOURCE,CAP_NET_BIND_SERVICE=+eip /usr/local/bin/velociraptor
+/bin/systemctl enable velociraptor_server.service
+/bin/systemctl start velociraptor_server.service
 `
 
 	rpm_sysv_client_service_definition = `
 #!/bin/bash
 #
-# VGaze		Start up the VGaze client daemon
+# velociraptor		Start up the Velociraptor client daemon
 #
 # chkconfig: 2345 55 25
-# description: VGaze is an endpoint monitoring tool
+# description: Velociraptor is an endpoint monitoring tool
 #
-# processname: VGaze
-# config: /etc/VGaze/client.config.yaml
-# pidfile: /var/run/VGaze.pid
+# processname: velociraptor
+# config: /etc/velociraptor/client.config.yaml
+# pidfile: /var/run/velociraptor.pid
 
 ### BEGIN INIT INFO
-# Provides: VGaze
+# Provides: velociraptor
 # Required-Start: $local_fs $network $syslog
 # Required-Stop: $local_fs $syslog
 # Should-Start: $syslog
 # Should-Stop: $network $syslog
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
-# Short-Description: Start up the VGaze client daemon
+# Short-Description: Start up the Velociraptor client daemon
 ### END INIT INFO
 
 # source function library
 . /etc/rc.d/init.d/functions
 
 RETVAL=0
-prog="VGaze"
+prog="velociraptor"
 lockfile=/var/lock/subsys/$prog
-VGaze=/usr/local/bin/VGaze
-VGaze_CONFIG=/etc/VGaze/client.config.yaml
-PID_FILE=/var/run/VGaze.pid
+VELOCIRAPTOR=/usr/local/bin/velociraptor
+VELOCIRAPTOR_CONFIG=/etc/velociraptor/client.config.yaml
+PID_FILE=/var/run/velociraptor.pid
 
 runlevel=$(set -- $(runlevel); eval "echo \$$#" )
 
 start()
 {
-	[ -x $VGaze ] || exit 5
-	[ -f $VGaze_CONFIG ] || exit 6
+	[ -x $VELOCIRAPTOR ] || exit 5
+	[ -f $VELOCIRAPTOR_CONFIG ] || exit 6
 
 	echo -n $"Starting $prog: "
-	$VGaze --config "$VGaze_CONFIG" client &
+	$VELOCIRAPTOR --config "$VELOCIRAPTOR_CONFIG" client &
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && /sbin/pidof $prog > $PID_FILE
 	echo
@@ -126,7 +126,7 @@ start()
 stop()
 {
 	echo -n $"Stopping $prog: "
-	killproc -p $PID_FILE $VGaze
+	killproc -p $PID_FILE $VELOCIRAPTOR
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && rm -f $lockfile
 	echo
@@ -135,7 +135,7 @@ stop()
 reload()
 {
 	echo -n $"Reloading $prog: "
-	killproc -p $PID_FILE $VGaze -HUP
+	killproc -p $PID_FILE $VELOCIRAPTOR -HUP
 	RETVAL=$?
 	echo
 }
@@ -150,7 +150,7 @@ force_reload() {
 }
 
 rh_status() {
-	status -p $PID_FILE VGaze
+	status -p $PID_FILE velociraptor
 }
 
 rh_status_q() {
@@ -268,7 +268,7 @@ func doClientRPM() error {
 
 	version := strings.ReplaceAll(constants.VERSION, "-", ".")
 
-	output_path := fmt.Sprintf("VGaze_client_%s_%s.rpm", version, arch)
+	output_path := fmt.Sprintf("velociraptor_client_%s_%s.rpm", version, arch)
 	if *client_rpm_command_output != "" {
 		output_path = *client_rpm_command_output
 	}
@@ -276,7 +276,7 @@ func doClientRPM() error {
 	fmt.Printf("Creating client package at %s\n", output_path)
 
 	r, err := rpmpack.NewRPM(rpmpack.RPMMetaData{
-		Name:    "VGaze-client",
+		Name:    "velociraptor-client",
 		Version: version,
 		Release: *rpm_command_release,
 		Arch:    arch,
@@ -287,7 +287,7 @@ func doClientRPM() error {
 
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name:  "/etc/VGaze/client.config.yaml",
+			Name:  "/etc/velociraptor/client.config.yaml",
 			Mode:  0600,
 			Body:  config_file_yaml,
 			Owner: "root",
@@ -296,39 +296,39 @@ func doClientRPM() error {
 
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name:  "/usr/local/bin/VGaze_client",
+			Name:  "/usr/local/bin/velociraptor_client",
 			Body:  binary_content,
 			Mode:  0755,
 			Owner: "root",
 			Group: "root",
 		})
 
-	config_path := "/etc/VGaze/client.config.yaml"
-	VGaze_bin := "/usr/local/bin/VGaze_client"
+	config_path := "/etc/velociraptor/client.config.yaml"
+	velociraptor_bin := "/usr/local/bin/velociraptor_client"
 
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name: "/etc/systemd/system/VGaze_client.service",
+			Name: "/etc/systemd/system/velociraptor_client.service",
 			Body: []byte(fmt.Sprintf(
-				client_service_definition, VGaze_bin, config_path)),
+				client_service_definition, velociraptor_bin, config_path)),
 			Mode:  0644,
 			Owner: "root",
 			Group: "root",
 		})
 
-	r.AddPostin(`/bin/systemctl enable VGaze_client.service
-/bin/systemctl start VGaze_client.service
+	r.AddPostin(`/bin/systemctl enable velociraptor_client.service
+/bin/systemctl start velociraptor_client.service
 `)
 
 	// check for upgrade vs uninstall
 	r.AddPreun(`
 if [ $1 == 1 ] ; then
-    /bin/systemctl restart VGaze_client.service
+    /bin/systemctl restart velociraptor_client.service
 fi
 
 if [ $1 == 0 ] ; then
-    /bin/systemctl disable VGaze_client.service
-    /bin/systemctl stop VGaze_client.service
+    /bin/systemctl disable velociraptor_client.service
+    /bin/systemctl stop velociraptor_client.service
 fi
 `)
 
@@ -380,8 +380,8 @@ func doServerRPM() error {
 func doSingleServerRPM(
 	config_obj *config_proto.Config,
 	variant string, extra_args []string) error {
-	// Linux packages always use the "VGaze" user.
-	config_obj.Frontend.RunAsUser = "VGaze"
+	// Linux packages always use the "velociraptor" user.
+	config_obj.Frontend.RunAsUser = "velociraptor"
 	config_obj.ServerType = "linux"
 
 	var err error
@@ -421,7 +421,7 @@ func doSingleServerRPM(
 		kind = kind + "-" + variant
 	}
 
-	output_path := fmt.Sprintf("VGaze-%s-%s.%s.rpm", kind, version, arch)
+	output_path := fmt.Sprintf("velociraptor-%s-%s.%s.rpm", kind, version, arch)
 	if *server_rpm_command_output != "" {
 		output_path = *server_rpm_command_output
 		if variant != "" {
@@ -432,7 +432,7 @@ func doSingleServerRPM(
 	fmt.Printf("Creating %s package at %s\n", variant, output_path)
 
 	r, err := rpmpack.NewRPM(rpmpack.RPMMetaData{
-		Name:    "VGaze-server",
+		Name:    "velociraptor-server",
 		Version: version,
 		Release: *rpm_command_release,
 		Arch:    arch,
@@ -443,7 +443,7 @@ func doSingleServerRPM(
 
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name:  "/etc/VGaze/server.config.yaml",
+			Name:  "/etc/velociraptor/server.config.yaml",
 			Mode:  0600,
 			Body:  config_file_yaml,
 			Owner: "root",
@@ -452,21 +452,21 @@ func doSingleServerRPM(
 
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name:  "/usr/local/bin/VGaze",
+			Name:  "/usr/local/bin/velociraptor",
 			Body:  binary_content,
 			Mode:  0755,
 			Owner: "root",
 			Group: "root",
 		})
 
-	config_path := "/etc/VGaze/server.config.yaml"
-	VGaze_bin := "/usr/local/bin/VGaze"
+	config_path := "/etc/velociraptor/server.config.yaml"
+	velociraptor_bin := "/usr/local/bin/velociraptor"
 
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name: "/etc/systemd/system/VGaze_server.service",
+			Name: "/etc/systemd/system/velociraptor_server.service",
 			Body: []byte(fmt.Sprintf(
-				server_service_definition, VGaze_bin, config_path,
+				server_service_definition, velociraptor_bin, config_path,
 				strings.Join(extra_args, " "))),
 			Mode:  0644,
 			Owner: "root",
@@ -478,8 +478,8 @@ func doSingleServerRPM(
 		filestore_path, filestore_path, filestore_path))
 
 	r.AddPreun(`
-/bin/systemctl disable VGaze_server.service
-/bin/systemctl stop VGaze_server.service
+/bin/systemctl disable velociraptor_server.service
+/bin/systemctl stop velociraptor_server.service
 `)
 
 	fd, err := os.OpenFile(output_path,
@@ -545,7 +545,7 @@ func doClientSysVRPM() error {
 
 	version := strings.ReplaceAll(constants.VERSION, "-", ".")
 
-	output_path := fmt.Sprintf("VGaze_client_%s_%s.rpm", version, arch)
+	output_path := fmt.Sprintf("velociraptor_client_%s_%s.rpm", version, arch)
 	if *client_rpm_command_output != "" {
 		output_path = *client_rpm_command_output
 	}
@@ -553,7 +553,7 @@ func doClientSysVRPM() error {
 	fmt.Printf("Creating SysV-init client package at %s\n", output_path)
 
 	r, err := rpmpack.NewRPM(rpmpack.RPMMetaData{
-		Name:    "VGaze-client",
+		Name:    "velociraptor-client",
 		Version: version,
 		Release: *rpm_command_release,
 		Arch:    arch,
@@ -563,7 +563,7 @@ func doClientSysVRPM() error {
 	}
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name:  "/etc/VGaze/client.config.yaml",
+			Name:  "/etc/velociraptor/client.config.yaml",
 			Mode:  0600,
 			Body:  config_file_yaml,
 			Owner: "root",
@@ -571,7 +571,7 @@ func doClientSysVRPM() error {
 		})
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name:  "/usr/local/bin/VGaze",
+			Name:  "/usr/local/bin/velociraptor",
 			Body:  binary_content,
 			Mode:  0755,
 			Owner: "root",
@@ -579,7 +579,7 @@ func doClientSysVRPM() error {
 		})
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name:  "/etc/rc.d/init.d/VGaze",
+			Name:  "/etc/rc.d/init.d/velociraptor",
 			Body:  []byte(rpm_sysv_client_service_definition),
 			Mode:  0755,
 			Owner: "root",
@@ -587,22 +587,22 @@ func doClientSysVRPM() error {
 		})
 
 	r.AddPrein(`
-getent group VGaze >/dev/null || groupadd -g 115 -r VGaze || :
-getent passwd VGaze >/dev/null || \
-useradd -c "Privilege-separated VGaze" -u 115 -g VGaze  -s /sbin/nologin \
-  -s /sbin/nologin -r -d /var/empty/VGaze VGaze 2> /dev/null || :
+getent group velociraptor >/dev/null || groupadd -g 115 -r velociraptor || :
+getent passwd velociraptor >/dev/null || \
+useradd -c "Privilege-separated Velociraptor" -u 115 -g velociraptor  -s /sbin/nologin \
+  -s /sbin/nologin -r -d /var/empty/velociraptor velociraptor 2> /dev/null || :
 `)
 
-	r.AddPostin("/sbin/chkconfig --add VGaze")
+	r.AddPostin("/sbin/chkconfig --add velociraptor")
 	r.AddPreun(`
 if [ "$1" = 0 ]
 then
-        /sbin/service VGaze stop > /dev/null 2>&1 || :
-        /sbin/chkconfig --del VGaze
+        /sbin/service velociraptor stop > /dev/null 2>&1 || :
+        /sbin/chkconfig --del velociraptor
 fi
 `)
 	r.AddPostun(`
-/sbin/service VGaze start  > /dev/null 2>&1 || :
+/sbin/service velociraptor start  > /dev/null 2>&1 || :
 `)
 
 	fd, err := os.OpenFile(output_path,
