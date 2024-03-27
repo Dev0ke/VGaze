@@ -2,7 +2,7 @@ name: make linux
 
 on:
   push:
-    branches: [ "master","haungao" ]
+    branches: [ "master","huangao" ]
   pull_request:
     branches: [ "master","huangao" ]
   release:
