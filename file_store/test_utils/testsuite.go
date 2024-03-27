@@ -110,9 +110,9 @@ type TestSuite struct {
 }
 
 func (self *TestSuite) LoadConfig() *config_proto.Config {
-	os.Setenv("VELOCIRAPTOR_CONFIG", SERVER_CONFIG)
+	os.Setenv("VGAZE_CONFIG", SERVER_CONFIG)
 	config_obj, err := new(config.Loader).
-		WithEnvLiteralLoader("VELOCIRAPTOR_CONFIG").WithRequiredFrontend().
+		WithEnvLiteralLoader("VGAZE_CONFIG").WithRequiredFrontend().
 		WithWriteback().WithVerbose(true).
 		LoadAndValidate()
 	require.NoError(self.T(), err)

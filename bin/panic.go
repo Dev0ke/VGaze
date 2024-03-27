@@ -17,7 +17,7 @@ func writeLogOnPanic() error {
 	config_obj, err := new(config.Loader).
 		WithFileLoader(*config_path).
 		WithEmbedded(*embedded_config_path).
-		WithEnvLoader("VELOCIRAPTOR_CONFIG").
+		WithEnvLoader("VGAZE_CONFIG").
 		LoadAndValidate()
 	if err != nil {
 		return fmt.Errorf("Unable to load config file: %w", err)
