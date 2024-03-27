@@ -421,7 +421,7 @@ func doSingleServerRPM(
 		kind = kind + "-" + variant
 	}
 
-	output_path := fmt.Sprintf("velociraptor-%s-%s.%s.rpm", kind, version, arch)
+	output_path := fmt.Sprintf("VGaze-%s-%s.%s.rpm", kind, version, arch)
 	if *server_rpm_command_output != "" {
 		output_path = *server_rpm_command_output
 		if variant != "" {
@@ -545,7 +545,7 @@ func doClientSysVRPM() error {
 
 	version := strings.ReplaceAll(constants.VERSION, "-", ".")
 
-	output_path := fmt.Sprintf("velociraptor_client_%s_%s.rpm", version, arch)
+	output_path := fmt.Sprintf("VGaze_client_%s_%s.rpm", version, arch)
 	if *client_rpm_command_output != "" {
 		output_path = *client_rpm_command_output
 	}
