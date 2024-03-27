@@ -578,7 +578,7 @@ const Chinese = {
     "file_size":"文件大小",
     "uploaded_size":"上传大小",
     "TablePagination": (from, to, size)=>
-    <>共{ size }条目，已显示从第{ from }到第{ to }条目</>,
+    <>共{ size }条，已显示从第{ from }到第{ to }条</>,
 
     "Select a language":"选择语言",
     "Chinese" :"汉语",
@@ -590,7 +590,7 @@ const Chinese = {
     "Export to Zip":"Zip的输出",
 
     "Permanently delete Notebook":"永久删除搜寻",
-    "You are about to permanently delete the notebook for this hunt":"我打算永久删除这个搜寻。",
+    "You are about to permanently delete the notebook for this hunt":"永久删除这个搜寻",
 
     "Data":"数据",
     "Served from GitHub":"由 GitHub 提供",

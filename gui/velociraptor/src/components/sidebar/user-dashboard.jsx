@@ -77,15 +77,6 @@ class UserDashboard extends React.Component {
                     <FontAwesomeIcon icon="sync"/>
                   </Button>
 
-                  <Button variant="default"
-                          data-position="right"
-                          className="btn-tooltip"
-                          data-tooltip={T("Edit the dashboard")}
-                          onClick={() => {
-                      this.props.history.push("/artifacts/Server.Monitor.Health");
-                  }} >
-                    <FontAwesomeIcon icon="pencil-alt"/>
-                  </Button>
                 </ButtonGroup>
                 <ButtonGroup className="float-right">
                   <Dropdown>
