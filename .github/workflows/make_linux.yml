@@ -2,9 +2,9 @@ name: make linux
 
 on:
   push:
-    branches: [ "master","Dev0ke" ]
+    branches: [ "master","haungao" ]
   pull_request:
-    branches: [ "master","Dev0ke" ]
+    branches: [ "master","huangao" ]
   release:
     types: [created,published] # 表示在创建新的 Release 时触发
 jobs:
