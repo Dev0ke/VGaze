@@ -1,6 +1,6 @@
 name: Windows.System.Pslist
 description: |
-  List processes and their running binaries.
+  用于获取系统中的进程列表。
 
 parameters:
   - name: ProcessRegex

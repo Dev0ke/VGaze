@@ -1,5 +1,5 @@
 name: Linux.Sys.Services
-description: Parse services from systemctl 
+description: 解析系统服务列表。
 
 sources:
   - precondition: |

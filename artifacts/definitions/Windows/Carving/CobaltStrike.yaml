@@ -1,29 +1,6 @@
 name: Windows.Carving.CobaltStrike
-author: Matt Green - @mgreen27
 description: |
-  This artifact extracts cobalt strike configuration from a byte stream, process
-  or file on disk such as a process dump. Best used as a triage step against a
-  detection of a cobalt strike beacon via a yara process scan.
-
-  The User can define bytes, file glob, process name or pid regex as a target. The
-  content will search for a configuration pattern, extract a defined byte size,
-  xor with discovered key, then attempt configuration extraction.
-
-  - Cobalt Strike beacon configuration is typically XORed with 0x69 or 0x2e
-  (depending on version) but trivial to change.
-  - Configuration is built in a typical index / type / length / value structure
-  with either big endian values or zero terminated strings.
-  - If no beacon is found, parser will fallback to CobaltStrike Shellcode analysis.
-
-  This content simply carves the configuration and does not unpack files on
-  disk. That means pointing this artifact as a packed or obfuscated file may not
-  obtain the expected results.
-
-  Unpacking later version.
-
-reference:
-  - https://attack.mitre.org/software/S0154/
-  - https://blog.didierstevens.com/2020/11/07/1768-k/
+    用于检测并提取Cobalt Strike配置文件、shellcode等。
 
 parameters:
   - name: TargetBytes

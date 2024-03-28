@@ -1,10 +1,6 @@
 name: Windows.System.CriticalServices
 description: |
-  This artifact returns information about any services which are
-  considered critical.
-
-  The default list contains virus scanners. If the software is not
-  installed at all, it will not be shown.
+  用于获取系统中的关键服务的状态。
 
 reference:
   - "ATT&CK: T1089"

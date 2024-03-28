@@ -1,14 +1,7 @@
 name: Windows.System.TaskScheduler
 description: |
-  The Windows task scheduler is a common mechanism that malware uses
-  for persistence. It can be used to run arbitrary programs at a later
-  time. Commonly malware installs a scheduled task to run itself
-  periodically to achieve persistence.
-
-  This artifact enumerates all the task jobs (which are XML
-  files). The artifact uploads the original XML files and then
-  analyses them to provide an overview of the commands executed and
-  the user under which they will be run.
+  Windows 任务计划是恶意软件常用的持久化机制。它可以在之后的某个时间点运行任意程序。恶意软件会安装一个定期运行自身的计划任务实现持久化。
+  本规则用于解析 Windows 任务计划。
 
 parameters:
   - name: TasksPath

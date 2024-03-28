@@ -1,6 +1,6 @@
 name: Windows.System.LocalAdmins
 description: |
-   Gets a list of local admin accounts.
+   用于获取本地管理员组的成员列表。
 
 reference:
 - https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.localaccounts/get-localgroupmember?view=powershell-5.1

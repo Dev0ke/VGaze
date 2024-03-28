@@ -1,9 +1,6 @@
 name: Linux.Syslog.SSHLogin
 description: |
-  Parses the auth logs to determine all SSH login attempts.
-
-reference:
-  - https://www.elastic.co/blog/grokking-the-linux-authorization-logs
+  获取SSH登录日志。
 
 type: CLIENT
 

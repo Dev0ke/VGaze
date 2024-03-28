@@ -1,20 +1,6 @@
 name: Windows.System.Powershell.PSReadline
 description: |
-  This Artifact will search and extract lines from PSReadline history file.
-
-  Powershell is commonly used by attackers across all stages of the attack
-  lifecycle. The PSReadline module is responsible for command history and from
-  Powershell 5 on Windows 10 default configuration saves a copy of the console
-  history to disk.
-
-  There are several parameter's available for search leveraging regex.
-  - SearchStrings enables regex search over a PSReadline line.
-  - StringWhiteList enables a regex whitelist for results.
-  - UserRegex enables a regex search on Username
-  - UploadFiles enables upload ConsoleHost_history.txt in scope
-
-
-author: Matt Green - @mgreen27
+  用于搜索和提取 Powershell中的命令行记录。
 
 reference:
   - https://attack.mitre.org/techniques/T1059/001/

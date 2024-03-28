@@ -1,5 +1,5 @@
 name: Windows.Sys.DiskInfo
-description: Retrieve basic information about the physical disks of a system.
+description: 获取磁盘信息。
 sources:
   - precondition:
       SELECT OS From info() where OS = 'windows'

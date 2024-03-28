@@ -1,6 +1,6 @@
 name: Windows.System.Services
 description: |
-  List Service details.
+  用于解析 Windows 服务列表。
 
 parameters:
   - name: servicesKeyGlob
