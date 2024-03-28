@@ -1,0 +1,31 @@
+name: System.VFS.BackdoorDetection
+description: |
+   This artifact is designed to detect potential backdoor activity on a system. 
+   It monitors for unusual processes, network connections, 
+   and file modifications that might indicate backdoor implantation.
+
+type: CLIENT
+
+sources:
+  - name: UnusualProcesses
+    query: |
+      SELECT Name, CommandLine, Ctime, Pid, PPid
+      FROM pslist()
+      WHERE Name =~ '.*sh$|.*nc$|.*python.*|.*bash$'
+        OR CommandLine =~ '.*-e.*|.*bind.*|.*reverse.*'
+
+  - name: SuspiciousNetworkConnections
+    query: |
+      SELECT RemoteAddress, RemotePort, Protocol, State
+      FROM netscan()
+      WHERE RemotePort in ('4444', '5555', '6666') 
+        OR Protocol in ('tcp', 'udp') 
+        AND State = 'ESTABLISHED'
+
+  - name: UnusualFileModifications
+    query: |
+      LET one_day_ago = timestamp(epoch=now() - 86400)
+      SELECT FullPath, Size, Mtime, Ctime, Atime, Mode
+      FROM stat(directory='/etc/')
+      WHERE Mtime > one_day_ago
+        OR Ctime > one_day_ago
