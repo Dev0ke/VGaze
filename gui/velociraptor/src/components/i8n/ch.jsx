@@ -380,7 +380,7 @@ const Chinese = {
     "Exception Records":"异常详情",
     "Application Records":"应用记录详情",
     "All Clinets":"所有客户端",
-    "Server Events":"服务器事件",
+    "Server Events":"服务器监控",
     "Server Artifacts":"服务器工件",
     "Host Information":"主机信息",
     "Virtual Filesystem":"虚拟文件系统",
