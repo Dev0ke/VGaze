@@ -29,15 +29,15 @@ import SplitPane from 'react-split-pane';
 const presetFilters = [
     {value: "type:CLIENT", label: T("Client Artifacts")},
     {value: "type:SERVER", label: T("Server Artifacts")},
-    {value: "type:NOTEBOOK", label: T("Notebook templates")},
+    /*{value: "type:NOTEBOOK", label: T("Notebook templates")},*/
     {value: "", label: T("All Artifacts")},
     {value: "precondition:WINDOWS", label: T("Windows Only")},
     {value: "precondition:LINUX", label: T("Linux Only")},
-    {value: "precondition:DARWIN", label: T("OSX Only")},
+    /*{value: "precondition:DARWIN", label: T("OSX Only")},*/
     {value: "type:CLIENT_EVENT", label: T("Client Monitoring")},
     {value: "type:SERVER_EVENT", label: T("Server Monitoring")},
     {value: "tool:.+", label: T("Using Tools")},
-    {value: "^exchange.+", label: T("Exchange")},
+    /*{value: "^exchange.+", label: T("Exchange")},*/
     {value: "^custom.+", label: T("Custom")},
     {value: "builtin:yes", label: T("BuiltIn Only")},
     {value: "builtin:no", label: T("Custom Only")},

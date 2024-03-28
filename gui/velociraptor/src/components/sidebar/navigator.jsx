@@ -168,7 +168,7 @@ class VeloNavigator extends Component {
                         </NavLink>
                       </li>*/}
 
-                      {!customization.disable_server_events && (
+                       {/*{!customization.disable_server_events && (
                         <li className="nav-link">
                           <NavLink to="/events/server">
                             <span>
@@ -190,7 +190,7 @@ class VeloNavigator extends Component {
                           </span>
                           {T("Server Artifacts")}
                         </NavLink>
-                      </li>
+                      </li>*/}
 
                       {/* <li className="nav-link">
                         <NavLink to="/notebooks">

@@ -1,16 +1,12 @@
-name: linux.sys.jsonhunt
+name: Linux.Terminal.Log
 description: |
-   This workpiece will read the json file in the specified directory (the file after the original terminal log file has been cleaned and converted), and will output the operation record of the terminal by group, with 5 elements, file creation time, current user, run command, run program, and detailed record of the terminal.
-    Note that you need to change the directory to the required directory.
-# Can be CLIENT, CLIENT_EVENT, SERVER, SERVER_EVENT or NOTEBOOK
+   该规则旨在监控Linux系统的终端活动，并抓取终端日志以进行进一步分析和审计。
 type: CLIENT
-parameters:
-   - name: FirstParameter
-     default: Default Value of first parameter
+
 sources:
   - precondition:
-      SELECT OS From info() where OS = 'windows' OR OS = 'linux' OR OS = 'darwin'
+      SELECT OS From info() where OS = 'linux' 
     query: |
        LET bdb = SELECT Mtime, OSPath, read_file(filename=OSPath) AS Content FROM glob(globs='/var/tmp/Json/*.json')
-       LET json = SELECT parse_json(data=Content)   FROM  bdb
+       LET json = SELECT parse_json(data=Content)  FROM  bdb
        SELECT * FROM json

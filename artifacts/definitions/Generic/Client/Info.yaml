@@ -119,7 +119,7 @@ reports:
 
       {{ Query "SELECT * FROM source(source='BasicInformation')" | Table }}
 
-      # Memory and CPU footprint over the past 24 hours
+      # 硬件使用情况
 
       {{ define "resources" }}
        SELECT * FROM sample(
@@ -153,23 +153,23 @@ reports:
 
       {{ $windows_info := Query "SELECT * FROM source(source='WindowsInfo')" }}
       {{ if $windows_info | Expand }}
-      # Windows agent information
+      # Windows 信息
         {{ $windows_info | Table }}
       {{ end }}
 
       {{ $linux_info := Query "LET X <= SELECT * FROM source(artifact='Generic.Client.Info/LinuxInfo') LIMIT 1 SELECT * FROM X" }}
       {{ if Query "SELECT * FROM source(artifact='Generic.Client.Info/LinuxInfo')" | Expand }}
-      # Linux agent information
+      # Linux 信息
 
-      ### Network Info
+      ### 网络信息
         {{ Query "SELECT * FROM foreach(row=X[0].`Network Info`)" | Table }}
 
-      ### Computer Info
+      ### 计算机信息
         {{ Query "computerinfo" | Table }}
 
       {{ end }}
 
-      # Active Users
+      # 用户
       {{ Query "SELECT * FROM source(source='Users')" | Table }}
 
 
