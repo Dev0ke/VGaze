@@ -112,6 +112,17 @@ class VeloNavigator extends Component {
                       </li>
 
                       <li className="nav-link">
+                        <NavLink to="/search/all">
+                          <span>
+                            <i className="navicon">
+                              <FontAwesomeIcon icon="desktop" />
+                            </i>
+                          </span>
+                          {T("All Clinets")}
+                        </NavLink>
+                      </li>
+
+                      <li className="nav-link">
                         <NavLink to="/hunts">
                           <span>
                             <i className="navicon">
@@ -134,7 +145,7 @@ class VeloNavigator extends Component {
                       </li>
                       
                       {/* Add Exception Records Link */}
-                      <li className="nav-link">
+                      {/*<li className="nav-link">
                         <NavLink to="/records/exception">
                           <span>
                             <i className="navicon">
@@ -143,10 +154,10 @@ class VeloNavigator extends Component {
                           </span>
                           {T("Exception Records")}
                         </NavLink>
-                      </li>
+                      </li>*/}
 
                       {/* Add Application Records Link */}
-                      <li className="nav-link">
+                      {/*<li className="nav-link">
                         <NavLink to="/records/application">
                           <span>
                             <i className="navicon">
@@ -155,8 +166,8 @@ class VeloNavigator extends Component {
                           </span>
                           {T("Application Records")}
                         </NavLink>
-                      </li>
-                      
+                      </li>*/}
+
                       {!customization.disable_server_events && (
                         <li className="nav-link">
                           <NavLink to="/events/server">
