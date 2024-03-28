@@ -15,7 +15,7 @@ const Chinese = {
           隔离期间不能与 Velociraptor 服务器以外的其他网络进行通信。
           </p>
         </>),
-    "Cannot Quarantine host": "不能隔离主机",
+    "Cannot Quarantine host": "无法隔离主机",
     "Cannot Quarantine host message": (os_name, quarantine_artifact)=>
         <>
           <Alert variant="warning">
@@ -34,7 +34,7 @@ const Chinese = {
     "Labels": "标签",
     "Operating System": "操作系统",
     "Hostname": "主机名",
-    "FQDN": "完全限定域名FQDN",
+    "FQDN": "FQDN(完整域名)",
     "Release": "系统版本",
     "Architecture": "系统架构",
     "Client Metadata": "客户端元数据",
@@ -374,7 +374,7 @@ const Chinese = {
     "Currently refreshing from the client":"目前正在更新客户端信息",
     "Recursively download files":"递归下载文件",
 
-    "Home":"总览",
+    "Home":"服务器状态",
     "Hunt Manager":"任务管理器",
     "View Artifacts":"浏览工件",
     "Exception Records":"异常详情",

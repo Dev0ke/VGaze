@@ -27,8 +27,10 @@ reports:
 
       * <a href="#/dashboard">查看服务器状态</a>
       * <a href="#/search/all">查看所有客户端</a>
-      *
-
+      * <a href="#/hunts">查看审计任务</a>
+      * <a href="#/artifacts">查看审计规则</a>
+      * <a href="#/users">查看系统用户</a>
+      
       ## 帮助
 
       1. 点击左上角绿色Logo图标可以返回到这个页面。
