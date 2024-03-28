@@ -1,5 +1,5 @@
 name: Windows.Sys.CertificateAuthorities
-description: Certificate Authorities installed in Keychains/ca-bundles.
+description: 用于解析证书颁发机构。
 sources:
   - precondition:
       SELECT OS From info() where OS = 'windows'

@@ -1,20 +1,6 @@
 name: Windows.Sys.AllUsers
 description: |
-  List User accounts. We combine two data sources - the output from
-  the `NetUserEnum` API (termed `local` users) and the list of SIDs in
-  the registry (termed `remote` users).
-
-  In this artifact, 'remote' means that user profile was cached in the
-  registry, but the user does not appear in the output of the
-  `NetUserEnum` API - this normally happens for users remotely logging
-  into the system using domain credentials.
-
-  On Domain Controllers the `NetUserEnum` API will return the contents
-  of the entire ActiveDirectory as a list of 'local' users, however
-  this does not mean that the users have logged into the DC
-  locally. In this artifact we limit the number of users to 1000. If
-  you need to obtain the full list from the AD, customize this
-  artifact.
+  用于列出Windows用户账户。
 
 parameters:
   - name: remoteRegKey

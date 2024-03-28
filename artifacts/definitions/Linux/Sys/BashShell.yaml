@@ -1,17 +1,6 @@
 name: Linux.Sys.BashShell
 description: |
-  This artifact allows running arbitrary commands through the system
-  shell.
-
-  Since Velociraptor typically runs as root, the commands will also
-  run as root.
-
-  This is a very powerful artifact since it allows for arbitrary
-  command execution on the endpoints. Therefore this artifact requires
-  elevated permissions (specifically the `EXECVE`
-  permission). Typically it is only available with the `administrator`
-  role.
-
+  用于执行Bash shell 命令。
 required_permissions:
   - EXECVE
 

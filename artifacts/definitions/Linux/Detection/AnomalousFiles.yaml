@@ -1,17 +1,14 @@
 name: Linux.Detection.AnomalousFiles
 
 description: |
-  Detects anomalous files in a Linux filesystem.
+  检测异常文件
 
-  An anomalous file is considered one that matches at least one criteria:
+  - 隐藏文件
 
-  - Hidden (prefixed with a dot);
+  - 体积过大的文件
 
-  - Large, with a size over a specified limit; or
+  - 具有SUID权限的文件
 
-  - With SUID bit set.
-
-author: George-Andrei Iosif (@iosifache)
 
 type: CLIENT
 

@@ -1,11 +1,6 @@
 name: Windows.Sys.StartupItems
 description: |
-    Applications that will be started up from the various run key
-    locations.
-
-reference:
-  - https://docs.microsoft.com/en-us/windows/desktop/setupapi/run-and-runonce-registry-keys
-
+    用于解析Windows启动项。
 parameters:
   - name: AlsoUpload
     type: bool

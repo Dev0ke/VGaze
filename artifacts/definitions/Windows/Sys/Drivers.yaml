@@ -1,7 +1,6 @@
 name: Windows.Sys.Drivers
 description: |
-  Details for in-use Windows device drivers. This does not display
-  installed but unused drivers.
+  获取系统驱动程序信息。
 
 precondition:
       SELECT OS From info() where OS = 'windows'
