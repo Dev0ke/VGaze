@@ -216,6 +216,11 @@ class VeloNavigator extends Component {
                         </li>
                       )}
 
+<div className="navigator-footer">
+            <div className="navigator-footer-divider"></div>
+            <ul className="nav nav-pills navigator-footer-links">
+              {/* 新增的底部导航项 */}
+              <li className="nav-footer-link">
                       <li
                         className={classNames({
                           "nav-link": true,
@@ -307,32 +312,9 @@ class VeloNavigator extends Component {
                           {T("Client Events")}
                         </NavLink>
                       </li>
-{/* 
-                      {_.map(sidebar_links, (x) => {
-                        return (
-                          <li
-                            key={x.text}
-                            className={classNames({
-                              "nav-link": true,
-                            })}
-                          >
-                            <a
-                              href={x.url}
-                              rel="noreferrer"
-                              target={x.new_tab ? "_blank" : ""}
-                            >
-                              <span>
-                                <img
-                                  className="sidebar-icon"
-                                  alt=""
-                                  src={api.src_of(x.icon_url)}
-                                />
-                              </span>
-                              {T(x.text)}
-                            </a>
-                          </li>
-                        );
-                      })} */}
+                  </li>
+                </ul>
+              </div>
                     </ul>
                   </nav>
                 </div>

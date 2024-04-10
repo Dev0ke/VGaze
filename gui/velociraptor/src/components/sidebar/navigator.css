@@ -133,3 +133,38 @@ a.disabled {
     width: 15px;
     height: 15px;
 }
+
+
+/* 新增加的底部导航区域样式 */
+.navigator-footer {
+  transition: 0.5s;
+  overflow-x: hidden;
+  left: 0;
+  z-index: 1000; 
+  position: absolute;
+  bottom: 80px;
+  width: 260px; /* 与上方导航栏宽度一致 */
+  padding-bottom: 10px; /* 底部间隔 */
+  background-color: var(--color-sidebar-background); /* 与导航背景色一致 */
+  border-right-style: solid;
+  border-right: gray;
+}
+
+
+.navigator-footer .nav-footer-link a {
+  color: var(--color-sidebar-foreground); /* 链接文字颜色 */
+}
+
+.navigator-footer .nav-footer-link a:hover {
+  color: var(--color-sidebar-inactive-foreground-hover);
+  background: var(--color-sidebar-inactive-background-hover);
+}
+
+/* 底部导航区分隔线样式 */
+.navigator-footer-divider {
+  border-top: 1px solid #ccc; /* 分隔线颜色 */
+  margin-top: 20px; /* 与上方链接的间隔 */
+  padding-top: 10px; /* 分隔线与下方链接的间隔 */
+}
+
+

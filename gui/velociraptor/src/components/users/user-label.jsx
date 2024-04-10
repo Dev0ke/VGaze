@@ -252,7 +252,7 @@ class UserSettings extends React.PureComponent {
                   value={this.state.default_password}
                   setValue={value=>this.setState({default_password: value})}
                 />
-                <Form.Group as={Row}>
+                {/* <Form.Group as={Row}>
                   <Form.Label column sm="3">
                     <OverlayTrigger
                       delay={{show: 250, hide: 400}}
@@ -280,9 +280,9 @@ class UserSettings extends React.PureComponent {
                       <option value="en">{T("English")}</option> 
                     </Form.Control>
                   </Col>
-                </Form.Group>
+                </Form.Group> */}
 
-                <Form.Group as={Row}>
+                {/* <Form.Group as={Row}>
                   <Form.Label column sm="3">
                     <OverlayTrigger
                       delay={{show: 250, hide: 400}}
@@ -328,7 +328,7 @@ class UserSettings extends React.PureComponent {
                         spellCheck="false"/>
                     </InputGroup>
                   </Col>
-                </Form.Group>
+                </Form.Group> */}
 
               </Modal.Body>
               <Modal.Footer>
