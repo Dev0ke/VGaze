@@ -1,19 +1,12 @@
 name: Admin.Client.UpdateClientConfig
 description: |
-  Sometimes we wish to move a client from one org ID to another. This
-  requires updating the config on the client and rekeying the client.
-
-  This artifact will replace the client's config file and restart
-  it. The config file will be verified before replacing it.
-
-  This artifact has a notebook suggestion that allows a client to be
-  changed to a different org.
+  更新客户端配置。
 
 parameters:
    - name: ConfigYaml
-     description: The new config to write in yaml form.
+     description: 新的配置文件路径
    - name: ConfigPath
-     description: Path of config file to overwrite
+     description: 旧的配置文件路径
    - name: WaitPeriod
      type: int
      default: 10

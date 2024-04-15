@@ -1,10 +1,6 @@
 name: Generic.Client.DiskSpace
 description: |
-  This artifact reports the amount of free disk space. It is designed
-  to work equally on all architectures:
-
-    1. On Linux and MacOS we call `df -h`.
-    2. On Windows we use WMI
+  获取客户端的磁盘空间使用情况。
 
 sources:
 - query: |

@@ -1,16 +1,6 @@
 name: Generic.Client.Info
 description: |
-  Collect basic information about the client.
-
-  This artifact is collected when any new client is enrolled into the
-  system. Velociraptor will watch for this artifact and populate its
-  internal indexes from this artifact as well.
-
-  You can edit this artifact to enhance the client's interrogation
-  information as required, by adding new sources.
-
-  NOTE: Do not modify the BasicInformation source since it is used to
-  interrogate the clients.
+  用于获取客户端的基本信息。
 
 sources:
   - name: BasicInformation

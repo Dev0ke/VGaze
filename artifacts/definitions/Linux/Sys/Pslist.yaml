@@ -2,8 +2,6 @@ name: Linux.Sys.Pslist
 description: |
   用于获取系统中的进程列表。
 
-aliases:
-  - MacOS.Sys.Pslist
 
 parameters:
   - name: processRegex

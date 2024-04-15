@@ -1,12 +1,10 @@
 name: Linux.Detection.AnomalousFiles
 
 description: |
-  检测异常文件
+  检测异常文件，包括：
 
   - 隐藏文件
-
   - 体积过大的文件
-
   - 具有SUID权限的文件
 
 

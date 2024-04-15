@@ -1,6 +1,6 @@
 name: Generic.Client.LocalLogsRetrieve
 description: |
-  Retrives the locally written logs.
+  获取客户端的本地日志文件。
 
 type: CLIENT
 

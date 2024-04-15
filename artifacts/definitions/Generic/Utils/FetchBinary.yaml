@@ -1,19 +1,10 @@
 name: Generic.Utils.FetchBinary
 description: |
-   A utility artifact which fetches a binary from a URL and caches it on disk.
-   We verify the hash of the binary on disk and if it does not match we fetch it again
-   from the source URL.
+  用于从URL获取二进制文件并将其缓存在磁盘上。验证磁盘上二进制文件的哈希值，如果不匹配，则会从源URL重新获取。
+   Tool_<ToolName>_HASH     -  二进制文件的哈希值。
+   Tool_<ToolName>_FILENAME -  二进制文件的文件名。
+   Tool_<ToolName>_URL      -  二进制文件的URL。
 
-   This artifact is designed to be called from other artifacts. The
-   binary path will be emitted in the OSPath column.
-
-   As a result of launching an artifact with declared "tools"
-   field, the server will populate the following environment
-   variables.
-
-   Tool_<ToolName>_HASH     - The hash of the binary
-   Tool_<ToolName>_FILENAME - The filename to store it.
-   Tool_<ToolName>_URL      - The URL.
 
 parameters:
   - name: ToolName

@@ -1,8 +1,8 @@
 name: Generic.Client.Stats
-description: An Event artifact which generates client's CPU and memory statistics.
+description: 获取客户端的CPU和内存使用情况。
 parameters:
   - name: Frequency
-    description: Return stats every this many seconds.
+    description: 检测频率
     type: int
     default: "10"
 type: CLIENT_EVENT

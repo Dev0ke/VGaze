@@ -1,7 +1,6 @@
 name: Generic.Network.InterfaceAddresses
 description: |
-  Network interfaces and relevant metadata. This artifact works on all
-  supported OSs.
+  获取网络接口的地址信息。
 
 aliases:
   - Windows.Network.InterfaceAddresses

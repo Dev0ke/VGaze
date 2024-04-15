@@ -13,11 +13,11 @@ parameters:
     default: /{root,home/*}/.*_history
   - name: SearchRegex
     type: regex
-    description: "Regex of strings to search in line."
+    description: 用于搜索的正则表达式
     default: '.'
   - name: WhitelistRegex
     type: regex
-    description: "Regex of strings to leave out of output."
+    description: 用于排除的正则表达式
     default:
 
 sources:

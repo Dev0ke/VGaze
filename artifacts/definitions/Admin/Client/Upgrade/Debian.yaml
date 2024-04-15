@@ -1,11 +1,6 @@
 name: Admin.Client.Upgrade.Debian
 description: |
-  Remotely push new client updates to Debian hosts.
-
-  NOTE: This artifact requires that you supply a client Debian package using the
-  tools interface or using the "debian client" command. Simply click on the tool
-  in the GUI and upload a package.
-
+  用于升级客户端二进制。
 tools:
   - name: VelociraptorDebian
 

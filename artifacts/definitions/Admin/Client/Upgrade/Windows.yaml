@@ -1,14 +1,6 @@
 name: Admin.Client.Upgrade.Windows
 description: |
-  Remotely push new client updates.
-
-  NOTE: This artifact requires that you supply a client MSI using the
-  tools interface. Simply click on the tool in the GUI and upload a
-  pre-packaged MSI.
-
-  While typically the MSI will contain the Velociraptor windows
-  client, you can install any other MSI as well by customizing this
-  artifact or uploading a different msi file.
+  用于升级客户端二进制。
 
 tools:
   - name: WindowsMSI
@@ -18,9 +10,7 @@ parameters:
     default: "600"
     type: int
     description: |
-      The MSI file is typically very large and we do not want to
-      overwhelm the server so we stagger the download over this many
-      seconds.
+      由于下载需要时间，因此会进行适当的延迟。
 
 sources:
   - precondition:

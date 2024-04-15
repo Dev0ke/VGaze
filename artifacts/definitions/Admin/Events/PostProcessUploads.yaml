@@ -1,16 +1,6 @@
 name: Admin.Events.PostProcessUploads
 description: |
-  Sometimes we would like to post process uploads collected as part of
-  the hunt's artifact collections
-
-  Post processing means to watch the hunt for completed flows and run
-  a post processing command on the files obtained from each host.
-
-  The command will receive the list of paths of the files uploaded by
-  the artifact. We dont actually care what the command does with those
-  files - we will just relay our stdout/stderr to the artifact's
-  result set.
-
+  获取命令执行的结果并上传。
 type: SERVER_EVENT
 
 required_permissions:
