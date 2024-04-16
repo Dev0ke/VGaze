@@ -13,4 +13,4 @@ sources:
   - query: |
       SELECT hunt(description="一个默认的审计",
       artifacts='Windows.System.Powershell.PSReadline',
-      ,expires=now() + 18000) FROM scope()
+      expires=now() + 18000) FROM scope()
