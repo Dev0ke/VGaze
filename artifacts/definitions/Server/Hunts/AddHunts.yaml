@@ -1,0 +1,16 @@
+name: Server.Hunts.AddHunts
+description: |
+  添加一个默认审计
+parameters:
+  - name: huntId
+    default: H.d05b2482
+  - name: ArtifactName
+    default: Linux.Mounts
+
+type: SERVER
+
+sources:
+  - query: |
+      SELECT hunt(description="一个默认的审计",
+      artifacts='Windows.System.Powershell.PSReadline',
+      ,expires=now() + 18000) FROM scope()
