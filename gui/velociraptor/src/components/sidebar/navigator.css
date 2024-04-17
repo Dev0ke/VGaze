@@ -152,13 +152,24 @@ a.disabled {
 
 
 .navigator-footer .nav-footer-link a {
-  color: var(--color-sidebar-foreground); /* 链接文字颜色 */
+    display: block;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: var(--color-sidebar-foreground);
+  background: var(--color-sidebar-inactive-background-hover);
 }
 
 .navigator-footer .nav-footer-link a:hover {
   color: var(--color-sidebar-inactive-foreground-hover);
   background: var(--color-sidebar-inactive-background-hover);
 }
+
+.navigator-footer .nav-footer-link a.active,
+.navigator-footer .nav-link:has(> a.active) {
+  background-color: var(--color-sidebar-active-background); /* 激活状态背景颜色 */
+  color: var(--color-sidebar-active-foreground); /* 激活状态文字颜色 */
+}
+
 
 /* 底部导航区分隔线样式 */
 .navigator-footer-divider {
