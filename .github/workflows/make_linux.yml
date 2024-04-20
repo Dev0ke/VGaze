@@ -9,7 +9,7 @@ on:
     types: [created,published] # 表示在创建新的 Release 时触发
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
     - uses: actions/checkout@v4
