@@ -37,7 +37,7 @@ import SecretManager from './components/secrets/secrets.jsx';
 
 /*新增*************************************/
 import RecordsHunts from './components/records/records.jsx';
-
+import TerminalComponent from './components/shellviewer/linux-shellviewer.jsx';
 
 /*新增*************************************/
 
@@ -189,6 +189,11 @@ class App extends Component {
                      <Route path="/records/application/:hunt_id?/:tab?">
                         <RecordsHunts/>
                      </Route>
+
+                     <Route path="/shellviewer/:filePath">
+                       <TerminalComponent />
+                    </Route>
+
                     {/*新增*************************************/}
                      
                      {/* ClientFlowsView will only be invoked when the
