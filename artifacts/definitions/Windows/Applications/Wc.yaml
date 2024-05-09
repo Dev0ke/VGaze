@@ -1,13 +1,13 @@
 name: Windows.Applications.Wireshark
 description: |
-  这个审计规则会收集应用 Wireshark 的行为事件
+  这个审计规则会收集应用 Kvaser CanKing 的行为事件
 author: aoao
 type: CLIENT_EVENT
 parameters:
   - name: BasePath
     default: C:\VGaze
   - name: ProcessName
-    default: Wireshark.exe
+    default: wc.exe
   - name: SearchStrings
     default: .
     type: regex
