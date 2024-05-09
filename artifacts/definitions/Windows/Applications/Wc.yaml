@@ -1,4 +1,4 @@
-name: Windows.Applications.Wireshark
+name: Windows.Applications.Wc
 description: |
   这个审计规则会收集应用 Kvaser CanKing 的行为事件
 author: aoao
