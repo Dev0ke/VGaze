@@ -190,7 +190,7 @@ class App extends Component {
                         <RecordsHunts/>
                      </Route>
 
-                     <Route path="/shellviewer/:filePath">
+                     <Route path="/shellviewer/">
                        <TerminalComponent />
                     </Route>
 
