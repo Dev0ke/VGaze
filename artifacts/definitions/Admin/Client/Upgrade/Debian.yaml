@@ -2,7 +2,7 @@ name: Admin.Client.Upgrade.Debian
 description: |
   用于升级客户端二进制。
 tools:
-  - name: VelociraptorDebian
+  - name: Debian
 
 parameters:
   - name: SleepDuration
@@ -27,7 +27,7 @@ sources:
       // FetchBinary downloads to /tmp on linux
       LET bin <= SELECT OSPath AS Dest
       FROM Artifact.Generic.Utils.FetchBinary(
-         ToolName="VelociraptorDebian", IsExecutable=FALSE,
+         ToolName="Debian", IsExecutable=FALSE,
          SleepDuration=SleepDuration)
 
       // Version handling for older clients.

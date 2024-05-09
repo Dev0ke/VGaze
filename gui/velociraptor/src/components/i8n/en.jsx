@@ -116,7 +116,7 @@ const English = {
     "PlaceHolder":
     <>
       Tool hash is currently unknown. The first time the tool
-      is needed, Velociraptor will download it from it's
+      is needed, We will download it from it's
       upstream URL and calculate its hash.
     </>,
     "ToolHash":
@@ -135,7 +135,7 @@ const English = {
     <>
       Tool's hash is not known and no URL
       is defined. It will be impossible to use this tool in an
-      artifact because Velociraptor is unable to resolve it. You
+      artifact because it is unable to resolve it. You
       can manually upload a file.
     </>,
     "OverrideToolDesc":
