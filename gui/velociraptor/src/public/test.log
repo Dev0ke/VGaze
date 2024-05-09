@@ -1,116 +1,0 @@
-Script started on 2024-01-05 16:36:59+08:00 [TERM="xterm-256color" TTY="/dev/pts/5" COLUMNS="77" LINES="27"]
-                                                                             ]0;ylwjl@kali: ~[0m[27m[24m[J[32m┌──([1m[32m[34mylwjl㉿kali[0m[34m[32m)-[[1m[32m[39m~[0m[32m]
-└─[1m[32m[34m$[0m[34m[39m [K[?1h=[?2004h[4mn[24m[4mn[24m[38;2;153;153;153mmap -p 192.168.121.129[39m[22D[24m[36mn[36mm[39m[39m[4mn[39m[4mm[39m[4ma[24m[38;2;153;153;153ma[38;2;153;153;153mp[38;2;153;153;153m [38;2;153;153;153m-[38;2;153;153;153mp[38;2;153;153;153m [38;2;153;153;153m1[38;2;153;153;153m9[38;2;153;153;153m2[38;2;153;153;153m.[38;2;153;153;153m1[38;2;153;153;153m6[38;2;153;153;153m8[38;2;153;153;153m.[38;2;153;153;153m1[38;2;153;153;153m2[38;2;153;153;153m1[38;2;153;153;153m.[38;2;153;153;153m1[38;2;153;153;153m2[38;2;153;153;153m9[39m[21D[24m[36mn[24m[36mm[24m[36ma[36mp[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [20D[38;2;153;153;153m -p 192.168.121.129[39m[19D[39m [39m1[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [17D[38;2;153;153;153m92.168.121.144 -p80[39m[19D[39m9[39m2[39m.[39m1[39m6[39m8[39m.[39m1[39m2[39m1[39m.[39m1[39m4[39m4[39m [39m [39m [39m [39m [?1l>[?2004l
-Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-01-05 16:37 CST
-Nmap scan report for 192.168.121.144
-Host is up (0.00065s latency).
-All 1000 scanned ports on 192.168.121.144 are in ignored states.
-Not shown: 1000 closed tcp ports (conn-refused)
-
-Nmap done: 1 IP address (1 host up) scanned in 0.13 seconds
-                                                                             ]0;ylwjl@kali: ~
-[0m[27m[24m[J[32m┌──([1m[32m[34mylwjl㉿kali[0m[34m[32m)-[[1m[32m[39m~[0m[32m]
-└─[1m[32m[34m$[0m[34m[39m [K[?1h=[?2004h[36mnmap[39m 192.168.121.144 [38;2;153;153;153m4[39m [39m [38;2;153;153;153m44[39m[39m2[39m [38;2;153;153;153m9[39m[39m9[?1l>[?2004l
-Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-01-05 16:37 CST
-Nmap scan report for 192.168.121.129
-Host is up (0.0010s latency).
-Not shown: 999 closed tcp ports (conn-refused)
-PORT     STATE    SERVICE
-9999/tcp filtered abyss
-
-Nmap done: 1 IP address (1 host up) scanned in 1.32 seconds
-                                                                             ]0;ylwjl@kali: ~
-[0m[27m[24m[J[32m┌──([1m[32m[34mylwjl㉿kali[0m[34m[32m)-[[1m[32m[39m~[0m[32m]
-└─[1m[32m[34m$[0m[34m[39m [K[?1h=[?2004h[7m[36mnmap[39m[7m [7m[32m-sT[39m[7m  192.168.3.74[27m[22D[27m[36mn[27m[36mm[27m[36ma[27m[36mp[39m[27m [27m[32m-[27m[32ms[27m[32mT[39m[27m [27m [27m1[27m9[27m2[27m.[27m1[27m6[27m8[27m.[27m3[27m.[27m7[27m    121.144[?1l>[?2004l
-Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-01-05 16:44 CST
-Nmap scan report for 192.168.121.144
-Host is up (0.0011s latency).
-All 1000 scanned ports on 192.168.121.144 are in ignored states.
-Not shown: 1000 closed tcp ports (conn-refused)
-
-Nmap done: 1 IP address (1 host up) scanned in 0.16 seconds
-                                                                             ]0;ylwjl@kali: ~
-[0m[27m[24m[J[32m┌──([1m[32m[34mylwjl㉿kali[0m[34m[32m)-[[1m[32m[39m~[0m[32m]
-└─[1m[32m[34m$[0m[34m[39m [K[?1h=[?2004h[7m[36msqlmap[39m[7m [7m[32m-u[39m[7m [7m[33m"http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id[7m[33m=[7m[33m1"[39m[7m  [7m[32m-D[39m[7m security [7m[32m--common-tables[39m[7m [7m[32m--batch[27m[39m[K[A[36D[27m[36ms[27m[36mq[27m[36ml[27m[36mm[27m[36ma[27m[36mp[39m[27m [27m[32m-[27m[32mu[39m[27m [27m[33m"[27m[33mh[27m[33mt[27m[33mt[27m[33mp[27m[33m:[27m[33m/[27m[33m1[27m[33m9[27m[33m2[27m[33m.[27m[33m1[27m[33m6[27m[33m8[27m[33m.[27m[33m3[27m[33m.[27m[33m2[27m[33m/[27m[33ms[27m[33mq[27m[33ml[27m[33mi[27m[33m-[27m[33ml[27m[33ma[27m[33mb[27m[33ms[27m[33m-[27m[33mm[27m[33ma[27m[33ms[27m[33mt[27m[33me[27m[33mr[27m[33m/[27m[33ms[27m[33mq[27m[33ml[27m[33mi[27m[33m-[27m[33ml[27m[33ma[27m[33mb[27m[33ms[27m[33m-[27m[33mm[27m[33ma[27m[33ms[27m[33mt[27m[33me[27m[33mr[27m[33m/[27m[33mL[27m[33me[27m[33ms[27m[33ms[27m[33m-[27m[33m1[27m[33m/[27m[33m?[27m[33mi[27m[33md[33m=[27m[33m1[27m[33m"[39m[27m [27m [27m[32m-[27m[32mD[39m[27m [27ms[27me[27mc[27mu[27mr[27mi[27mt[27my[27m [27m[32m-[27m[32m-[27m[32mc[27m[32mo[27m[32mm[27m[32mm[27m[32mo[27m[32mn[27m[32m-[27m[32mt[27m[32ma[27m[32mb[27m[32ml[27m[32me[27m[32ms[39m[27m [27m[32m-[27m[32m-[27m[32mb[27m[32ma[27m[32mt[27m[32mc[27m[32mh[39m[?1l>[?2004l
-[01;33m        ___
-       __H__
- ___ ___[[01;41m([01;49m]_____ ___ ___  [01;37m{[01;90m1.7.11#stable[01;37m}[01;33m
-|_ -| . [[01;41m"[01;49m]     | .'| . |
-|___|_  [[01;41m'[01;49m]_|_|_|__,|  _|
-      |_|V...       |_|   [0m[4;37mhttps://sqlmap.org[0m
-
-[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
-
-[*] starting @ 16:44:44 /2024-01-05/
-
-[[36m16:44:45[0m] [[41;37mCRITICAL[0m] invalid target URL
-
-[*] ending @ 16:44:45 /2024-01-05/
-
-                                                                             ]0;ylwjl@kali: ~
-[0m[27m[24m[J[32m┌──([1m[32m[34mylwjl㉿kali[0m[34m[32m)-[[1m[32m[39m~[0m[32m]
-└─[1m[32m[34m$[0m[34m[39m [K[?1h=[?2004h[7m[36msqlmap[39m[7m [7m[32m-u[39m[7m [7m[33m"http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id[7m[33m=[7m[33m1"[39m[7m  [7m[32m-D[39m[7m security [7m[32m-Tusers[39m[7m [7m[32m--common-columns[39m[7m [7m[32m--batch[27m[39m[K[A[45D[27m[36ms[27m[36mq[27m[36ml[27m[36mm[27m[36ma[27m[36mp[39m[27m [27m[32m-[27m[32mu[39m[27m [27m[33m"[27m[33mh[27m[33mt[27m[33mt[27m[33mp[27m[33m:[27m[33m/[27m[33m1[27m[33m9[27m[33m2[27m[33m.[27m[33m1[27m[33m6[27m[33m8[27m[33m.[27m[33m3[27m[33m.[27m[33m2[27m[33m/[27m[33ms[27m[33mq[27m[33ml[27m[33mi[27m[33m-[27m[33ml[27m[33ma[27m[33mb[27m[33ms[27m[33m-[27m[33mm[27m[33ma[27m[33ms[27m[33mt[27m[33me[27m[33mr[27m[33m/[27m[33ms[27m[33mq[27m[33ml[27m[33mi[27m[33m-[27m[33ml[27m[33ma[27m[33mb[27m[33ms[27m[33m-[27m[33mm[27m[33ma[27m[33ms[27m[33mt[27m[33me[27m[33mr[27m[33m/[27m[33mL[27m[33me[27m[33ms[27m[33ms[27m[33m-[27m[33m1[27m[33m/[27m[33m?[27m[33mi[27m[33md[33m=[27m[33m1[27m[33m"[39m[27m [27m [27m[32m-[27m[32mD[39m[27m [27ms[27me[27mc[27mu[27mr[27mi[27mt[27my[27m [27m[32m-[27m[32mT[27m[32mu[27m[32ms[27m[32me[27m[32mr[27m[32ms[39m[27m [27m[32m-[27m[32m-[27m[32mc[27m[32mo[27m[32mm[27m[32mm[27m[32mo[27m[32mn[27m[32m-[27m[32mc[27m[32mo[27m[32ml[27m[32mu[27m[32mm[27m[32mn[27m[32ms[39m[27m [27m[32m-[27m[32m-[27m[32mb[27m[32ma[27m[32mt[27m[32mc[27m[32mh[39m[?1l>[?2004l
-[01;33m        ___
-       __H__
- ___ ___[[01;41m([01;49m]_____ ___ ___  [01;37m{[01;90m1.7.11#stable[01;37m}[01;33m
-|_ -| . [[01;41m([01;49m]     | .'| . |
-|___|_  [[01;41m)[01;49m]_|_|_|__,|  _|
-      |_|V...       |_|   [0m[4;37mhttps://sqlmap.org[0m
-
-[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
-
-[*] starting @ 16:44:53 /2024-01-05/
-
-[[36m16:44:53[0m] [[41;37mCRITICAL[0m] invalid target URL
-
-[*] ending @ 16:44:53 /2024-01-05/
-
-                                                                             ]0;ylwjl@kali: ~
-[0m[27m[24m[J[32m┌──([1m[32m[34mylwjl㉿kali[0m[34m[32m)-[[1m[32m[39m~[0m[32m]
-└─[1m[32m[34m$[0m[34m[39m [K[?1h=[?2004h[7m[36mnetcat[39m[7m [7m[32m-v[39m[7m www.baidu.com 90[27m[26D[27m[36mn[27m[36me[27m[36mt[27m[36mc[27m[36ma[27m[36mt[39m[27m [27m[32m-[27m[32mv[39m[27m [27mw[27mw[27mw[27m.[27mb[27ma[27mi[27md[27mu[27m.[27mc[27mo[27mm[27m [27m9[27m0[?1l>[?2004l
-Warning: inverse host lookup failed for 182.61.200.6: Unknown host
-Warning: inverse host lookup failed for 182.61.200.7: Unknown host
-^C
-                                                                             ]0;ylwjl@kali: ~
-[0m[27m[24m[J[32m┌──([1m[32m[34mylwjl㉿kali[0m[34m[32m)-[[1m[32m[39m~[0m[32m]
-└─[1m[32m[34m$[0m[34m[39m [K[?1h=[?2004h[7m[36mnetcat[39m[7m [7m[32m-v[39m[7m www.baidu.com 90[27m
-[K[K[A[4C[27m[36mn[27m[36me[27m[36mt[27m[36mc[27m[36ma[27m[36mt[39m[27m [27m[32m-[27m[32mv[39m[27m [27mw[27mw[27mw[27m.[27mb[27ma[27mi[27md[27mu[27m.[27mc[27mo[27mm[27m [27m9[27m0[1B[K[A[30C [38;2;153;153;153m0[39m [39m [38;2;153;153;153m90[39m[39m8[39m [38;2;153;153;153m0[39m[39m0[?1l>[?2004l[1BWarning: inverse host lookup failed for 182.61.200.7: Unknown host
-Warning: inverse host lookup failed for 182.61.200.6: Unknown host
-www.a.shifen.com [182.61.200.7] 80 (http) open
-^C
-                                                                             ]0;ylwjl@kali: ~
-[0m[27m[24m[J[32m┌──([1m[32m[34mylwjl㉿kali[0m[34m[32m)-[[1m[32m[39m~[0m[32m]
-└─[1m[32m[34m$[0m[34m[39m [K[?1h=[?2004h[7m[36mnetcat[39m[7m [7m[32m-l[39m[7m 10000[27m[15D[27m[36mn[27m[36me[27m[36mt[27m[36mc[27m[36ma[27m[36mt[39m[27m [27m[32m-[27m[32ml[39m[27m [27m1[27m0[27m0[27m0[27m     [32m-[39m[39m [38;2;153;153;153mv www.baidu.com 80[39m[18D[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [19D[38;2;153;153;153m-v www.baidu.com 80[39m[19D[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [20D[38;2;153;153;153m -v www.baidu.com 80[39m[20D[39m[4mn[39m[4me[39m[4mt[39m[4mc[39m[4ma[24m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [21D[38;2;153;153;153mt -v www.baidu.com 80[39m[21D[4mc[24m[24m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [22D[38;2;153;153;153mat -v www.baidu.com 80[39m[22D[24m[36mn[24m[36me[24m[36mt[39m[24m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [23D[38;2;153;153;153mcat -v www.baidu.com 80[39m[23D[39m[4mn[39m[4me[24m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [24D[38;2;153;153;153mtcat -v www.baidu.com 80[39m[24D[4mn[24m[24m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [25D[4mn[24m[38;2;153;153;153metcat -v www.baidu.com 80[39m[25D[24m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [26D[7m[36mnetcat[39m[7m 192.168.237.131 10000[27m[28D[27m[36mn[27m[36me[27m[36mt[27m[36mc[27m[36ma[27m[36mt[39m[27m [27m1[27m9[27m2[27m.[27m1[27m6[27m8[27m.[27m2[27m3[27m7[27m.[27m1[27m3[27m1[27m [27m1[27m0[27m0[27m0[27m [1C 10[2C  10[2C  10[2C  10[2C  10[2C  10[2C  10[2C 1 1[2C02 1[2C01 1[2C0. 1[2C01 1[2C02 1[2C09 1[2C0[1C[1C[1C[1C[1C    [38;2;153;153;153m9999[39m[39m9[39m9[39m9[39m9[?1l>[?2004l
-
-dsafsa\
-^C
-                                                                             ]0;ylwjl@kali: ~
-[0m[27m[24m[J[32m┌──([1m[32m[34mylwjl㉿kali[0m[34m[32m)-[[1m[32m[39m~[0m[32m]
-└─[1m[32m[34m$[0m[34m[39m [K[?1h=[?2004h[4mm[24m[4mm[24m[38;2;153;153;153msfconsole[39m[9D[4mm[39m[4ms[24m[4mm[4ms[39m[4mf[24m[4mf[39m[4mc[24m[4mc[39m[4mo[24m[4mo[39m[4mn[24m[4mn[39m[4mm[24m[39m [39m [39m [4mn[24m[24m [38;2;153;153;153msole[39m[4mn[39m[4ms[24m[4ms[39m[4mo[24m[4mo[39m[4ml[24m[9D[24m[36mm[24m[36ms[24m[36mf[24m[36mc[24m[36mo[24m[36mn[24m[36ms[24m[36mo[24m[36ml[36me[39m[?1l>[?2004l
-Metasploit tip: Network adapter names can be used for IP options set LHOST 
-eth0
-[*] Starting the Metasploit Framework console.../[*] Starting the Metasploit Framework console...-[*] Starting the Metasploit Framework console...\[*] starting the Metasploit Framework console...|[*] STarting the Metasploit Framework console.../[*] StArting the Metasploit Framework console...-[*] StaRting the Metasploit Framework console...\[*] StarTing the Metasploit Framework console...|[*] StartIng the Metasploit Framework console.../[*] StartiNg the Metasploit Framework console...-[*] StartinG the Metasploit Framework console...\[*] Starting the Metasploit Framework console...|[*] Starting The Metasploit Framework console.../[*] Starting tHe Metasploit Framework console...-[*] Starting thE Metasploit Framework console...\[*] Starting the Metasploit Framework console...|[*] Starting the metasploit Framework console.../[*] Starting the MEtasploit Framework console...-[*] Starting the MeTasploit Framework console...\[*] Starting the MetAsploit Framework console...|[*] Starting the MetaSploit Framework console.../[*] Starting the MetasPloit Framework console...-[*] Starting the MetaspLoit Framework console...\[*] Starting the MetasplOit Framework console...|[*] Starting the MetasploIt Framework console.../[*] Starting the MetasploiT Framework console...-[*] Starting the Metasploit Framework console...\[*] Starting the Metasploit framework console...|[*] Starting the Metasploit FRamework console.../[*] Starting the Metasploit FrAmework console...-[*] Starting the Metasploit FraMework console...\[*] Starting the Metasploit FramEwork console...|                                                  
-[0m[36m _                                                    _
-/ \    /\         __                         _   __  /_/ __
-| |\  / | _____   \ \           ___   _____ | | /  \ _   \ \
-| | \/| | | ___\ |- -|   /\    / __\ | -__/ | || | || | |- -|
-|_|   | | | _|__  | |_  / -\ __\ \   | |    | | \__/| |  | |_
-      |/  |____/  \___\/ /\ \\___/   \/     \__|    |_\  \___\
-[0m
-
-       =[ [33mmetasploit v6.3.43-dev[0m                          ]
-+ -- --=[ 2376 exploits - 1232 auxiliary - 416 post       ]
-+ -- --=[ 1391 payloads - 46 encoders - 11 nops           ]
-+ -- --=[ 9 evasion                                       ]
-
-Metasploit Documentation: https://docs.metasploit.com/
-
-[?1034h[4mmsf6[0m [0m> search ms17_010
-[0m
-Matching Modules
-================
-
-   #  Name                                      Disclosure Date  Rank     Check  Description
-   -  ----                                      ---------------  ----     -----  -----------
-   0  exploit/windows/smb/[45mms17_010[0m_eternalblue  2017-03-14       average  Yes    MS17-010 EternalBlue SMB Remote Windows Kernel Pool Corruption
-   1  exploit/windows/smb/[45mms17_010[0m_psexec       2017-03-14       normal   Yes    MS17-010 EternalRomance/EternalSynergy/EternalChamp
