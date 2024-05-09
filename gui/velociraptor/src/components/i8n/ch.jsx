@@ -708,7 +708,9 @@ const Chinese = {
     "This secret will be permanently deleted":"此密钥将被永久删除",
     "Time hunt will expire":"时间限制将过期",
      "Update the table column types in this cell.":"更新此单元格中的表格列类型。",
-    "Verify Expression":"验证表达式" 
+    "Verify Expression":"验证表达式" ,
+
+    "Label group": "标签组"
 };
 
 _.each(automated, (v, k)=>{

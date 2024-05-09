@@ -9,7 +9,7 @@ reports:
 
       ## {{ $artifact.Name }}
 
-      #### Type: {{ $artifact.Type }}
+      #### 类型: {{ $artifact.Type }}
 
       {{ if $artifact.BuiltIn }}
       {{ else }}
@@ -17,7 +17,7 @@ reports:
       {{ end }}
 
       {{ if $artifact.Author }}
-      ##### Author: {{ $artifact.Author }}
+      ##### 作者: {{ $artifact.Author }}
       {{end}}
 
       {{ if $artifact.Description }}
@@ -40,7 +40,7 @@ reports:
       {{ end }}
 
       {{ if $artifact.Tools }}
-      ### Tools
+      ### 工具
 
       {{ range $artifact.Tools -}}
       * <grr-tool-viewer name="{{.Name}}" version="{{.Version}}"></grr-tool-viewer>
@@ -50,7 +50,7 @@ reports:
 
       {{ if $artifact.Parameters }}
 
-      ### Parameters
+      ### 参数
 
       <table class="table table-striped">
       <thead>
@@ -95,7 +95,7 @@ reports:
       {{ end }}
 
       {{ if $artifact.Export }}
-      ### Exports
+      ### 导出
 
       ```vql
       {{ $artifact.Export }}
@@ -106,7 +106,7 @@ reports:
 
       {{ if or $source.Queries $source.Query }}
 
-      ### Source {{ $source.Name }}
+      ### 源码 {{ $source.Name }}
       {{ if $source.Query }}
 
       ```vql
