@@ -1,0 +1,48 @@
+name: Windows.Applications.Wireshark
+description: |
+  这个审计规则会收集 Wireshark 的行为事件
+author: aoao
+type: CLIENT_EVENT
+parameters:
+  - name: BasePath
+    default: C:\VGaze
+  - name: ProcessName
+    default: Wireshark.exe
+  - name: SearchStrings
+    default: .
+    type: regex
+  - name: StringWhiteList
+    default:
+    type: regex
+  - name: UserRegex
+    default: .
+    type: regex
+precondition:
+  SELECT OS From info() where OS = 'windows'
+
+sources:
+  - query: |
+        LET path= format(format="%s/events_%s.txt",args=[BasePath,ProcessName])
+        LET targets = SELECT Name as Username,
+           { SELECT Mtime, Atime, Ctime, Btime, Size, OSPath
+             FROM stat(filename=path)
+           } AS Stat
+        FROM Artifact.Windows.Sys.Users()
+        WHERE Directory and Username =~ UserRegex AND Stat.OSPath
+
+        -- Extract targets PSReadline entries
+        SELECT * FROM foreach(
+        row=targets,
+        query={
+            SELECT Stat, count() AS LineNum,
+                   Line,
+                   Username,
+                   Stat.OSPath AS OSPath
+            FROM parse_lines(filename=Stat.OSPath)
+            WHERE LineNum
+             AND Line =~ SearchStrings
+             AND NOT if(condition=StringWhiteList,
+                        then=Line =~ StringWhiteList,
+                        else=FALSE)
+        })
+
