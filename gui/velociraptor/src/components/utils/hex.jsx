@@ -409,7 +409,7 @@ export default class HexView extends React.Component {
       if (this.props.byte_array) {
           const asciiString = this.byteArrayToAscii(this.props.byte_array);
           this.terminal.reset();
-          this.terminal.write(asciiString);
+          this.terminal.write(this.props.byte_array);
       }
   };
 
