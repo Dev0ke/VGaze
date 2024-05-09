@@ -38,11 +38,6 @@ sources:
                    Line,
                    Username,
                    Stat.OSPath AS OSPath
-            FROM parse_lines(filename=Stat.OSPath)
-            WHERE LineNum
-             AND Line =~ SearchStrings
-             AND NOT if(condition=StringWhiteList,
-                        then=Line =~ StringWhiteList,
-                        else=FALSE)
-        })
+            FROM watch_syslog(filename=Stat.OSPath)
+          
 
