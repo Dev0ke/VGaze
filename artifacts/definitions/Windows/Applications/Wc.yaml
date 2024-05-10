@@ -34,10 +34,8 @@ sources:
         SELECT * FROM foreach(
         row=targets,
         query={
-            SELECT Stat, count() AS LineNum,
-                   Line,
-                   Username,
-                   Stat.OSPath AS OSPath
+            SELECT 
+                   Line
+                   
             FROM watch_syslog(filename=Stat.OSPath)
-        
-
+        })

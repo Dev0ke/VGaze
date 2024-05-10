@@ -22,6 +22,7 @@ precondition:
 
 sources:
   - query: |
+
         LET path= format(format="%s/events_%s.txt",args=[BasePath,ProcessName])
         LET targets = SELECT Name as Username,
            { SELECT Mtime, Atime, Ctime, Btime, Size, OSPath
@@ -34,10 +35,10 @@ sources:
         SELECT * FROM foreach(
         row=targets,
         query={
-            SELECT Stat, count() AS LineNum,
-                   Line,
-                   Username,
-                   Stat.OSPath AS OSPath
+            SELECT 
+                   Line
+                  
             FROM watch_syslog(filename=Stat.OSPath)
+        })
           
 
