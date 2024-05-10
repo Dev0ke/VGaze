@@ -8,11 +8,11 @@ import humanizeDuration from "humanize-duration";
 import automated from "./ch.json";
 
 const Chinese = {
-    "SEARCH_CLIENTS": "客户端搜索",
+    "SEARCH_CLIENTS": "搜索客户端",
     "Quarantine description": (<>
           <p>试图隔离这台主机</p>
           <p>
-          隔离期间不能与 Velociraptor 服务器以外的其他网络进行通信。
+          隔离期间不能与服务器以外的其他网络进行通信。
           </p>
         </>),
     "Cannot Quarantine host": "无法隔离主机",
@@ -20,7 +20,7 @@ const Chinese = {
         <>
           <Alert variant="warning">
             { quarantine_artifact ?
-              <p>这个 Velociraptor实例没有检验运行{os_name}的主机所需要的<b>{quarantine_artifact}</b>伪像</p> :
+              <p>这个实例没有检验运行{os_name}的主机所需要的<b>{quarantine_artifact}</b>伪像</p> :
               <p>实例没有定义用于检疫运行{os_name}的主机的伪像名称。</p>
             }
           </Alert>
@@ -235,7 +235,7 @@ const Chinese = {
     "No artifacts configured. Please add some artifacts to collect": "没有设置审计规则。请添加收集的审计规则。",
 
     "Artifacts": "审计规则",
-    "Collected Artifacts": "收集的审计规则",
+    "Collected Artifacts": "客户端审计任务",
     "Flow ID": "任务ID",
     "FlowId": "任务ID",
     "Goto notebooks": "跳转到审计结果",
@@ -349,11 +349,11 @@ const Chinese = {
     "RecursiveVFSMessage": path=><>
        <b>{path}</b>递归式获取所有文件
        <br/><br/>
-       这样一来，就有可能从终端传输大量的数据。默认上传上限为 1gb，但你可以在收集到的审计规则画面上修改。
+       这样一来，就有可能从终端传输大量的数据。默认上传上限为 1GB，但可以在收集到的审计规则画面上修改。
     </>,
 
-    "Textview":"Text视图",
-    "HexView":"Hex视图",
+    "Textview":"文本视图",
+    "HexView":"十六进制视图",
     "Refresh this directory (sync its listing with the client)":"刷新目录(客户端和列表同步)",
     "Recursively refresh this directory (sync its listing with the client)":"递归地刷新目录(与客户端同步列表)",
     "Recursively download this directory from the client":"从客户端递归下载该目录",
@@ -369,22 +369,24 @@ const Chinese = {
     "Ctime":"Ctime",
     "Btime":"Btime",
     "Properties":"属性",
-    "No data available. Refresh directory from client by clicking above.":"没有数据。请点击上面的按钮，从客户端更新目录。。",
+    "No data available. Refresh directory from client by clicking above.":"没有数据。请点击上面的按钮，从客户端更新目录。",
     "Please select a file or a folder to see its details here.":"选择文件或文件夹，会显示其详情。",
-    "Currently refreshing from the client":"目前正在更新客户端信息",
+    "Currently refreshing from the client":"正在更新客户端信息",
     "Recursively download files":"递归下载文件",
-
+    "Anomaly Detection":"异常事件",
     "Home":"服务器状态",
-    "Hunt Manager":"任务管理器",
-    "View Artifacts":"浏览审计规则",
+    "Windows Monitor":"Windows客户端事件",
+    "Linux Monitor":"Linux客户端事件",
+    "Hunt Manager":"审计任务管理",
+    "View Artifacts":"审计规则管理",
     "Exception Records":"异常详情",
     "Application Records":"应用记录详情",
-    "All Clinets":"所有客户端",
+    "All Clinets":"客户端列表",
     "Server Events":"服务器监控",
     "Server Artifacts":"服务器审计规则",
-    "Host Information":"主机信息",
-    "Virtual Filesystem":"虚拟文件系统",
-    "Client Events":"客户端事件",
+    "Host Information":"客户端信息",
+    "Virtual Filesystem":"客户端文件",
+    "Client Events":"客户端监控",
     "This is a notebook for processing a hunt.":"是用来处理审计的笔记。",
     "ToolLocalDesc":
     <>
@@ -496,7 +498,7 @@ const Chinese = {
     "Edit notebook ":"编辑笔记",
     "Notebook uploads":"上传笔记",
     "User Settings":"用户设置",
-    "Select a user": "挑选用户",
+    "Select a user": "选择用户",
 
     "Theme":"主题",
     "Select a theme":"选择主题",
@@ -552,7 +554,7 @@ const Chinese = {
     "Configuring Label": "标签设置",
     "Event Monitoring Label Groups": "事件监视的标签组",
     "Event Monitoring: Select artifacts to collect from label group ": "事件监视:从标签组中选 择要收集的审计规则",
-    "Artifact Collected": "收集的审计规则",
+    "Artifact Collected": "客户端审计任务",
     "Event Monitoring: Configure artifact parameters for label group ": "事件监视:设置标签组的审计规则参数 ",
     "Event Monitoring: Review new event tables": "事件监测:回顾新事件表",
 
@@ -692,9 +694,10 @@ const Chinese = {
     "New Notebook: Select Notebook template Artifact": "新建审计：选择审计模板",
     "No notebooks available - create one first": "没有可用的审计 - 先创建一个",
     "Permitted Users": "审计模板",
-    "Notebook templates":"允许的用户",
+    "Notebook templates":"结果模板",
     "Public Key/Certificate To Encrypt With. If empty, defaults To Frontend Cert": "用于加密的公钥/证书。如果为空，则默认为前端证书",
     "Redo": "重做",
+    "Users":"用户管理",
     "Secret Name": "密钥名称",
     "Secret Names": "密钥名称",
     "Secret Type": "密钥类型",

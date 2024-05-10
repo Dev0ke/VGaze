@@ -6,6 +6,8 @@ import api from '../core/api-service.jsx';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTwitter, faFontAwesome } from '@fortawesome/free-brands-svg-icons'
+
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import T from '../i8n/i8n.jsx';
@@ -104,7 +106,7 @@ class VeloNavigator extends Component {
                         <NavLink exact={true} to="/dashboard">
                           <span>
                             <i className="navicon">
-                              <FontAwesomeIcon icon="home" />
+                            <FontAwesomeIcon icon="fa-solid fa-gauge" />
                             </i>
                           </span>
                           {T("Home")}
@@ -145,30 +147,42 @@ class VeloNavigator extends Component {
                       </li>
                       
                       {/* Add Exception Records Link */}
-                      {/*<li className="nav-link">
-                        <NavLink to="/records/exception">
+                      <li className="nav-link">
+                        <NavLink to="/anomaly">
                           <span>
                             <i className="navicon">
-                              <FontAwesomeIcon icon="circle-exclamation" />
+                              <FontAwesomeIcon icon="bug" />
                             </i>
                           </span>
-                          {T("Exception Records")}
+                          {T("Anomaly Detection")}
                         </NavLink>
-                      </li>*/}
+                      </li>
 
-                      {/* Add Application Records Link */}
-                      {/*<li className="nav-link">
-                        <NavLink to="/records/application">
+                      {/* WIN */}
+                      <li className="nav-link">
+                        <NavLink to="/winmon">
                           <span>
                             <i className="navicon">
-                              <FontAwesomeIcon icon="desktop" />
+                            <FontAwesomeIcon icon="fa-brands fa-windows" />
                             </i>
                           </span>
-                          {T("Application Records")}
+                          {T("Windows Monitor")}
                         </NavLink>
-                      </li>*/}
+                      </li>
 
-                       {/*{!customization.disable_server_events && (
+                      {/* LINUX */}
+                      <li className="nav-link">
+                        <NavLink to="/linuxmon">
+                          <span>
+                            <i className="navicon">
+                            <FontAwesomeIcon icon="fa-brands fa-ubuntu" />
+                            </i>
+                          </span>
+                          {T("Linux Monitor")}
+                        </NavLink>
+                      </li>
+
+                       {!customization.disable_server_events && (
                         <li className="nav-link">
                           <NavLink to="/events/server">
                             <span>
@@ -190,9 +204,9 @@ class VeloNavigator extends Component {
                           </span>
                           {T("Server Artifacts")}
                         </NavLink>
-                      </li>*/}
+                      </li>
 
-                      {/* <li className="nav-link">
+                      <li className="nav-link">
                         <NavLink to="/notebooks">
                           <span>
                             <i className="navicon">
@@ -201,7 +215,7 @@ class VeloNavigator extends Component {
                           </span>
                           {T("Notebooks")}
                         </NavLink>
-                      </li> */}
+                      </li>
 
                       {user_is_admin && !customization.disable_user_management && (
                         <li className="nav-link">

@@ -1,0 +1,15 @@
+name: Custom.Server.Monitor.Windows
+description: |
+    Windows监控GUI
+
+type: SERVER_EVENT
+
+reports:
+  - type: SERVER_EVENT
+    template: |
+      # Windows 客户端数量
+        
+      ## 异常列表
+        
+      {{ Query "SELECT client_id FROM clients()" | Table }}
+      {{ Query "SELECT * FROM foreach(row={SELECT client_id FROM clients()},query={SELECT * FROM monitoring(client_id=client_id, artifact=\"Generic.Client.Stats\")})" | Table }}

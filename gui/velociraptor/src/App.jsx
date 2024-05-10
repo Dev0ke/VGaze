@@ -38,7 +38,9 @@ import SecretManager from './components/secrets/secrets.jsx';
 /*新增*************************************/
 import RecordsHunts from './components/records/records.jsx';
 import TerminalComponent from './components/shellviewer/linux-shellviewer.jsx';
-
+import Anomaly from './components/monitor/anomaly.jsx';
+import LinuxMonitor from './components/monitor/linux.jsx';
+import WindowsMonitor from './components/monitor/windows.jsx';
 /*新增*************************************/
 
 
@@ -56,6 +58,7 @@ import './themes/github-dimmed-dark.css';
 import './themes/ncurses.css';
 import './themes/coolgray-dark.css';
 import './themes/midnight.css';
+
 
 /* This is the main App page.
 
@@ -192,8 +195,20 @@ class App extends Component {
 
                      <Route path="/shellviewer/">
                        <TerminalComponent />
+
                     </Route>
 
+                    <Route path="/anomaly/">
+                       <Anomaly />
+                    </Route>
+
+                    <Route path="/winmon/">
+                       <WindowsMonitor />
+                    </Route>
+
+                    <Route path="/linuxmon/">
+                       <LinuxMonitor />
+                    </Route>
                     {/*新增*************************************/}
                      
                      {/* ClientFlowsView will only be invoked when the

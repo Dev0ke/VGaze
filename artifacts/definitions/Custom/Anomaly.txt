@@ -1,0 +1,15 @@
+name: Custom.Server.Monitor.Anomaly
+description: |
+    Anomaly Mointor GUI.
+
+type: SERVER_EVENT
+
+reports:
+  - type: SERVER_EVENT
+    template: |
+      # 异常检测
+        
+      ## 异常列表
+        
+      {{ Query "SELECT client_id FROM clients()" | Table }}
+      {{ Query "SELECT * FROM foreach(row={SELECT client_id FROM clients()},query={SELECT * FROM monitoring(client_id=client_id, artifact=\"Generic.Client.Stats\")})" | Table }}
