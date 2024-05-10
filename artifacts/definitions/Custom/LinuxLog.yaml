@@ -1,0 +1,40 @@
+name: Linux.Shell.Log
+description: |
+   
+type: CLIENT_EVENT
+
+parameters:
+  - name: TargetGlob
+    default: '/var/tmp/Log/*.log'
+
+precondition:
+      SELECT OS From info() where OS = 'linux'
+      
+sources:
+  - query: |
+        -- 获取指定目录下所有 .log 文件的当前哈希值
+        LET current_files = SELECT 
+            OSPath, 
+            hash(path=OSPath) as HashValue
+        FROM glob(globs=TargetGlob)
+
+        -- 使用 diff 插件监测文件哈希值的变化
+        LET file_changes = SELECT * FROM diff(
+            key="HashValue",
+            period=10,
+            query=current_files
+        ) WHERE Diff = "added"
+
+        -- 对所有检测到哈希值变化的文件进行处理
+        SELECT * FROM foreach(
+            row=file_changes,
+            query={
+                -- 使用 read_file 读取文件内容
+                SELECT
+                    OSPath,
+                    Mtime,
+                    HashValue,
+                     base64encode(string=read_file(filename=OSPath))
+                FROM scope()
+            }
+        )

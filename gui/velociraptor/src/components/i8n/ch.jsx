@@ -682,7 +682,7 @@ const Chinese = {
     "Delete secret": "删除密钥",
     "Edit Secret": "编辑密钥",
     "Edit Secret properties": "编辑密钥属性",
-    
+    "System Audit": "系统日志",
     "Errors": "错误",
     "Export VFS Files": "导出VFS文件",
     "Format Tables": "格式化表格",

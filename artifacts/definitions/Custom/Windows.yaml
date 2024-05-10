@@ -1,0 +1,27 @@
+name: Server.Monitor.Windows
+description: |
+    Windows监控GUI。
+
+type: SERVER_EVENT
+
+
+reports:
+  - type: SERVER_EVENT
+    template: |
+      # Windows客户端
+      {{ Query "SELECT * FROM clients() WHERE os_info.system = \"windows\" "  | Table }}
+
+      ## Wireshark日志
+      
+      {{ define "datax" }}
+        SELECT *  FROM foreach(row={SELECT client_id FROM clients()},query={SELECT * FROM monitoring(client_id=client_id, artifact="Windows.Applications.Wireshark")})
+      {{ end }}
+      
+      {{ Query "datax" | Table }}
+
+      ## Kvaser CANKing日志
+      {{ define "dataxx" }}
+        SELECT *  FROM foreach(row={SELECT client_id FROM clients()},query={SELECT * FROM monitoring(client_id=client_id, artifact="Windows.Applications.Wc")})
+      {{ end }}
+      
+      {{ Query "dataxx" | Table }}

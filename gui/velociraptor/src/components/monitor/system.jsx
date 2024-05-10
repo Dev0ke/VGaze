@@ -1,4 +1,4 @@
-import "./anomaly.css";
+import "./system.css";
 import PropTypes from 'prop-types';
 
 import React from 'react';
@@ -22,7 +22,7 @@ const ranges = [
   ];
 
 
-class LinuxMonitor extends React.Component {
+class SystemMonitor extends React.Component {
     static propTypes = {
         // React router props.
         history: PropTypes.object,
@@ -82,7 +82,7 @@ class LinuxMonitor extends React.Component {
               </Navbar>
               <div className="dashboard">
                 <VeloReportViewer
-                  artifact="Server.Monitor.Linux"
+                  artifact="Server.Monitor.System"
                   type="SERVER_EVENT"
                   params={{start_time: this.state.start_time,
                            version: this.state.version,
@@ -94,4 +94,4 @@ class LinuxMonitor extends React.Component {
     }
 };
 
-export default withRouter(LinuxMonitor);
+export default withRouter(SystemMonitor);

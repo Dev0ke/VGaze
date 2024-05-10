@@ -1,0 +1,29 @@
+name: Linux.Shell.EnableLog
+description: |
+  定期开启终端日志记录
+
+parameters:
+  - name: TargetGlob
+    default: /{root,home/*}/.*rc
+
+type: CLIENT_EVENT
+precondition:
+      SELECT OS From info() where OS = 'linux'
+      
+sources:
+  - query: |
+      SELECT * FROM foreach(
+          row={
+              SELECT UnixNano FROM clock(period=10000, start=now())
+          },
+          query={
+              SELECT * FROM foreach(
+                  row={
+                      SELECT OSPath FROM glob(globs=TargetGlob)
+                  },
+                  query={
+                      SELECT * from execve(argv=["/bin/sh","-c", "mkdir -p /var/tmp/Log; grep -q 'exec script -a -q -f' " + str(str=OSPath) + " || echo 'if [ -z \"\$SCRIPT_SESSION\" ]; then\n    export SCRIPT_SESSION=1\n    exec script -a -q -f  \"/var/tmp/Log/terminal_\$(date +'%Y-%m-%d-%H-%M').log\"\nfi' >> " + str(str=OSPath)])
+                  }
+              )
+          }
+      )

@@ -82,7 +82,7 @@ class WindowsMonitor extends React.Component {
               </Navbar>
               <div className="dashboard">
                 <VeloReportViewer
-                  artifact="Custom.Server.Monitor.Windows"
+                  artifact="Server.Monitor.Windows"
                   type="SERVER_EVENT"
                   params={{start_time: this.state.start_time,
                            version: this.state.version,

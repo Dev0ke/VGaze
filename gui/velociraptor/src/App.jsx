@@ -41,6 +41,7 @@ import TerminalComponent from './components/shellviewer/linux-shellviewer.jsx';
 import Anomaly from './components/monitor/anomaly.jsx';
 import LinuxMonitor from './components/monitor/linux.jsx';
 import WindowsMonitor from './components/monitor/windows.jsx';
+import SystemMonitor from './components/monitor/system.jsx';
 /*新增*************************************/
 
 
@@ -209,6 +210,11 @@ class App extends Component {
                     <Route path="/linuxmon/">
                        <LinuxMonitor />
                     </Route>
+
+                    <Route path="/sysmon/">
+                        <SystemMonitor />
+                    </Route>
+                  
                     {/*新增*************************************/}
                      
                      {/* ClientFlowsView will only be invoked when the

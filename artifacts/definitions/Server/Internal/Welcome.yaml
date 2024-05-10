@@ -23,16 +23,21 @@ reports:
 
       # 欢迎使用行为审计系统
 
-      ## 功能列表:
+      ## 功能列表
 
       * <a href="#/dashboard">查看服务器状态</a>
       * <a href="#/search/all">查看所有客户端</a>
       * <a href="#/hunts">查看审计任务</a>
       * <a href="#/artifacts">查看审计规则</a>
       * <a href="#/users">查看系统用户</a>
+
+      ## 客户端事件
+      * <a href="#/anomaly">查看异常事件</a>
+      * <a href="#/winmon">查看Windows客户端事件</a>
+      * <a href="#/linuxmon">查看Linux客户端事件</a>
       
       ## 帮助
 
-      1. 点击左上角绿色Logo图标可以返回到这个页面。
+      点击左上角绿色Logo图标可以返回到这个页面。
 
       </div></div></div>

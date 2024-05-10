@@ -1,0 +1,215 @@
+name: Windows.EventLogs.Loki
+description: |
+   异常扫描器
+
+precondition: SELECT OS From info() where OS = 'windows'
+
+parameters:
+ - name: Path
+   description: "Path to scan"
+   type: str
+   default: "C:\\Users\\Admin\\Downloads"
+ - name: Kilobyte
+   description: "Maximum file size to check in KB (default 5000 KB)"
+   type: str  # int
+   default: "5000"
+ - name: LogFile
+   description: "Log file"
+   type: str
+   default: "loki_results.csv"
+ - name: RemoteLogHost
+   description: "Remote syslog system"
+   type: str
+   default: ""
+ - name: RemoteSyslogPort
+   description: "Remote syslog port"
+   type: str  # int
+   default: "514"
+ - name: AlertLevel
+   description: "Alert score"
+   type: str  # int
+   default: "100"
+ - name: WarningLevel
+   description: "Warning score"
+   type: str  # int
+   default: "60"
+ - name: NoticeLevel
+   description: "Notice score"
+   type: str  # int
+   default: "40"
+ - name: AllHardDrives
+   description: "Scan all local hard drives (Windows only)"
+   type: bool
+   default: N
+ - name: AllDrives
+   description: "Scan all drives (including network drives and removable media)"
+   type: bool
+   default: N
+ - name: PrintAll
+   description: "Print all files that are scanned"
+   type: bool
+   default: N
+ - name: AllReasons
+   description: "Print all reasons that caused the score"
+   type: bool
+   default: N
+ - name: NoProcScan
+   description: "Skip the process scan"
+   type: bool
+   default: Y
+ - name: NoFileScan
+   description: "Skip the file scan"
+   type: bool
+   default: N
+ - name: VulnChecks
+   description: "Run the vulnerability checks"
+   type: bool
+   default: N
+ - name: NoLevCheck
+   description: "Skip the Levenshtein distance check"
+   type: bool
+   default: N
+ - name: ScriptAnalysis
+   description: "Statistical analysis for scripts to detect obfuscated code (beta)"
+   type: bool
+   default: N
+ - name: Rootkit
+   description: "Skip the rootkit check"
+   type: bool
+   default: N
+ - name: NoIndicator
+   description: "Do not show a progress indicator"
+   type: bool
+   default: N
+ - name: DontWait
+   description: "Do not wait on exit"
+   type: bool
+   default: N
+ - name: Intense
+   description: "Intense scan mode (also scan unknown file types and all extensions)"
+   type: bool
+   default: N
+ - name: Csv
+   description: "Write CSV log format to STDOUT (machine processing)"
+   type: bool
+   default: Y
+ - name: OnlyRelevant
+   description: "Only print relevant warnings or alerts"
+   type: bool
+   default: N
+ - name: NoLog
+   description: "Do not write a local log file"
+   type: bool
+   default: N
+ - name: Update
+   description: "Update the signatures from the \"signature-base\" sub repository"
+   type: bool
+   default: N
+ - name: Debug
+   description: "Debug output"
+   type: bool
+   default: N
+ - name: MaxWorkingSet
+   description: "Maximum working set size of processes to scan (in MB, default 100 MB)"
+   type: str  # int
+   default: "100"
+ - name: SysLogTcp
+   description: "Use TCP instead of UDP for syslog logging"
+   type: bool
+   default: N
+ - name: LogFolder
+   description: "Folder to use for logging when log file is not specified"
+   type: str
+   default: ""
+ - name: NoPeSieve
+   description: "Do not perform pe-sieve scans"
+   type: bool
+   default: N
+ - name: PeSieveShellc
+   description: "Perform pe-sieve shellcode scan"
+   type: bool
+   default: N
+ - name: Python
+   description: "Override default python path"
+   type: str
+   default: "python3"
+ - name: NoListen
+   description: "Do not show listening connections"
+   type: bool
+   default: N
+# TODO: does this work? how?
+# - name: ExludeProcess
+#   description: "Specify an executable name to exclude from scans, can be used multiple times"
+#   type: list
+#   default: []
+ - name: Force
+   description: "Force the scan on a certain folder (even if excluded with hard exclude in LOKI\'s code"
+   type: bool
+   default: N
+   
+sources:
+ - name: Upload
+   query: |
+        LET LokiDir <= 'C:\\Users\\Admin\\Desktop\\loki'
+        LET LokiExe <= LokiDir + '\\loki.exe'
+    
+        -- Optionally, update the signature base
+        LET _ <= if(condition=Update, then={
+        SELECT * FROM execve(argv=['cmd.exe', '/c', 'cd', LokiDir, '&', LokiExe, '--update']) })
+
+        LET CSVFile <= tempfile(remove_last=TRUE)
+        //
+
+        -- Build the command line considering all options
+        LET cmdline <= filter(list=(
+          'cmd.exe',
+          '/c',
+          LokiExe, 
+          "-p", Path,
+          "-s", Kilobyte,
+          "-l", CSVFile,
+          -- "-r", RemoteLogHost,
+          -- "-t", RemoteSyslogPort,
+          "-a", AlertLevel,
+          "-w", WarningLevel,
+          "--onlyrelevant",
+          "-n", NoticeLevel,
+          "--maxworkingset", MaxWorkingSet,
+          -- "--logfolder", LogFolder,
+          "--python", Python,
+          if(condition=AllHardDrives, then="--allhds"),
+          if(condition=AllDrives, then="--alldrives"),
+          if(condition=PrintAll, then="--printall"),
+          if(condition=AllReasons, then="--allreasons"),
+          if(condition=NoProcScan, then="--noprocscan"),
+          if(condition=NoFileScan, then="--nofilescan"),
+          if(condition=VulnChecks, then="--vulnchecks"),
+          if(condition=NoLevCheck, then="--nolevcheck"),
+          if(condition=ScriptAnalysis, then="--scriptanalysis"),
+          if(condition=Rootkit, then="--rootkit"),
+          if(condition=NoIndicator, then="--noindicator"),
+          if(condition=DontWait, then="--dontwait"),
+          if(condition=Intense, then="--intense"),
+          if(condition=Csv, then="--csv"),
+          if(condition=OnlyRelevant, then="--onlyrelevant"),
+          if(condition=NoLog, then="--nolog"),
+          if(condition=Debug, then="--debug"),
+          if(condition=SysLogTcp, then="--syslogtcp"),
+          if(condition=NoPeSieve, then="--nopesieve"),
+          if(condition=PeSieveShellc, then="--pesieveshellc"),
+          if(condition=NoListen, then="--nolisten"),
+          if(condition=Force, then="--force")
+        ),  regex=".+")
+
+        -- Run the tool and divert messages to logs.
+        LET ExecHB <= SELECT *
+        FROM execve(argv=cmdline, sep="\n", length=9999999)
+        WHERE log(message=Stdout)
+
+        -- Upload the raw file.
+        SELECT upload(file=CSVFile) AS Uploads FROM scope()
+
+ - name: Results
+   query: |
+        SELECT *, timestamp(string=Timestamp) AS EventTime
+        FROM parse_csv(filename=CSVFile)

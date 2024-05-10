@@ -1,0 +1,21 @@
+name: Server.Monitor.Linux
+description: |
+    Linux监控GUI。
+
+type: SERVER_EVENT
+
+
+reports:
+  - type: SERVER_EVENT
+    template: |
+      # Linux客户端
+      {{ Query "SELECT * FROM clients() WHERE os_info.system = \"linux\" "  | Table }}
+
+      ## 终端日志
+      
+      {{ define "datax" }}
+        LET ColumnTypes = dict(Data="base64hex")
+        SELECT OSPath,ClientId,Fqdn,Base64Hex AS Data FROM foreach(row={SELECT client_id FROM clients()},query={SELECT * FROM monitoring(client_id=client_id, artifact="Linux.Shell.Log")})
+      {{ end }}
+      
+      {{ Query "datax" | Table }}

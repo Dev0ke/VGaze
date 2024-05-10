@@ -217,6 +217,18 @@ class VeloNavigator extends Component {
                         </NavLink>
                       </li>
 
+                      {/* system */}
+                      <li className="nav-link">
+                        <NavLink to="/sysmon">
+                          <span>
+                            <i className="navicon">
+                            <FontAwesomeIcon icon="eye" />
+                            </i>
+                          </span>
+                          {T("System Audit")}
+                        </NavLink>
+                      </li>
+
                       {user_is_admin && !customization.disable_user_management && (
                         <li className="nav-link">
                           <NavLink to="/users">
