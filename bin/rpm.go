@@ -296,7 +296,7 @@ func doClientRPM() error {
 
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name:  "/usr/local/bin/velociraptor_client",
+			Name:  "/usr/local/bin/vgaze_client",
 			Body:  binary_content,
 			Mode:  0755,
 			Owner: "root",
@@ -304,11 +304,11 @@ func doClientRPM() error {
 		})
 
 	config_path := "/etc/velociraptor/client.config.yaml"
-	velociraptor_bin := "/usr/local/bin/velociraptor_client"
+	velociraptor_bin := "/usr/local/bin/vgaze_client"
 
 	r.AddFile(
 		rpmpack.RPMFile{
-			Name: "/etc/systemd/system/velociraptor_client.service",
+			Name: "/etc/systemd/system/vgaze_client.service",
 			Body: []byte(fmt.Sprintf(
 				client_service_definition, velociraptor_bin, config_path)),
 			Mode:  0644,
@@ -316,19 +316,19 @@ func doClientRPM() error {
 			Group: "root",
 		})
 
-	r.AddPostin(`/bin/systemctl enable velociraptor_client.service
-/bin/systemctl start velociraptor_client.service
+	r.AddPostin(`/bin/systemctl enable vgaze_client.service
+/bin/systemctl start vgaze_client.service
 `)
 
 	// check for upgrade vs uninstall
 	r.AddPreun(`
 if [ $1 == 1 ] ; then
-    /bin/systemctl restart velociraptor_client.service
+    /bin/systemctl restart vgaze_client.service
 fi
 
 if [ $1 == 0 ] ; then
-    /bin/systemctl disable velociraptor_client.service
-    /bin/systemctl stop velociraptor_client.service
+    /bin/systemctl disable vgaze_client.service
+    /bin/systemctl stop vgaze_client.service
 fi
 `)
 

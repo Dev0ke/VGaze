@@ -14,7 +14,7 @@ parameters:
       seconds.
 
   - name: ServiceName
-    default: "velociraptor_client"
+    default: "vgaze_client"
     type: str
     description: |
       The name of the service to restart after the upgrade.

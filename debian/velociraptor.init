@@ -10,9 +10,9 @@
 ### END INIT INFO
 
 PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
-DESC="velociraptor linux amd64"
-NAME="velociraptor-client"
-DAEMON="/usr/sbin/velociraptor"
+DESC="vgaze linux amd64"
+NAME="vgaze-client"
+DAEMON="/usr/sbin/vgaze"
 DAEMON_ARGS="client"
 PIDFILE="/var/run/${NAME}.pid"
 SCRIPTNAME="/etc/init.d/${NAME}"

@@ -368,7 +368,7 @@ func doClientDeb() error {
 	deb.SetShortDescription("Velociraptor client package.")
 
 	config_path := "/etc/velociraptor/client.config.yaml"
-	velociraptor_bin := "/usr/local/bin/velociraptor_client"
+	velociraptor_bin := "/usr/local/bin/vgaze_client"
 
 	err = deb.AddFileString(string(res), config_path)
 	if err != nil {
@@ -377,7 +377,7 @@ func doClientDeb() error {
 
 	err = deb.AddFileString(fmt.Sprintf(
 		client_service_definition, velociraptor_bin, config_path),
-		"/etc/systemd/system/velociraptor_client.service")
+		"/etc/systemd/system/vgaze_client.service")
 	if err != nil {
 		return fmt.Errorf("Deb write: %w", err)
 	}
@@ -392,22 +392,22 @@ func doClientDeb() error {
 chmod -R go-r /etc/velociraptor/
 chmod o+x "%s"
 
-/bin/systemctl enable velociraptor_client
-/bin/systemctl start velociraptor_client
+/bin/systemctl enable vgaze_client
+/bin/systemctl start vgaze_client
 `, velociraptor_bin))
 	if err != nil {
 		return fmt.Errorf("Deb write: %w", err)
 	}
 
 	err = deb.AddControlExtraString("prerm", `
-/bin/systemctl disable velociraptor_client
-/bin/systemctl stop velociraptor_client
+/bin/systemctl disable vgaze_client
+/bin/systemctl stop vgaze_client
 `)
 	if err != nil {
 		return fmt.Errorf("Deb write: %w", err)
 	}
 
-	output_path := fmt.Sprintf("velociraptor_client_%s_%s.deb",
+	output_path := fmt.Sprintf("vgaze_client_%s_%s.deb",
 		version, arch)
 
 	// If they have forgotten .deb in the filename, add it in.
