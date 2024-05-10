@@ -15,7 +15,7 @@ reports:
       
       {{ define "datax" }}
         LET ColumnTypes = dict(Data="base64hex")
-        SELECT OSPath,ClientId,Fqdn,Base64Hex AS Data FROM foreach(row={SELECT client_id FROM clients()},query={SELECT * FROM monitoring(client_id=client_id, artifact="Linux.Shell.Log")})
+        SELECT OSPath,ClientId,Fqdn,Log AS Data FROM foreach(row={SELECT client_id FROM clients()},query={SELECT * FROM monitoring(client_id=client_id, artifact="Linux.Shell.Log")})
       {{ end }}
       
       {{ Query "datax" | Table }}

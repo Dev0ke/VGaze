@@ -34,7 +34,7 @@ sources:
                     OSPath,
                     Mtime,
                     HashValue,
-                     base64encode(string=read_file(filename=OSPath))
+                     base64encode(string=read_file(filename=OSPath)) AS Log
                 FROM scope()
             }
         )
