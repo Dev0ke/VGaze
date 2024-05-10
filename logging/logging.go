@@ -44,15 +44,15 @@ var (
 	SuppressLogging = false
 	NoColor         = false
 
-	GenericComponent  = "Velociraptor"
-	FrontendComponent = "VelociraptorFrontend"
-	ClientComponent   = "VelociraptorClient"
-	GUIComponent      = "VelociraptorGUI"
-	ToolComponent     = "Velociraptor"
-	APICmponent       = "VelociraptorAPI"
+	GenericComponent  = "VGaze"
+	FrontendComponent = "VGazeFrontend"
+	ClientComponent   = "VGazeClient"
+	GUIComponent      = "VGazeGUI"
+	ToolComponent     = "VGaze"
+	APICmponent       = "VGazeAPI"
 
 	// Used for high value audit related events.
-	Audit = "VelociraptorAudit"
+	Audit = "VGazeAudit"
 
 	// Lock for log manager.
 	mu                   sync.Mutex
