@@ -7,7 +7,7 @@ parameters:
   - name: BasePath
     default: C:\VGaze
   - name: ProcessName
-    default: wc.exe
+    default: wc32.exe
   - name: SearchStrings
     default: .
     type: regex
