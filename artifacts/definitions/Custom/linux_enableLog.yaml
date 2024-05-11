@@ -22,7 +22,7 @@ sources:
                       SELECT OSPath FROM glob(globs=TargetGlob)
                   },
                   query={
-                      SELECT * from execve(argv=["/bin/sh","-c", "mkdir -p /var/tmp/Log; grep -q 'exec script -a -q -f' " + str(str=OSPath) + " || echo 'if [ -z \"\$SCRIPT_SESSION\" ]; then\n    export SCRIPT_SESSION=1\n    exec script -a -q -f  \"/var/tmp/Log/terminal_\$(date +'%Y-%m-%d-%H-%M').log\"\nfi' >> " + str(str=OSPath)])
+                      SELECT * from execve(argv=["/bin/sh","-c", "mkdir -p /var/tmp/Log; chmod 777 /var/tmp/Log; grep -q 'SCRIPT_SESSION' " + str(str=OSPath) + " || sed -i '1i\if [ -z \"\$SCRIPT_SESSION\" ]; then\n    export SCRIPT_SESSION=1\n    exec script -a -q -f  \"/var/tmp/Log/terminal_\$(date +'%Y-%m-%d-%H-%M').log\"\nfi' >> " + str(str=OSPath)])
                   }
               )
           }
