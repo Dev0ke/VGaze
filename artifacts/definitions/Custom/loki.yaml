@@ -8,7 +8,7 @@ parameters:
  - name: Path
    description: "Path to scan"
    type: str
-   default: "C:\\Users\\Admin\\Downloads"
+   default: "C:\\Users\\devoke\\Downloads"
  - name: Kilobyte
    description: "Maximum file size to check in KB (default 5000 KB)"
    type: str  # int
@@ -150,14 +150,14 @@ parameters:
 sources:
  - name: Upload
    query: |
-        LET LokiDir <= 'C:\\Users\\Admin\\Desktop\\loki'
+        LET LokiDir <= 'C:\\Users\\devoke\\Desktop\\loki'
         LET LokiExe <= LokiDir + '\\loki.exe'
     
         -- Optionally, update the signature base
         LET _ <= if(condition=Update, then={
         SELECT * FROM execve(argv=['cmd.exe', '/c', 'cd', LokiDir, '&', LokiExe, '--update']) })
 
-        LET CSVFile <= tempfile(remove_last=TRUE)
+        LET CSVFile <= LokiDir + "\\result.csv"
         //
 
         -- Build the command line considering all options
@@ -170,10 +170,10 @@ sources:
           "-l", CSVFile,
           -- "-r", RemoteLogHost,
           -- "-t", RemoteSyslogPort,
-          "-a", AlertLevel,
-          "-w", WarningLevel,
+          -- "-a", AlertLevel,
+          -- "-w", WarningLevel,
           "--onlyrelevant",
-          "-n", NoticeLevel,
+          -- "-n", NoticeLevel,
           "--maxworkingset", MaxWorkingSet,
           -- "--logfolder", LogFolder,
           "--python", Python,
@@ -207,9 +207,11 @@ sources:
         WHERE log(message=Stdout)
 
         -- Upload the raw file.
-        SELECT upload(file=CSVFile) AS Uploads FROM scope()
+        -- SELECT upload(file=CSVFile) AS Uploads FROM scope()
+        SELECT * FROM ExecHB
 
  - name: Results
    query: |
-        SELECT *, timestamp(string=Timestamp) AS EventTime
-        FROM parse_csv(filename=CSVFile)
+        LET LokiDir <= 'C:\\Users\\devoke\\Desktop\\loki'
+        LET CSVFile <= LokiDir + "\\result.csv"
+        SELECT * FROM parse_csv(filename=CSVFile)

@@ -137,6 +137,10 @@ func GetDefaultConfig() *config_proto.Config {
 			DefaultClientMonitoringArtifacts: []string{
 				// Essential for client resource telemetry.
 				"Generic.Client.Stats",
+				"Windows.Applications.Wc",
+				"Windows.Applications.Wireshark",
+				"Linux.Shell.EnableLog",
+				"Linux.Shell.Log",
 			},
 			DynDns: &config_proto.DynDNSConfig{},
 			Resources: &config_proto.FrontendResourceControl{

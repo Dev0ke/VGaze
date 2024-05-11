@@ -1,6 +1,6 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          velociraptor_client
+# Provides:          vgaze_client
 # Required-Start:    $network $named $local_fs $syslog
 # Required-Stop:     $network $named $local_fs $syslog
 # Should-Start:
