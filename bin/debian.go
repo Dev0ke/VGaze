@@ -359,13 +359,13 @@ func doClientDeb() error {
 	// https://manpages.ubuntu.com/manpages/xenial/man5/deb-version.5.html
 	version := strings.ReplaceAll(constants.VERSION, "-", ".")
 
-	deb.SetName("velociraptor-client")
+	deb.SetName("VGaze-client")
 	deb.SetVersion(version)
 	deb.SetArchitecture(arch)
-	deb.SetMaintainer("Velocidex Enterprises")
+	deb.SetMaintainer("VGaze Enterprises")
 	deb.SetMaintainerEmail("support@velocidex.com")
 	deb.SetHomepage("https://www.velocidex.com")
-	deb.SetShortDescription("Velociraptor client package.")
+	deb.SetShortDescription("VGaze client package.")
 
 	config_path := "/etc/velociraptor/client.config.yaml"
 	velociraptor_bin := "/usr/local/bin/vgaze_client"
