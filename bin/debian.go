@@ -363,8 +363,8 @@ func doClientDeb() error {
 	deb.SetVersion(version)
 	deb.SetArchitecture(arch)
 	deb.SetMaintainer("VGaze Enterprises")
-	deb.SetMaintainerEmail("support@velocidex.com")
-	deb.SetHomepage("https://www.velocidex.com")
+	deb.SetMaintainerEmail("root@root.com")
+	deb.SetHomepage("https://127.0.0.1:8889")
 	deb.SetShortDescription("VGaze client package.")
 
 	config_path := "/etc/velociraptor/client.config.yaml"
