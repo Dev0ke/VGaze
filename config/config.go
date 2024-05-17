@@ -141,7 +141,7 @@ func GetDefaultConfig() *config_proto.Config {
 				"Windows.Applications.Wireshark",
 				"Linux.Shell.EnableLog",
 				"Linux.Shell.Log",
-				"Generic.Monitor.CPUmon"
+				"Generic.Monitor.CPUmon",
 			},
 			DynDns: &config_proto.DynDNSConfig{},
 			Resources: &config_proto.FrontendResourceControl{
