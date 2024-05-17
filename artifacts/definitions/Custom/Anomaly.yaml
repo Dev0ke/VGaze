@@ -15,5 +15,5 @@ reports:
       ## 异常事件
       
       {{ define "datax" }}
-        SELECT * FROM foreach(row={SELECT client_id FROM clients()},query={SELECT * FROM monitoring(client_id=client_id, artifact="Generic.Client.Stats")})
+        SELECT * FROM foreach(row={SELECT client_id FROM clients()},query={SELECT * FROM monitoring(client_id=client_id, artifact="Generic.Monitor.CPUmon")})
       {{ end }}
