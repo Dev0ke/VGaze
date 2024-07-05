@@ -2,7 +2,12 @@ package authenticators
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/Velocidex/ordereddict"
 	"github.com/gorilla/csrf"
@@ -13,6 +18,54 @@ import (
 	"www.velocidex.com/golang/velociraptor/json"
 	"www.velocidex.com/golang/velociraptor/services"
 )
+
+const lockoutFile = "/tmp/login_attempts.txt"
+const lockoutDuration = time.Hour
+const maxAttempts = 5
+
+func logAttempt(ip string) {
+	f, err := os.OpenFile(lockoutFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		// fmt.Println("Error opening lockout file:", err)
+		return
+	}
+	defer f.Close()
+	timestamp := time.Now().Unix()
+	_, err = f.WriteString(fmt.Sprintf("%s %d\n", ip, timestamp))
+	if err != nil {
+		// fmt.Println("Error writing to lockout file:", err)
+	}
+}
+
+func getRecentAttempts(ip string) int {
+	data, err := os.ReadFile(lockoutFile)
+	if err != nil {
+		// fmt.Println("Error reading lockout file:", err)
+		return 0
+	}
+
+	lines := strings.Split(string(data), "\n")
+	now := time.Now().Unix()
+	count := 0
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+		parts := strings.Split(line, " ")
+		if len(parts) != 2 {
+			continue
+		}
+		recordedIP := parts[0]
+		timestamp, err := strconv.ParseInt(parts[1], 10, 64)
+		if err != nil {
+			continue
+		}
+		if recordedIP == ip && now-timestamp <= int64(lockoutDuration.Seconds()) {
+			count++
+		}
+	}
+	return count
+}
 
 // Implement basic authentication.
 type BasicAuthenticator struct {
@@ -71,6 +124,13 @@ func (self *BasicAuthenticator) AuthenticateUserHandler(
 		w.Header().Set("X-CSRF-Token", csrf.Token(r))
 		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
 
+		/// -----
+		ip := strings.Split(r.RemoteAddr, ":")[0]
+		if getRecentAttempts(ip) >= maxAttempts {
+			http.Error(w, "Too many failed attempts, try again later.", http.StatusForbidden)
+			return
+		}
+
 		username, password, ok := r.BasicAuth()
 		if !ok {
 			http.Error(w, "Not authorized", http.StatusUnauthorized)
@@ -83,6 +143,7 @@ func (self *BasicAuthenticator) AuthenticateUserHandler(
 		user_record, err := users_manager.GetUserWithHashes(r.Context(),
 			username, username)
 		if err != nil || user_record.Name != username {
+			logAttempt(ip)
 			services.LogAudit(r.Context(),
 				self.config_obj, username, "Unknown username",
 				ordereddict.NewDict().
@@ -95,6 +156,7 @@ func (self *BasicAuthenticator) AuthenticateUserHandler(
 		ok, err = users_manager.VerifyPassword(r.Context(),
 			username, username, password)
 		if !ok || err != nil {
+			logAttempt(ip)
 			services.LogAudit(r.Context(),
 				self.config_obj, username, "Invalid password",
 				ordereddict.NewDict().

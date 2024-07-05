@@ -22,7 +22,7 @@ func (self *ApiServer) SetPassword(
 	in *api_proto.SetPasswordRequest) (*emptypb.Empty, error) {
 
 	// Enforce a minimum length password
-	if len(in.Password) < 4 {
+	if len(in.Password) < 6 {
 		return nil, InvalidStatus("Password is not set or too short")
 	}
 
