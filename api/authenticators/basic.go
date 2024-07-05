@@ -127,7 +127,7 @@ func (self *BasicAuthenticator) AuthenticateUserHandler(
 		/// -----
 		ip := strings.Split(r.RemoteAddr, ":")[0]
 		if getRecentAttempts(ip) >= maxAttempts {
-			http.Error(w, "Too many failed attempts, try again later.", http.StatusForbidden)
+			http.Error(w, "登录错误次数过多 请1小时后重试", http.StatusForbidden)
 			return
 		}
 
