@@ -31,6 +31,10 @@ func (self *MultiAuthenticator) AddLogoff(mux *http.ServeMux) error {
 	return nil
 }
 
+func (self *MultiAuthenticator) AddLogIn(mux *http.ServeMux) error {
+	return nil
+}
+
 func (self *MultiAuthenticator) reject_with_username(
 	w http.ResponseWriter, r *http.Request, err error, username string) {
 

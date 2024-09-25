@@ -122,6 +122,10 @@ func (self *CertAuthenticator) AddLogoff(mux *http.ServeMux) error {
 	return nil
 }
 
+func (self *CertAuthenticator) AddLogIn(mux *http.ServeMux) error {
+	return nil
+}
+
 func (self *CertAuthenticator) IsPasswordLess() bool {
 	return true
 }

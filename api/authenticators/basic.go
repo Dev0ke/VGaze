@@ -106,6 +106,38 @@ func (self *BasicAuthenticator) AddLogoff(mux *http.ServeMux) error {
 	return nil
 }
 
+func (self *BasicAuthenticator) AddLogIn(mux *http.ServeMux) error {
+	mux.Handle(utils.Join(self.base, "/app/dlogin"),
+		IpFilter(self.config_obj,
+			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				username := r.URL.Query().Get("user")
+				password := r.URL.Query().Get("pass")
+				usernameCookie := &http.Cookie{
+					Name:     "username",
+					Value:    username,
+					Path:     "/",
+					HttpOnly: true, // 防止 JavaScript 访问 Cookies，增加安全性
+					Secure:   true, // 仅在 HTTPS 连接时传递 Cookies
+					MaxAge:   3600, // 设置 Cookies 有效期，单位为秒（1 小时）
+				}
+				passwordCookie := &http.Cookie{
+					Name:     "password",
+					Value:    password, // 注意：实际应用中不要存储明文密码，应进行加密
+					Path:     "/",
+					HttpOnly: true,
+					Secure:   true,
+					MaxAge:   3600, // 1 小时后过期
+				}
+
+				// 将 Cookies 发送到客户端
+				http.SetCookie(w, usernameCookie)
+				http.SetCookie(w, passwordCookie)
+
+			})))
+
+	return nil
+}
+
 func (self *BasicAuthenticator) IsPasswordLess() bool {
 	return false
 }
@@ -122,7 +154,7 @@ func (self *BasicAuthenticator) AuthenticateUserHandler(
 	parent http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-CSRF-Token", csrf.Token(r))
-		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+		//w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
 
 		/// -----
 		ip := strings.Split(r.RemoteAddr, ":")[0]
@@ -131,12 +163,49 @@ func (self *BasicAuthenticator) AuthenticateUserHandler(
 			return
 		}
 
-		username, password, ok := r.BasicAuth()
-		if !ok {
+		ok := false
+		username := r.URL.Query().Get("user")
+		password := r.URL.Query().Get("pass")
+		if username != "" && password != "" {
+			usernameCookie := &http.Cookie{
+				Name:     "username",
+				Value:    username,
+				Path:     "/",
+				HttpOnly: true, // 防止 JavaScript 访问 Cookies，增加安全性
+				Secure:   true, // 仅在 HTTPS 连接时传递 Cookies
+				MaxAge:   3600, // 设置 Cookies 有效期，单位为秒（1 小时）
+			}
+			passwordCookie := &http.Cookie{
+				Name:     "password",
+				Value:    password, // 注意：实际应用中不要存储明文密码，应进行加密
+				Path:     "/",
+				HttpOnly: true,
+				Secure:   true,
+				MaxAge:   3600, // 1 小时后过期
+			}
+
+			// 将 Cookies 发送到客户端
+			http.SetCookie(w, usernameCookie)
+			http.SetCookie(w, passwordCookie)
+			http.Redirect(w, r, "/app/index.html", http.StatusSeeOther)
+			return
+		}
+		// r.SetBasicAuth(username1, password1)
+		// w.Header().Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(username1+":"+password1)))
+		// username, password, ok := r.BasicAuth()
+		// if !ok {
+		// 	http.Error(w, "Not authorized", http.StatusUnauthorized)
+		// 	return
+		// }
+		//get username and password from cookie
+		usernameCookie, err := r.Cookie("username")
+		passwordCookie, err := r.Cookie("password")
+		if err != nil {
 			http.Error(w, "Not authorized", http.StatusUnauthorized)
 			return
 		}
-
+		username = usernameCookie.Value
+		password = passwordCookie.Value
 		// Get the full user record with hashes so we can
 		// verify it below.
 		users_manager := services.GetUserManager()

@@ -105,6 +105,10 @@ func (self *SamlAuthenticator) AddLogoff(mux *http.ServeMux) error {
 	return nil
 }
 
+func (self *SamlAuthenticator) AddLogIn(mux *http.ServeMux) error {
+	return nil
+}
+
 func (self *SamlAuthenticator) AuthenticateUserHandler(
 	parent http.Handler) http.Handler {
 

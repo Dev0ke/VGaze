@@ -89,6 +89,10 @@ func (self *OidcAuthenticator) AddLogoff(mux *http.ServeMux) error {
 	return nil
 }
 
+func (self *OidcAuthenticator) AddLogIn(mux *http.ServeMux) error {
+	return nil
+}
+
 func (self *OidcAuthenticator) AuthenticateUserHandler(
 	parent http.Handler) http.Handler {
 	return authenticateUserHandle(
