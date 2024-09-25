@@ -14,7 +14,6 @@ description: |
 parameters:
   - name: documentGlobs
     default: /*.{txt,md,docx,docm,dotx,dotm,docb,xlsx,xlsm,xltx,xltm,pptx,pptm,potx,potm,ppam,ppsx,ppsm,sldx,sldm,odt,ott,oth,odm}
-  // */
   - name: searchGlob
     default: C:\Users\Admin\Desktop\
   - name: TimeThreshold
