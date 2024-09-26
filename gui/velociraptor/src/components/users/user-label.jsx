@@ -428,7 +428,7 @@ export default class UserLabel extends React.Component {
     render() {
         return (
             <>
-              { this.state.showUserSettings &&
+              {/* { this.state.showUserSettings &&
                 <UserSettingsWithRouter
                   setSetting={this.setSettings}
                   onClose={()=>this.setState({showUserSettings: false})} /> }
@@ -455,7 +455,7 @@ export default class UserLabel extends React.Component {
                 >
                   <FontAwesomeIcon icon="wrench" />
                 </Button>
-              </ButtonGroup>
+              </ButtonGroup> */}
             </>
         );
     }
