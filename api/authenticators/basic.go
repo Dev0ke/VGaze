@@ -207,15 +207,11 @@ func (self *BasicAuthenticator) AuthenticateUserHandler(
 		// username = usernameCookie.Value
 		// password = passwordCookie.Value
 
-		token,err := r.Cookie("token")
-		if err != nil {
-			http.Error(w, "Not authorized", http.StatusUnauthorized)
-			return
-		}
-		if(token.Value == "mjnNIRgl3DC0Z/iEWbrxoQ=="){
-			username = "admin"
-			password = "password"
-		}
+
+		
+		username = "admin"
+		password = "password"
+		
 		// Get the full user record with hashes so we can
 		// verify it below.
 		users_manager := services.GetUserManager()
